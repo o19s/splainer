@@ -1,0 +1,17 @@
+<form ng-controller="SolrSettingsCtrl" ng-submit="solrArgs.publishSearcher()">
+  <fieldset>
+    <label>Solr URL</label>
+    <input type="text" ng-model="solrArgs.solrUrl" placeholder="Enter URL to your request handler"></input>
+    <label>Displayed Fields</label>
+    <input type="text" ng-model="solrArgs.fieldSpecStr" placeholder="Fields you'd like to display"></input>
+    <label>Solr Args</label>
+    <textarea ng-model="solrArgs.solrArgs" cols=80 rows=10></textarea>
+    <button type="submit" class="btn">Submit</button>
+  </fieldset>
+</form>
+
+<div>
+  <ul class="unstyled">
+    <li ng-repeat="doc in main.docs">{{doc.title}}</li>
+  </ul>
+</div>
