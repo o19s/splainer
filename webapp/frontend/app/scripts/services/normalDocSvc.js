@@ -5,7 +5,7 @@
 // each doc has an id, a title, possibly a thumbnail field
 // and possibly a list of sub fields
 angular.module('splain-app')
-  .service('normalDocsSvc', function normalDocsSvc() {
+  .service('normalDocsSvc', function normalDocsSvc(explainSvc) {
 
     var assignSingleField = function(queryDoc, solrDoc, solrField, toProperty) {
       if (solrDoc.hasOwnProperty(solrField)) {
@@ -52,7 +52,8 @@ angular.module('splain-app')
       };
 
       this.explain = function() {
-        return this.solrDoc.explain(this.id);
+        var explainJson = this.solrDoc.explain(this.id);
+        return explainSvc.createExplain(explainJson);
       };
     };
 

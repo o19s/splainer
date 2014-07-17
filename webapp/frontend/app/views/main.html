@@ -11,7 +11,11 @@
 </form>
 
 <div>
-  <ul class="unstyled">
-    <li ng-repeat="doc in main.docs">{{doc.title}}</li>
-  </ul>
+    <div ng-repeat="doc in main.docs">
+      <h1>{{doc.title}}</h1>
+      <pre>
+        {{doc.explain().toStr()}}
+      </pre>
+    
+    </div>
 </div>

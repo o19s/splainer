@@ -42,7 +42,8 @@ angular.module('splain-app')
     var buildSolrUrl = function(fieldList, solrUrl, solrArgs, queryText) {
       solrArgs.fl = [fieldList.join(' ')];
       solrArgs.wt = ['json'];
-      solrArgs.debugQuery = ['true'];
+      solrArgs.debug = ['true'];
+      solrArgs['debug.explain.structured'] = ['true'];
       var baseUrl = buildUrl(solrUrl, solrArgs);
       baseUrl = baseUrl.replace(/#\$query##/g, encodeURIComponent(queryText));
       return baseUrl;

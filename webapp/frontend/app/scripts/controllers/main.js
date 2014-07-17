@@ -12,5 +12,4 @@ angular.module('splain-app')
     $scope.main = {};
     $scope.main.searcher = null;
     $scope.main.docs = [];
-
   });
