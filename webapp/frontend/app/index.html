@@ -23,18 +23,13 @@
     <!-- Add your site or application content here -->
     <div class="container">
       <div class="header">
-        <ul class="nav nav-pills pull-right">
-          <li class="active"><a ng-href="#">Home</a></li>
-          <li><a ng-href="#">About</a></li>
-          <li><a ng-href="#">Contact</a></li>
-        </ul>
-        <h3 class="text-muted">frontend</h3>
+        <h3 class="text-muted">Splainer</h3>
       </div>
 
       <div ng-include="'views/main.html'" ng-controller="MainCtrl"></div>
 
       <div class="footer">
-        <p><span class="glyphicon glyphicon-heart"></span> from the Yeoman team</p>
+        <p><span class="glyphicon glyphicon-heart"></span> from the <a href="http://opensourceconnections.com">OpenSource Connections</a> team</p>
       </div>
     </div>
 
@@ -67,15 +62,15 @@
     <!-- endbower -->
     <!-- endbuild -->
 
-        <!-- build:js({.tmp,app}) scripts/scripts.js -->
-        <script src="scripts/promise.js"></script>
-        <script src="scripts/app.js"></script>
-        <script src="scripts/services/explainSvc.js"></script>
-        <script src="scripts/services/normalDocSvc.js"></script>
-        <script src="scripts/services/solrSearchSvc.js"></script>
-        <script src="scripts/services/fieldSpecSvc.js"></script>
-        <script src="scripts/controllers/main.js"></script>
-        <script src="scripts/controllers/solrSettings.js"></script>
-        <!-- endbuild -->
+      <!-- build:js({.tmp,app}) scripts/scripts.js -->
+      <script src="scripts/promise.js"></script>
+      <script src="scripts/app.js"></script>
+      <script src="scripts/services/explainSvc.js"></script>
+      <script src="scripts/services/normalDocSvc.js"></script>
+      <script src="scripts/services/solrSearchSvc.js"></script>
+      <script src="scripts/services/fieldSpecSvc.js"></script>
+      <script src="scripts/controllers/main.js"></script>
+      <script src="scripts/controllers/solrSettings.js"></script>
+      <!-- endbuild -->
 </body>
 </html>

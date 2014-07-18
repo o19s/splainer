@@ -1,9 +1,9 @@
 <form ng-controller="SolrSettingsCtrl" ng-submit="solrArgs.publishSearcher()">
   <fieldset>
     <label>Solr URL</label>
-    <input type="text" ng-model="solrArgs.solrUrl" placeholder="Enter URL to your request handler"></input>
+    <input type="text" ng-model="solrArgs.solrUrl" placeholder="Enter URL to your request handler"></input></br>
     <label>Displayed Fields</label>
-    <input type="text" ng-model="solrArgs.fieldSpecStr" placeholder="Fields you'd like to display"></input>
+    <input type="text" ng-model="solrArgs.fieldSpecStr" placeholder="Fields you'd like to display"></input></br>
     <label>Solr Args</label>
     <textarea ng-model="solrArgs.solrArgs" cols=80 rows=10></textarea>
     <button type="submit" class="btn">Submit</button>
@@ -11,9 +11,16 @@
 </form>
 
 <div>
-    <div ng-repeat="doc in main.docs">
-      <h1>{{doc.title}}</h1>
-      <pre>{{doc.explain().toStr()}}</pre>
-    
+    <div class="row" ng-repeat="doc in main.docs">
+      <h4>{{doc.title}}</h4>
+      <div class="col-md-4">
+        <div ng-repeat="sub in doc.subsList">
+          {{sub.value}}
+        </div> 
+      </div>
+      <div class="col-md-8">
+        <pre>{{doc.explain().toStr()}}</pre>
+      </div>
     </div>
+    <hr>
 </div>
