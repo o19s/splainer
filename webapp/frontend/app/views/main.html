@@ -13,9 +13,7 @@
 <div>
     <div ng-repeat="doc in main.docs">
       <h1>{{doc.title}}</h1>
-      <pre>
-        {{doc.explain().toStr()}}
-      </pre>
+      <pre>{{doc.explain().toStr()}}</pre>
     
     </div>
 </div>

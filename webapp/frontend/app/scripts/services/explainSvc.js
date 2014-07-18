@@ -54,21 +54,22 @@ angular.module('splain-app')
         return new SumOrProductExplain(explJson, 'sum_of');
       }
       else if (description.hasSubstr('product of')) {
+        var coordExpl = null;
         if (details.length === 2) {
-          var coordExpl = null;
           angular.forEach(details, function(detail) {
             if (detail.description.startsWith('coord(')) {
               CoordExplain.prototype = base;
               coordExpl = new CoordExplain(explJson, parseFloat(detail.value));
             }
           });
-          if (coordExpl !== null) {
-            return coordExpl;
-          } else {
-            return new SumOrProductExplain(explJson, 'product_of');
-          }
         }
         console.log('product expl');
+        if (coordExpl !== null) {
+          return coordExpl;
+        } else {
+          SumOrProductExplain.prototype = base;
+          return new SumOrProductExplain(explJson, 'product_of');
+        }
       }
       else {
         console.log('regular explain');
@@ -106,8 +107,8 @@ angular.module('splain-app')
         if (depth === undefined) {
           depth = 0;
         }
-        var prefix = new Array(2 * depth).join('  ');
-        var me = prefix + ' ' + this.contribution() + ' ' + this.explanation();
+        var prefix = new Array(2 * depth).join(' ');
+        var me = prefix + this.contribution() + ' ' + this.explanation() + '\n';
         var childStrs = [];
         angular.forEach(this.influencers(), function(child) {
           childStrs.push(child.toStr(depth+1));
@@ -139,7 +140,7 @@ angular.module('splain-app')
         this.influencers = function() {
           var infl = [];
           for (var i = 0; i < this.children.length; i++) {
-            if (this.children[i].hasSubstr('coord')) {
+            if (this.children[i].description.hasSubstr('coord')) {
               continue;
             } else {
               infl.push(this.children[i]);
