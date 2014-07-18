@@ -51,9 +51,10 @@ angular.module('splain-app')
         return this.solrDoc.url(fieldSpec.id, this.id);
       };
 
+      var explainJson = this.solrDoc.explain(this.id);
+      var simplerExplain = explainSvc.createExplain(explainJson);
       this.explain = function() {
-        var explainJson = this.solrDoc.explain(this.id);
-        return explainSvc.createExplain(explainJson);
+        return simplerExplain;
       };
     };
 

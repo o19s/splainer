@@ -156,7 +156,7 @@ angular.module('splain-app')
 
       this.influencers = function() {
         var infl = angular.copy(this.children);
-        infl.sort(function(a, b) {return a.score - b.score;});
+        infl.sort(function(a, b) {return b.score - a.score;});
         return infl;
         
       };
@@ -168,7 +168,7 @@ angular.module('splain-app')
       
       this.influencers = function() {
         var infl = angular.copy(this.children);
-        infl.sort(function(a, b) {return a.score - b.score;});
+        infl.sort(function(a, b) {return b.score - a.score;});
         return infl;
       };
     };
@@ -188,7 +188,7 @@ angular.module('splain-app')
       };
 
       this.influencers = function() {
-        var infl = angular.copy(this.children);
+        var preInfl = angular.copy(this.children);
         var children = this.children;
         if (children.length === 1 && this.isChildSame(children[0], this.sumOrProduct)) {
           // just use the children's info
@@ -196,7 +196,19 @@ angular.module('splain-app')
         } else {
           // sort children on score
           // If I'm a sum, and the child is the sum, just wrap child child here?
-          infl.sort(function(a, b) {return a.score - b.score;});
+          preInfl.sort(function(a, b) {return b.score - a.score;});
+          var infl = [];
+          var dat = this;
+          angular.forEach(preInfl, function(child) {
+            // get rid of cruft, if I'm a sum, and my child is sum, then collapse
+            if (dat.isChildSame(child, 'sum_of')) {
+              angular.forEach(child.influencers(), function(grandchild) {
+                infl.push(grandchild);
+              });
+            } else {
+              infl.push(child);
+            }
+          });
           return infl;
         }
       };
