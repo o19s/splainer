@@ -3,6 +3,20 @@
 angular.module('splain-app')
   .controller('SolrSettingsCtrl', function ($scope, solrSearchSvc, fieldSpecSvc, normalDocsSvc, localStorageService) {
 
+    var parseSettings = function(solrUrl, fieldSpecStr, solrArgsStr) {
+      var parsedUrl = solrSearchSvc.parseSolrUrl(solrUrl);
+      if (solrArgsStr.trim() === '' && parsedUrl !== null) {
+        solrArgsStr = solrSearchSvc.formatSolrArgs(parsedUrl.solrArgs);
+      } 
+      if (fieldSpecStr.trim() === '' && parsedUrl !== null && parsedUrl.solrArgs.hasOwnProperty('fl')) {
+        var fl = parsedUrl.solrArgs.fl;
+        fieldSpecStr = fl[0];
+      }
+      return {sorlUrl: parsedUrl.handlerUrl(),
+              fieldSpecStr: fieldSpecStr,
+              solrArgsStr: solrArgsStr};
+    };
+
     var initSolrArgs = function() {
       var solrArgs = {solrUrl: '', fieldSpecStr: '', solrArgs: ''};
       var localStorageTryGet = function(key) {

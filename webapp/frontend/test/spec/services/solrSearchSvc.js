@@ -346,7 +346,30 @@ describe('Service: solrSearchSvc', function () {
     expect(parsedSolrUrl.collectionName).toEqual('collection1');
     expect(parsedSolrUrl.requestHandler).toEqual('select');
     expect(parsedSolrUrl.solrArgs.q).toContain('*:*');
-
   });
+
+  describe('solr args parse/format', function() {
+  
+    var formatThenParse = function(solrArgs) {
+      var formatted = solrSearchSvc.formatSolrArgs(solrArgs);
+      return solrSearchSvc.parseSolrArgs(formatted);
+    };
+
+    var solrArgsEqual = function(args1, args2) {
+      angular.forEach(args1, function(values, key) {
+        expect(args2.hasOwnProperty(key));
+        var values2 = args2[key];
+        expect(values).toEqual(values2);
+      });
+    };
+
+    it('formats/parses basic', function() {
+      var solrArgs = {q: ['*:*'], fq: ['title:bar', 'text:foo']};
+      var parsedBack = formatThenParse(solrArgs);
+      solrArgsEqual(solrArgs, parsedBack);
+    });
+  
+  });
+
 
 });

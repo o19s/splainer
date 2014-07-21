@@ -147,6 +147,23 @@ angular.module('splain-app')
       return rVal;
     };
 
+    /* Given arguments of the form {q: ['*:*'], fq: ['title:foo', 'text:bar']}
+     * turn into string suitable for URL query param q=*:*&fq=title:foo&fq=text:bar
+     *
+     * */
+    this.formatSolrArgs = function(argsObj) {
+      var rVal = '';
+      angular.forEach(argsObj, function(values, param) {
+        angular.forEach(values, function(value) {
+          rVal += param + '=' + value + '&';
+        });
+      });
+      // percentages need to be escaped before
+      // url escaping
+      rVal = rVal.replace(/%/g, '%25');
+      return rVal.slice(0, -1); // take out last & or trailing ? if no args
+    };
+
     /* Parse a Solr URL of the form [/]solr/[collectionName]/[requestHandler]
      * return object with {collectionName: <collectionName>, requestHandler: <requestHandler>} 
      * return null on failure to parse as above solr url
