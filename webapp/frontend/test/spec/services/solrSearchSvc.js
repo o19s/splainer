@@ -364,7 +364,6 @@ describe('Service: solrSearchSvc', function () {
     };
 
     it('formats/parses basic', function() {
-      console.log('wut');
       var solrArgs = {q: ['*:*'], fq: ['title:bar', 'text:foo']};
       var parsedBack = formatThenParse(solrArgs);
       solrArgsEqual(solrArgs, parsedBack);
