@@ -147,4 +147,53 @@ angular.module('splain-app')
       return rVal;
     };
 
+    /* Parse a Solr URL of the form [/]solr/[collectionName]/[requestHandler]
+     * return object with {collectionName: <collectionName>, requestHandler: <requestHandler>} 
+     * return null on failure to parse as above solr url
+     * */
+    this.parseSolrPath = function(pathStr) {
+      if (pathStr.startsWith('/')) {
+        pathStr = pathStr.slice(1);
+      }
+      var solrPrefix = 'solr/';
+      if (pathStr.startsWith(solrPrefix)) {
+        pathStr = pathStr.slice(solrPrefix.length);
+        var colAndHandler = pathStr.split('/');
+        if (colAndHandler.length === 2) {
+          var collectionName = colAndHandler[0];
+          var requestHandler = colAndHandler[1];
+          if (requestHandler.endsWith('/')) {
+            requestHandler = requestHandler.slice(0, requestHandler.length - 1);
+          }
+          return {'collectionName': collectionName,
+                  'requestHandler': requestHandler};
+        }
+      }
+      return null;
+    };
+
+    /* Parse a Sor URL of the form [http|https]://[host]/solr/[collectionName]/[requestHandler]?[args]
+     * return null on failure to parse
+     * */
+    this.parseSolrUrl = function(solrReq) {
+
+      var parseUrl = function(url) {
+        var a = document.createElement('a');
+        a.href = url;
+        return a;
+      };
+
+      var parsedUrl = parseUrl(solrReq);
+      parsedUrl.solrArgs = this.parseSolrArgs(parsedUrl.search);
+      var pathParsed = this.parseSolrPath(parsedUrl.pathname);
+      if (pathParsed) {
+        parsedUrl.collectionName = pathParsed.collectionName;
+        parsedUrl.requestHandler = pathParsed.requestHandler;
+      } else {
+        return null;
+      }
+      return parsedUrl;
+
+    };
+
   });

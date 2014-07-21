@@ -1,18 +1,5 @@
 'use strict';
 
-if (typeof String.prototype.startsWith !== 'function') {
-  // see below for better implementation!
-  String.prototype.startsWith = function (str){
-    return this.indexOf(str) === 0;
-  };
-}
-
-if (typeof String.prototype.startsWith !== 'hasSubstr') {
-  String.prototype.hasSubstr = function(str) {
-    return this.indexOf(str) !== -1;
-  };
-}
-
 // Executes a solr search and returns
 // a set of queryDocs
 angular.module('splain-app')

@@ -325,4 +325,28 @@ describe('Service: solrSearchSvc', function () {
 
   });
 
+  it('parses solr args', function() {
+    var argStr = 'q=1234&q=5678&fq=cat:foo';
+    var parsedArgs = solrSearchSvc.parseSolrArgs(argStr);
+    
+    expect(parsedArgs.q).toContain('1234');
+    expect(parsedArgs.q).toContain('5678');
+    expect(parsedArgs.q.length).toEqual(2);
+    expect(parsedArgs.fq).toContain('cat:foo');
+    expect(parsedArgs.fq.length).toEqual(1);
+    expect(parsedArgs.q.length).toEqual(2);
+  });
+  
+  it('parses solr url', function() {
+    var urlStr = 'http://localhost:8983/solr/collection1/select?q=*:*';
+
+    var parsedSolrUrl = solrSearchSvc.parseSolrUrl(urlStr);
+    expect(parsedSolrUrl.protocol).toEqual('http:');
+    expect(parsedSolrUrl.host).toEqual('localhost:8983');
+    expect(parsedSolrUrl.collectionName).toEqual('collection1');
+    expect(parsedSolrUrl.requestHandler).toEqual('select');
+    expect(parsedSolrUrl.solrArgs.q).toContain('*:*');
+
+  });
+
 });
