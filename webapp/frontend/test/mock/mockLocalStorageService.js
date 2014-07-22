@@ -13,13 +13,11 @@ window.MockLocalStorageService = function() {
     return this.store[key];
   };
 
-  this.isSupported = function() {
-    return this.isLocalStorageSupported;
-  };
+  this.isSupported = true; 
 
   this.reset = function() {
     this.store = {};
-    this.isLocalStorageSupported = true;
+    this.isSupported = true;
   };
 
   this.reset();

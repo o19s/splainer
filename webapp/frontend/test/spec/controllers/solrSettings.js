@@ -44,7 +44,7 @@ describe('solrSettingsCtrl', function() {
 
   describe('local storage init', function() {
     it('loads partial', function() {
-      localStorage.isLocalStorageSupported = true;
+      localStorage.isSupported = true;
       var  testUrl = 'http://localhost:8983/solr/collection1/select';
       localStorage.store.solrUrl = testUrl;
       createController();
@@ -54,7 +54,7 @@ describe('solrSettingsCtrl', function() {
     });
     
     it('loads all', function() {
-      localStorage.isLocalStorageSupported = true;
+      localStorage.isSupported = true;
       var testUrl = 'http://localhost:8983/solr/collection1/select';
       var testArgsStr = 'q=*:*&fq=blah&qq=blarg';
       localStorage.store.solrUrl = testUrl;
@@ -65,7 +65,7 @@ describe('solrSettingsCtrl', function() {
     });
 
     it('gets ""s if unsupported', function() {
-      localStorage.isLocalStorageSupported = false;
+      localStorage.isSupported = false;
       createController();
       expect(scope.solrSettings.solrUrl).toEqual('');
       expect(scope.solrSettings.fieldSpecStr).toEqual('');
@@ -160,6 +160,32 @@ describe('solrSettingsCtrl', function() {
         expect(scope.solrSettings.fieldSpecStr).toEqual('field1');
         expect(scope.solrSettings.solrArgsStr).toEqual('q=*:*');
         expect(scope.solrSettings.solrUrl).toEqual(testUserUrlBase);
+      });
+      
+      afterEach(function() {
+        httpBackend.verifyNoOutstandingExpectation();
+      });
+    });
+    
+    describe('url and preexisting input', function() {
+      var testNewUserUrl = 'http://localhost:8983/solr/collection1/select?q=field:foo&fl=field1';
+      var testNewUserUrlBase = 'http://localhost:8983/solr/collection1/select';
+      var testFieldSpecStr = 'field1';
+      var testArgsStr = 'q=*:*';
+      
+      /* global urlContainsParams*/
+      beforeEach(function() {
+        localStorage.store.solrArgsStr = testArgsStr;
+        localStorage.store.fieldSpecStr = testFieldSpecStr;
+        createController();
+      });
+
+      it('sets params to new url', function() {
+        httpBackend.expectJSONP(urlContainsParams(testNewUserUrlBase, {q: ['field:foo'], 'fl': ['id field1']}))
+                   .respond(200, mockSolrResp);
+        scope.solrSettings.solrUrl = testNewUserUrl;
+        scope.solrSettings.publishSearcher();
+        httpBackend.flush();
       });
       
       afterEach(function() {

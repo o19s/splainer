@@ -90,6 +90,19 @@ angular.module('splain-app')
         return this.realExplanation;
       };
 
+      /* Return my influencers as a vector
+       * where magnitude of each dimension is how 
+       * much I am influenced
+       * */
+      this.vectorize = function() {
+        var rVal = {};
+        rVal[this.explanation()] = this.contribution();
+        return rVal;
+      };
+
+      /* A friendly, hiererarchical view
+       * of all the influencers
+       * */
       this.toStr = function(depth) {
         if (depth === undefined) {
           depth = 0;
@@ -118,6 +131,7 @@ angular.module('splain-app')
       } else {
         this.realExplanation = 'Could not parse weight...';
       }
+
     };
 
     var CoordExplain = function(explJson, coordFactor) {
@@ -145,7 +159,12 @@ angular.module('splain-app')
         var infl = angular.copy(this.children);
         infl.sort(function(a, b) {return b.score - a.score;});
         return infl;
-        
+      };
+
+      this.vectorize = function() {
+        var infl = this.influencers();
+        // infl[0] is the winner of the dismax competition
+        v1 = infl1.vectorize();
       };
     };
 

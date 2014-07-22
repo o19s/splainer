@@ -7,17 +7,23 @@ angular.module('splain-app')
      * Take user input settings, massage them
      * if only URL provided etc
      */
+    var deleteUnwantedArgs = function(argsToUse) {
+        delete argsToUse.fl;
+        delete argsToUse.wt;
+        delete argsToUse.rows;
+    };
+
     var parseUserSettings = function(userSettings) {
       var parsedUrl = solrSearchSvc.parseSolrUrl(userSettings.solrUrl);
-      if (userSettings.solrArgsStr.trim() === '' && parsedUrl !== null) {
+      if (parsedUrl !== null && parsedUrl.solrArgs && Object.keys(parsedUrl.solrArgs).length > 0) {
         var argsToUse = angular.copy(parsedUrl.solrArgs);
-        delete argsToUse.fl; 
+        deleteUnwantedArgs(argsToUse);
         userSettings.solrArgsStr = solrSearchSvc.formatSolrArgs(argsToUse);
+        if (parsedUrl.solrArgs.hasOwnProperty('fl')) {
+          var fl = parsedUrl.solrArgs.fl;
+          userSettings.fieldSpecStr = fl[0];
+        }
       } 
-      if (userSettings.fieldSpecStr.trim() === '' && parsedUrl !== null && parsedUrl.solrArgs.hasOwnProperty('fl')) {
-        var fl = parsedUrl.solrArgs.fl;
-        userSettings.fieldSpecStr = fl[0];
-      }
       userSettings.solrUrl = parsedUrl.solrEndpoint();
     };
 
@@ -31,7 +37,7 @@ angular.module('splain-app')
           solrSettings[key] = '';
         }
       };
-      if (localStorageService.isSupported()) {
+      if (localStorageService.isSupported) {
         localStorageTryGet('solrUrl');
         localStorageTryGet('fieldSpecStr');
         localStorageTryGet('solrArgsStr');
@@ -40,7 +46,7 @@ angular.module('splain-app')
     };
 
     var trySaveSolrArgs= function(solrSettings) {
-      if (localStorageService.isSupported()) {
+      if (localStorageService.isSupported) {
         localStorageService.set('solrUrl', solrSettings.solrUrl);
         localStorageService.set('fieldSpecStr', solrSettings.fieldSpecStr);
         localStorageService.set('solrArgsStr', solrSettings.solrArgsStr);
