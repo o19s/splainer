@@ -141,6 +141,32 @@ describe('solrSettingsCtrl', function() {
       });
     });
 
+    // someone just pastes in a big URL
+    describe('just url input', function() {
+      var testUserUrl = 'http://localhost:8983/solr/collection1/select?q=*:*&fl=field1';
+      var testUserUrlBase = 'http://localhost:8983/solr/collection1/select';
+      
+      /* global urlContainsParams*/
+      beforeEach(function() {
+        httpBackend.expectJSONP(urlContainsParams(testUserUrlBase, {q: ['*:*'], 'fl': ['id field1']}))
+                   .respond(200, mockSolrResp);
+        createController();
+        scope.solrSettings.solrUrl = testUserUrl;
+        scope.solrSettings.publishSearcher();
+        httpBackend.flush();
+      });
+
+      it('sets inputs up', function() {
+        expect(scope.solrSettings.fieldSpecStr).toEqual('field1');
+        expect(scope.solrSettings.solrArgsStr).toEqual('q=*:*');
+        expect(scope.solrSettings.solrUrl).toEqual(testUserUrlBase);
+      });
+      
+      afterEach(function() {
+        httpBackend.verifyNoOutstandingExpectation();
+      });
+    });
+
 
   });
   

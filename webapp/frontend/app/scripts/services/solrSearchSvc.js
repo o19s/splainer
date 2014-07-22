@@ -209,6 +209,11 @@ angular.module('splain-app')
       } else {
         return null;
       }
+      var solrEndpoint = function() {
+        return parsedUrl.protocol + '//' + parsedUrl.host + parsedUrl.pathname;
+      };
+
+      parsedUrl.solrEndpoint = solrEndpoint;
       return parsedUrl;
 
     };

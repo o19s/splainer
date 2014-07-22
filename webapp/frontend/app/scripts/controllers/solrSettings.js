@@ -10,12 +10,15 @@ angular.module('splain-app')
     var parseUserSettings = function(userSettings) {
       var parsedUrl = solrSearchSvc.parseSolrUrl(userSettings.solrUrl);
       if (userSettings.solrArgsStr.trim() === '' && parsedUrl !== null) {
-        userSettings.solrArgsStr = solrSearchSvc.formatSolrArgs(parsedUrl.solrArgsStr);
+        var argsToUse = angular.copy(parsedUrl.solrArgs);
+        delete argsToUse.fl; 
+        userSettings.solrArgsStr = solrSearchSvc.formatSolrArgs(argsToUse);
       } 
       if (userSettings.fieldSpecStr.trim() === '' && parsedUrl !== null && parsedUrl.solrArgs.hasOwnProperty('fl')) {
         var fl = parsedUrl.solrArgs.fl;
         userSettings.fieldSpecStr = fl[0];
       }
+      userSettings.solrUrl = parsedUrl.solrEndpoint();
     };
 
     var initSolrArgs = function() {
