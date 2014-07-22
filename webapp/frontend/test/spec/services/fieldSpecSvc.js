@@ -87,4 +87,11 @@ describe('Service: fieldSpecSvc', function () {
     expect(fieldList).toContain('id');
   });
 
+  it('allows commas', function() {
+    var fieldSpec = fieldSpecSvc.createFieldSpec('id:foo_id, atitlefield,thumb:foo_img');
+    expect(fieldSpec.id).toEqual('foo_id');
+    expect(fieldSpec.title).toEqual('atitlefield');
+    expect(fieldSpec.thumb).toEqual('foo_img');
+  });
+
 });

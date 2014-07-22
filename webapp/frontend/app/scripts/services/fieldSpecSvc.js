@@ -19,7 +19,7 @@ angular.module('splain-app')
 
     // Populate field spec from a field spec string
     var populateFieldSpec = function(fieldSpec, fieldSpecStr) {
-      var fieldSpecs = fieldSpecStr.split(' ');
+      var fieldSpecs = fieldSpecStr.split(/[\s,]+/);
       angular.forEach(fieldSpecs, function(aField) {
         var typeAndField = aField.split(':');
         var fieldType = null;
