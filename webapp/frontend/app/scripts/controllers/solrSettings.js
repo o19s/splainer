@@ -3,18 +3,19 @@
 angular.module('splain-app')
   .controller('SolrSettingsCtrl', function ($scope, solrSearchSvc, fieldSpecSvc, normalDocsSvc, localStorageService) {
 
-    var parseSettings = function(solrUrl, fieldSpecStr, solrArgsStr) {
-      var parsedUrl = solrSearchSvc.parseSolrUrl(solrUrl);
-      if (solrArgsStr.trim() === '' && parsedUrl !== null) {
-        solrArgsStr = solrSearchSvc.formatSolrArgs(parsedUrl.solrArgsStr);
+    /*
+     * Take user input settings, massage them
+     * if only URL provided etc
+     */
+    var parseUserSettings = function(userSettings) {
+      var parsedUrl = solrSearchSvc.parseSolrUrl(userSettings.solrUrl);
+      if (userSettings.solrArgsStr.trim() === '' && parsedUrl !== null) {
+        userSettings.solrArgsStr = solrSearchSvc.formatSolrArgs(parsedUrl.solrArgsStr);
       } 
-      if (fieldSpecStr.trim() === '' && parsedUrl !== null && parsedUrl.solrArgs.hasOwnProperty('fl')) {
+      if (userSettings.fieldSpecStr.trim() === '' && parsedUrl !== null && parsedUrl.solrArgs.hasOwnProperty('fl')) {
         var fl = parsedUrl.solrArgs.fl;
-        fieldSpecStr = fl[0];
+        userSettings.fieldSpecStr = fl[0];
       }
-      return {sorlUrl: parsedUrl.handlerUrl(),
-              fieldSpecStr: fieldSpecStr,
-              solrArgsStr: solrArgsStr};
     };
 
     var initSolrArgs = function() {
@@ -46,6 +47,7 @@ angular.module('splain-app')
     $scope.solrSettings = initSolrArgs();
 
     $scope.solrSettings.publishSearcher = function() {
+      parseUserSettings($scope.solrSettings);
       console.log('publishing search');
       var fieldSpec = fieldSpecSvc.createFieldSpec(this.fieldSpecStr);
       var parsedArgs = solrSearchSvc.parseSolrArgs(this.solrArgsStr);

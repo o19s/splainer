@@ -66,39 +66,6 @@ window.expectedSolrUrl = function(expected) {
   };
 };
 
-window.mockFullQueriesResp = {
-  queries: {
-    displayOrder: [2,1,0],
-    queries: {
-      '0': {
-        'arrangedAt': '3681400536',
-        'arrangedNext': '4294967295',
-        'deleted': 'false',
-        'queryId': '0',
-        'query_text': 'symptoms of heart attack',
-        'doc1': '5',
-        'doc2': '9'
-      },
-      '1': {
-        'arrangedAt': '3067833780',
-        'arrangedNext': '3681400536',
-        'deleted': 'true',
-        'queryId': '1',
-        'query_text': 'how is kidney cancer diagnosed'
-      },
-      '2': {
-        'arrangedAt': '0',
-        'arrangedNext': '613566756',
-        'deleted': 'false',
-        'l_31284': '10',
-        'queryId': '2',
-        'query_text': 'prognosis of alzheimers',
-        'doc1': '1',
-        'doc2': '10'
-      }
-    }
-  }
-};
 window.mockResults = {
   response: {
     numFound: 2,
