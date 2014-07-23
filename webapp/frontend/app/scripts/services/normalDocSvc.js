@@ -56,6 +56,7 @@ angular.module('splain-app')
       this.explain = function() {
         return simplerExplain;
       };
+      this.score = simplerExplain.contribution();
     };
 
     this.createNormalDoc = function(fieldSpec, doc) {

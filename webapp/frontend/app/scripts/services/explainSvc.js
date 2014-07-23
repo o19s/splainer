@@ -67,6 +67,7 @@ angular.module('splain-app')
 
     var Explain = function(explJson) {
       var datExplain = this;
+      this.asJson = explJson;
       this.realContribution = this.score = parseFloat(explJson.value);
       this.realExplanation = this.description = explJson.description;
       var details = [];
@@ -114,6 +115,11 @@ angular.module('splain-app')
           childStrs.push(child.toStr(depth+1));
         });
         return me + childStrs.join('\n');
+      };
+
+      this.rawStr = function() {
+        /* global JSON */
+        return JSON.stringify(this.asJson);
       };
     };
 

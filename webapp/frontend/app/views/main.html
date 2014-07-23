@@ -12,16 +12,18 @@
 
 <div>
     <div class="row" ng-repeat="doc in main.docs">
-      <h4>{{doc.title}}</h4>
       <div class="col-md-4">
+      <h4>{{doc.title}}</h4>
         <div ng-repeat="sub in doc.subsList">
           {{sub.value}}
         </div> 
       </div>
       <div class="col-md-8">
+      <h4>Score: {{doc.score}}</h4>
+      
 
         <tabset>
-          <tab heading="Full Explain">GOBBLY GOOK</tab>
+          <tab heading="Full Explain"><pre>{{doc.explain().rawStr()}}</pre></tab>
           <tab heading="Summarized"> <pre>{{doc.explain().toStr()}}</pre></tab>
           <tab heading="Hot Matches"><pre>{{doc.explain().vectorize().toStr()}}</pre></tab>
         </tabset>
