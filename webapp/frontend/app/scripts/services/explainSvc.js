@@ -3,7 +3,7 @@
 // Executes a solr search and returns
 // a set of queryDocs
 angular.module('splain-app')
-  .service('explainSvc', function solrSearchSvc() {
+  .service('explainSvc', function explainSvc(vectorSvc) {
 
     var tieRegex = /max plus ([0-9.]+) times/;
     var createExplain = function(explJson) {
@@ -36,9 +36,9 @@ angular.module('splain-app')
         return new DismaxExplain(explJson);
       }
       else if (description.hasSubstr('sum of')) {
-        SumOrProductExplain.prototype = base;
+        SumExplain.prototype = base;
         console.log('sum or product expl');
-        return new SumOrProductExplain(explJson, 'sum_of');
+        return new SumExplain(explJson);
       }
       else if (description.hasSubstr('product of')) {
         var coordExpl = null;
@@ -54,8 +54,8 @@ angular.module('splain-app')
         if (coordExpl !== null) {
           return coordExpl;
         } else {
-          SumOrProductExplain.prototype = base;
-          return new SumOrProductExplain(explJson, 'product_of');
+          ProductExplain.prototype = base;
+          return new ProductExplain(explJson);
         }
       }
       else {
@@ -95,8 +95,8 @@ angular.module('splain-app')
        * much I am influenced
        * */
       this.vectorize = function() {
-        var rVal = {};
-        rVal[this.explanation()] = this.contribution();
+        var rVal = vectorSvc.create();
+        rVal.set(this.explanation(), this.contribution());
         return rVal;
       };
 
@@ -149,6 +149,16 @@ angular.module('splain-app')
           }
           return infl;
         };
+
+        this.vectorize = function() {
+          // scale the others by coord factor
+          var rVal = vectorSvc.create();
+          angular.forEach(this.influencers(), function(infl) {
+            rVal = vectorSvc.add(rVal, infl.vectorize());
+          });
+          rVal = vectorSvc.scale(rVal, coordFactor);
+          return rVal;
+        };
       }
     };
 
@@ -164,7 +174,13 @@ angular.module('splain-app')
       this.vectorize = function() {
         var infl = this.influencers();
         // infl[0] is the winner of the dismax competition
-        v1 = infl1.vectorize();
+        var rVal = infl[0].vectorize();
+        angular.forEach(infl.slice(1), function(currInfl) {
+          var vInfl = currInfl.vectorize();
+          var vInflScaled = vectorSvc.scale(vInfl, tie);
+          rVal = vectorSvc.add(rVal, vInflScaled);
+        });
+        return rVal;
       };
     };
 
@@ -177,49 +193,70 @@ angular.module('splain-app')
         infl.sort(function(a, b) {return b.score - a.score;});
         return infl;
       };
+
+      this.vectorize = function() {
+        var infl = this.influencers();
+        // Dismax, winner takes all, influencers
+        // are sorted by influence
+        return infl[0].vectorize();
+      };
     };
 
-    var SumOrProductExplain = function(explJson, sumOrProduct) {
-      this.sumOrProduct = sumOrProduct;
-      if (sumOrProduct === 'sum_of') {
-        this.realExplanation = 'Sum of the following:';
-      } else if (sumOrProduct === 'product_of') {
-        this.realExplanation = 'Product of following:';
-      }
-
-      this.isChildSame = function(child, sumOrProduct) {
-        return (this.sumOrProduct === sumOrProduct &&
-                child.hasOwnProperty('sumOrProduct') &&
-                child.sumOrProduct === sumOrProduct);
-      };
+    var SumExplain = function() {
+      this.realExplanation = 'Sum of the following:';
+      this.isSumExplain = true;
 
       this.influencers = function() {
         var preInfl = angular.copy(this.children);
-        var children = this.children;
-        if (children.length === 1 && this.isChildSame(children[0], this.sumOrProduct)) {
-          // just use the children's info
-          return children[0].influencers();
+        // Well then the child is the real influencer, we're taking sum
+        // of one thing
+        if (this.children.length === 1) {
+          return this.children[0].influencers();
         } else {
-          // sort children on score
-          // If I'm a sum, and the child is the sum, just wrap child child here?
           preInfl.sort(function(a, b) {return b.score - a.score;});
           var infl = [];
-          var dat = this;
           angular.forEach(preInfl, function(child) {
-            // get rid of cruft, if I'm a sum, and my child is sum, then collapse
-            if (dat.isChildSame(child, 'sum_of')) {
+            // take advantage of commutative property
+            if (child.hasOwnProperty('isSumExplain') && child.isSumExplain) {
               angular.forEach(child.influencers(), function(grandchild) {
                 infl.push(grandchild);
               });
             } else {
               infl.push(child);
             }
+            return infl;
           });
-          return infl;
         }
       };
-      
+
+      this.vectorize = function() {
+        // vector sum all the components
+        var rVal = vectorSvc.create();
+        angular.forEach(this.influencers(), function(infl) {
+          rVal = vectorSvc.add(rVal, infl.vectorize());
+        });
+        return rVal;
+      };
     };
+
+    var ProductExplain = function() {
+      this.realExplanation = 'Product of following:';
+      
+      this.influencers = function() {
+        var infl = angular.copy(this.children);
+        infl.sort(function(a, b) {return b.score - a.score;});
+        return infl;
+      };
+      this.vectorize = function() {
+        // vector sum all the components
+        var rVal = vectorSvc.create();
+        angular.forEach(this.influencers(), function(infl) {
+          rVal = vectorSvc.add(rVal, infl.vectorize());
+        });
+        return rVal;
+      };
+    };
+
 
     this.createExplain = function(explJson) {
       return createExplain(explJson);
