@@ -210,23 +210,19 @@ angular.module('splain-app')
         var preInfl = angular.copy(this.children);
         // Well then the child is the real influencer, we're taking sum
         // of one thing
-        if (this.children.length === 1) {
-          return this.children[0].influencers();
-        } else {
-          preInfl.sort(function(a, b) {return b.score - a.score;});
-          var infl = [];
-          angular.forEach(preInfl, function(child) {
-            // take advantage of commutative property
-            if (child.hasOwnProperty('isSumExplain') && child.isSumExplain) {
-              angular.forEach(child.influencers(), function(grandchild) {
-                infl.push(grandchild);
-              });
-            } else {
-              infl.push(child);
-            }
-            return infl;
-          });
-        }
+        preInfl.sort(function(a, b) {return b.score - a.score;});
+        var infl = [];
+        angular.forEach(preInfl, function(child) {
+          // take advantage of commutative property
+          if (child.hasOwnProperty('isSumExplain') && child.isSumExplain) {
+            angular.forEach(child.influencers(), function(grandchild) {
+              infl.push(grandchild);
+            });
+          } else {
+            infl.push(child);
+          }
+        });
+        return infl;
       };
 
       this.vectorize = function() {

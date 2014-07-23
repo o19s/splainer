@@ -28,9 +28,9 @@ angular.module('splain-app')
         angular.forEach(this.vecObj, function(value, key) {
           sortedL.push([key, value]);
         });
-        sortedL.sort(function(lhs, rhs) {return lhs[1] - rhs[1];});
+        sortedL.sort(function(lhs, rhs) {return rhs[1] - lhs[1];});
         angular.forEach(sortedL, function(keyVal) {
-          rVal += (keyVal[1] + ' ' + keyVal[0]);
+          rVal += (keyVal[1] + ' ' + keyVal[0] + '\n');
         });
         return rVal;
       };

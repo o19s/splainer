@@ -18,11 +18,15 @@
           {{sub.value}}
         </div> 
       </div>
-      <div class="col-md-4">
-        <pre>{{doc.explain().toStr()}}</pre>
-      </div>
-      <div class="col-md-4">
-        <pre>{{doc.explain().vectorize().toStr()}}</pre>
+      <div class="col-md-8">
+
+        <tabset>
+          <tab heading="Full Explain">GOBBLY GOOK</tab>
+          <tab heading="Summarized"> <pre>{{doc.explain().toStr()}}</pre></tab>
+          <tab heading="Hot Matches"><pre>{{doc.explain().vectorize().toStr()}}</pre></tab>
+        </tabset>
+
+       
       </div>
     </div>
     <hr>

@@ -9,4 +9,4 @@
  * Main module of the application.
  */
 angular
-  .module('splain-app', ['LocalStorageModule']);
+  .module('splain-app', ['LocalStorageModule', 'ui.bootstrap']);
