@@ -7,7 +7,8 @@
     "es5-shim": "~3.1.0",
     "bootstrap": "~3.2.0",
     "angular-local-storage": "~0.0.5",
-    "angular-bootstrap": "~0.11.0"
+    "angular-bootstrap": "~0.11.0",
+    "ng-json-explorer": "*"
   },
   "devDependencies": {
     "angular-mocks": "1.2.16",

@@ -23,7 +23,7 @@
       
 
         <tabset>
-          <tab heading="Full Explain"><pre>{{doc.explain().rawStr()}}</pre></tab>
+          <tab heading="Full Explain"><json-explorer json-data="{{doc.explain().rawStr()}}"></json-explorer></tab>
           <tab heading="Summarized"> <pre>{{doc.explain().toStr()}}</pre></tab>
           <tab heading="Hot Matches"><pre>{{doc.explain().vectorize().toStr()}}</pre></tab>
         </tabset>
