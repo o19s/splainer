@@ -5,6 +5,15 @@
 angular.module('splain-app')
   .service('explainSvc', function explainSvc(vectorSvc) {
 
+    var meOrOnlyChild = function(explain) {
+      var infl = explain.influencers();
+      if (infl.length === 1) {
+        return infl[0]; //only child
+      } else {
+        return explain;
+      }
+    };
+
     var tieRegex = /max plus ([0-9.]+) times/;
     var createExplain = function(explJson) {
       var base = new Explain(explJson);
@@ -24,6 +33,11 @@ angular.module('splain-app')
         console.log('weight');
         return new WeightExplain(explJson);
       }
+      else if (description.startsWith('FunctionQuery')) {
+        console.log('func query');
+        FunctionQueryExplain.prototype = base;
+        return new FunctionQueryExplain(explJson);
+      }
       else if (tieMatch && tieMatch.length > 1) {
         console.log('dismax tie expl');
         var tie = parseFloat(tieMatch[1]);
@@ -33,12 +47,12 @@ angular.module('splain-app')
       else if (description.hasSubstr('max of')) {
         console.log('dismax expl');
         DismaxExplain.prototype = base;
-        return new DismaxExplain(explJson);
+        return meOrOnlyChild(new DismaxExplain(explJson));
       }
       else if (description.hasSubstr('sum of')) {
         SumExplain.prototype = base;
         console.log('sum or product expl');
-        return new SumExplain(explJson);
+        return meOrOnlyChild(new SumExplain(explJson));
       }
       else if (description.hasSubstr('product of')) {
         var coordExpl = null;
@@ -55,7 +69,7 @@ angular.module('splain-app')
           return coordExpl;
         } else {
           ProductExplain.prototype = base;
-          return new ProductExplain(explJson);
+          return meOrOnlyChild(new ProductExplain(explJson));
         }
       }
       else {
@@ -135,9 +149,19 @@ angular.module('splain-app')
       if (match !== null && match.length > 1) {
         this.realExplanation = match[1];
       } else {
-        this.realExplanation = 'Could not parse weight...';
+        this.realExplanation = description;
       }
+    };
 
+    var FunctionQueryExplain = function(explJson) {
+      var funcQueryRegex = /FunctionQuery\((.*)\)/;
+      var description = explJson.description;
+      var match = description.match(funcQueryRegex);
+      if (match !== null && match.length > 1) {
+        this.realExplanation = match[1];
+      } else {
+        this.realExplanation = description;
+      }
     };
 
     var CoordExplain = function(explJson, coordFactor) {
@@ -211,7 +235,7 @@ angular.module('splain-app')
     var SumExplain = function() {
       this.realExplanation = 'Sum of the following:';
       this.isSumExplain = true;
-
+      
       this.influencers = function() {
         var preInfl = angular.copy(this.children);
         // Well then the child is the real influencer, we're taking sum
@@ -243,6 +267,10 @@ angular.module('splain-app')
 
     var ProductExplain = function() {
       this.realExplanation = 'Product of following:';
+
+      var oneFilled = function(length) {
+        return Array.apply(null, new Array(length)).map(Number.prototype.valueOf,1);
+      };
       
       this.influencers = function() {
         var infl = angular.copy(this.children);
@@ -252,13 +280,29 @@ angular.module('splain-app')
       this.vectorize = function() {
         // vector sum all the components
         var rVal = vectorSvc.create();
-        angular.forEach(this.influencers(), function(infl) {
-          rVal = vectorSvc.add(rVal, infl.vectorize());
-        });
+
+        var infl = this.influencers();
+
+        var inflFactors = oneFilled(infl.length);
+
+        for (var factorInfl = 0; factorInfl < infl.length; factorInfl++) {
+          for (var currMult = 0; currMult < infl.length; currMult++) {
+            if (currMult !== factorInfl) {
+              inflFactors[factorInfl] = (inflFactors[factorInfl] * infl[currMult].contribution());
+            }
+          }
+        }
+
+        for (var currInfl = 0; currInfl < infl.length; currInfl++) {
+          var i = infl[currInfl];
+          var thisVec = i.vectorize();
+          var thisScaledByOthers = vectorSvc.scale(thisVec, inflFactors[currInfl]);
+          rVal = vectorSvc.add(rVal, thisScaledByOthers);
+        }
+
         return rVal;
       };
     };
-
 
     this.createExplain = function(explJson) {
       return createExplain(explJson);
