@@ -337,6 +337,13 @@ describe('Service: solrSearchSvc', function () {
     expect(parsedArgs.q.length).toEqual(2);
   });
   
+  it('parses urlencoded solr args', function() {
+    var argStr = 'q=1234%20foo&q=5678&fq=cat:foo';
+    var parsedArgs = solrSearchSvc.parseSolrArgs(argStr);
+    
+    expect(parsedArgs.q).toContain('1234 foo');
+  });
+  
   it('parses solr url', function() {
     var urlStr = 'http://localhost:8983/solr/collection1/select?q=*:*';
 

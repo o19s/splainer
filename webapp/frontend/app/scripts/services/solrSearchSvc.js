@@ -137,10 +137,11 @@ angular.module('splain-app')
         if (nameAndValue.length === 2) {
           var name = nameAndValue[0];
           var value = nameAndValue[1];
+          var decodedValue = decodeURIComponent(value);
           if (!rVal.hasOwnProperty(name)) {
-            rVal[name] = [value];
+            rVal[name] = [decodedValue];
           } else {
-            rVal[name].push(value);
+            rVal[name].push(decodedValue);
           }
         }
       });

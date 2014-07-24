@@ -144,22 +144,38 @@ describe('solrSettingsCtrl', function() {
     // someone just pastes in a big URL
     describe('just url input', function() {
       var testUserUrl = 'http://localhost:8983/solr/collection1/select?q=*:*&fl=field1';
+      var testUrlEncodedUrl = 'http://localhost:8983/solr/collection1/select?q=choice%20of%20law&defType=edismax&qf=catch_line%20text&pf=catch_line&fl=catch_line%20text';
       var testUserUrlBase = 'http://localhost:8983/solr/collection1/select';
       
       /* global urlContainsParams*/
       beforeEach(function() {
+      });
+
+      it('sets inputs up', function() {
         httpBackend.expectJSONP(urlContainsParams(testUserUrlBase, {q: ['*:*'], 'fl': ['id field1']}))
                    .respond(200, mockSolrResp);
         createController();
         scope.solrSettings.solrUrl = testUserUrl;
         scope.solrSettings.publishSearcher();
         httpBackend.flush();
-      });
 
-      it('sets inputs up', function() {
         expect(scope.solrSettings.fieldSpecStr).toEqual('field1');
         expect(scope.solrSettings.solrArgsStr).toEqual('q=*:*');
         expect(scope.solrSettings.solrUrl).toEqual(testUserUrlBase);
+      });
+
+      it('url decodes URL', function() {
+        httpBackend.expectJSONP(urlContainsParams(testUserUrlBase, {q: ['choice of law'], 'fl': ['id catch_line text']}))
+                   .respond(200, mockSolrResp);
+        createController();
+        scope.solrSettings.solrUrl = testUrlEncodedUrl;
+        scope.solrSettings.publishSearcher();
+        httpBackend.flush();
+
+        expect(scope.solrSettings.fieldSpecStr).toEqual('catch_line text');
+        expect(scope.solrSettings.solrArgsStr).toEqual('q=choice of law&defType=edismax&qf=catch_line text&pf=catch_line');
+        expect(scope.solrSettings.solrUrl).toEqual(testUserUrlBase);
+
       });
       
       afterEach(function() {
