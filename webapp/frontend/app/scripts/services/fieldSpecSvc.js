@@ -53,6 +53,10 @@ angular.module('splain-app')
         this.fields.push('id');
       }
 
+      if (!this.hasOwnProperty('title')) {
+        this.title = this.id;
+      }
+
       this.fieldList = function() {
         var rVal = [this.id];
         this.forEachField(function(fieldName) {

@@ -13,25 +13,50 @@
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
-    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="stylesheet" href="styles/panes.css" />
     <!-- endbuild -->
   </head>
   <body ng-app="splain-app">
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
-
     <!-- Add your site or application content here -->
-    <div class="container">
-      <div class="header">
-        <h3 class="text-muted">Splainer</h3>
+    <div class="pane_container" ng-controller="MainCtrl">
+        <div class="pane_main">
+          <div class="container">
+            <div class="navbar">
+              <h3 class="pull-left">Splainer</h3>
+              <a ng-show="main.state !== main.NO_SEARCH" dispatch-on-click="toggleEast" href="#" type="button" class="btn btn-default navbar-btn pull-right">
+                Tweak ->
+              </a>
+            </div>
+
+            <hr/>
+            
+            <div ng-include="'views/searchResults.html'"></div>
+            <div ng-controller="StartUrlCtrl" ng-show="main.state === main.NO_SEARCH" ng-include="'views/startUrl.html'"></div>
+          </div>
+          <div class="footer">
+            <p><span class="glyphicon glyphicon-heart"></span> from the <a href="http://opensourceconnections.com">OpenSource Connections</a> team</p>
+          </div>
+      </div>
+      <div class="east-slider">
+      </div>    
+      <div class="pane_east">
+        <form ng-controller="SolrSettingsCtrl" ng-submit="solrSettings.publishSearcher()">
+          <fieldset>
+            <label>Solr URL</label>
+            <input type="text" ng-model="solrSettings.solrUrl" placeholder="Enter URL to your request handler"></input></br>
+            <label>Displayed Fields</label>
+            <input type="text" ng-model="solrSettings.fieldSpecStr" placeholder="Fields you'd like to display"></input></br>
+            <label>Solr Args</label>
+            <textarea ng-model="solrSettings.solrArgsStr" cols=80 rows=10></textarea>
+            <button type="submit" class="btn">Rerun Query</button>
+          </fieldset>
+        </form>
       </div>
 
-      <div ng-include="'views/main.html'" ng-controller="MainCtrl"></div>
-
-      <div class="footer">
-        <p><span class="glyphicon glyphicon-heart"></span> from the <a href="http://opensourceconnections.com">OpenSource Connections</a> team</p>
-      </div>
     </div>
 
 
@@ -66,16 +91,20 @@
     <!-- endbuild -->
 
       <!-- build:js({.tmp,app}) scripts/scripts.js -->
+      <script src="scripts/panes.js"></script>
       <script src="scripts/promise.js"></script>
       <script src="scripts/stringPatch.js"></script>
       <script src="scripts/app.js"></script>
+      <script src="scripts/directives/dispatchOnClick.js"></script>
       <script src="scripts/services/explainSvc.js"></script>
       <script src="scripts/services/normalDocSvc.js"></script>
       <script src="scripts/services/vectorSvc.js"></script>
+      <script src="scripts/services/settingsStoreSvc.js"></script>
       <script src="scripts/services/solrSearchSvc.js"></script>
       <script src="scripts/services/fieldSpecSvc.js"></script>
       <script src="scripts/controllers/main.js"></script>
       <script src="scripts/controllers/solrSettings.js"></script>
+      <script src="scripts/controllers/startUrl.js"></script>
       <!-- endbuild -->
 </body>
 </html>

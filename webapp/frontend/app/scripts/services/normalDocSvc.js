@@ -53,8 +53,16 @@ angular.module('splain-app')
 
       var explainJson = this.solrDoc.explain(this.id);
       var simplerExplain = explainSvc.createExplain(explainJson);
+      var explSummary = simplerExplain.toStr();
+      var hotMatches = simplerExplain.vectorize().toStr();
       this.explain = function() {
         return simplerExplain;
+      };
+      this.explainSummary = function() {
+        return explSummary;
+      };
+      this.hotMatches = function() {
+        return hotMatches;
       };
       this.score = simplerExplain.contribution();
     };
