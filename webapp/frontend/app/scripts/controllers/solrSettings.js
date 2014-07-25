@@ -61,6 +61,7 @@ angular.module('splain-app')
       var fieldSpec = fieldSpecSvc.createFieldSpec(this.fieldSpecStr);
       var parsedArgs = solrSearchSvc.parseSolrArgs(this.solrArgsStr);
       $scope.main.solrSearcher = solrSearchSvc.createSearcher(fieldSpec.fieldList(), this.solrUrl, parsedArgs, '');
+      $scope.main.isLoading = true;
       $scope.main.solrSearcher.search()
       .then(function() {
         trySaveSolrArgs($scope.solrSettings);
@@ -68,6 +69,7 @@ angular.module('splain-app')
         angular.forEach($scope.main.solrSearcher.docs, function(doc) {
           $scope.main.docs.push(normalDocsSvc.createNormalDoc(fieldSpec, doc));
         });
+        $scope.main.isLoading = false;
       });
     };
     

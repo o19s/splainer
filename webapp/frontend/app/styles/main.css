@@ -77,3 +77,8 @@ body {
     border-bottom: 0;
   }
 }
+
+.loading {
+    background-image:url('ajax-loader.gif');
+    text-align: center
+}
