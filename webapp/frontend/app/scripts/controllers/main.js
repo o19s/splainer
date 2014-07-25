@@ -17,6 +17,7 @@ angular.module('splain-app')
     $scope.main.WAITING_FOR_SEARCH = 2;
     $scope.main.IN_ERROR = 2;
     $scope.main.state = $scope.main.NO_SEARCH;
+
     
     var solrSettings = settingsStoreSvc.get();
 
@@ -30,8 +31,20 @@ angular.module('splain-app')
       $scope.main.solrSearcher.search()
       .then(function() {
         $scope.main.docs.length = 0;
+        var maxScore = null;
         angular.forEach($scope.main.solrSearcher.docs, function(doc) {
-          $scope.main.docs.push(normalDocsSvc.createNormalDoc(fieldSpec, doc));
+          var normalDoc = normalDocsSvc.createNormalDoc(fieldSpec, doc);
+          if (maxScore === null) {
+            maxScore = 0.0 + normalDoc.score;
+          }
+          normalDoc.hots = {outOf: maxScore, matches: []};
+          var hotMatches = normalDoc.explain().vectorize();
+          var i = 0;
+          angular.forEach(hotMatches.vecObj, function(contribution, description) {
+            normalDoc.hots.matches[i] = {label: description, percentage: ((contribution / maxScore) * 100.0)};
+            i++;
+          });
+          $scope.main.docs.push(normalDoc);
         });
         $scope.main.state = $scope.main.DID_SEARCH;
         promise.complete();

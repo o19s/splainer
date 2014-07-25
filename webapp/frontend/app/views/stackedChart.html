@@ -1,0 +1,8 @@
+<div class="chart-container">
+  <div class="stacked-chart" style="height: 100%">
+    <div ng-repeat="match in hots.matches" ng-class="$index | stackChartColor" ng-style="match.percentage | stackChartHeight">
+
+      <div class="tooltip">{{match.label}}</div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,89 @@
+.chart-container {
+    height: 250px;
+}
+
+.stacked-chart {
+    background: #F0F0F0;
+    border: 1px solid #999;
+    margin: 5%;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+    width: 50px;
+    overflow: hidden;
+    border-radius: 5px;
+}
+
+.chart-area { width: 50px; }
+
+.red { background: #A00; }
+.orange { background: #e18728; }
+.green { background: #6C0; }
+.blue { background: #369; } 
+
+.chart-area .tooltip {
+  background: #FFF;
+  border: 1px solid #CCC;
+  right: 20px;
+  font-family: Verdana;
+  font-size: 12px;
+  display: block;
+  left: 100%;
+  margin-left: 15px;
+  opacity: 0;
+  padding: 10px;
+  position: absolute;
+  width: 300px;
+  -webkit-transform: translateY(10px);
+     -moz-transform: translateY(10px);
+      -ms-transform: translateY(10px);
+       -o-transform: translateY(10px);
+          transform: translateY(10px);
+  -webkit-transition: all .25s ease-out;
+     -moz-transition: all .25s ease-out;
+      -ms-transition: all .25s ease-out;
+       -o-transition: all .25s ease-out;
+          transition: all .25s ease-out;
+}
+
+/* This bridges the gap so you can mouse into the tooltip without it disappearing */
+.chart-area .tooltip:before {
+  bottom: -20px;
+  content: " ";
+  display: block;
+  height: 20px;
+  left: 0;
+  position: absolute;
+  width: 100%;
+}  
+
+/* CSS Triangles - see Trevor's post */
+.chart-area .tooltip:after {
+  border-top: solid transparent 5px;
+  border-bottom: solid transparent 5px;
+  border-right: solid #CCC 7px;
+  left: 0;
+  top: 5px;
+  content: " ";
+  height: 0;
+  margin-left: -8px;
+  position: absolute;
+  width: 0;
+}
+  
+.chart-area:hover .tooltip {
+  opacity: 1;
+  pointer-events: auto;
+  -webkit-transform: translateY(0px);
+     -moz-transform: translateY(0px);
+      -ms-transform: translateY(0px);
+       -o-transform: translateY(0px);
+          transform: translateY(0px);
+}
+
+/* IE can just show/hide with no transition */
+.lte8 .chart-area .tooltip {
+  display: none;
+}
+
+.lte8 .chart-area:hover .tooltip {
+  display: block;
+}
