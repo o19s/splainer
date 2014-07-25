@@ -17,6 +17,20 @@ angular.module('splain-app')
 });
 
 angular.module('splain-app')
+  .filter('stackChartLeftover', function() {
+    return function(allMatches) {
+      var leftover = 100.0;
+      angular.forEach(allMatches, function(match) {
+        leftover -= match.percentage;
+      });
+      if (leftover < 0) {
+        leftover = 0;
+      }
+      return {'height': leftover + '%'};
+    };
+  });
+
+angular.module('splain-app')
   .directive('stackedChart', function () {
     return {
       restrict: 'E',
