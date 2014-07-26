@@ -142,7 +142,8 @@ angular.module('splain-app')
     };
 
     var WeightExplain = function(explJson) {
-      var weightRegex = /weight\((.*?)\)/;
+      // take weight(text:foo in 1234), extract text:foo
+      var weightRegex = /weight\((.*?)\s+in\s+\d+?\)/;
       var description = explJson.description;
       
       var match = description.match(weightRegex);
