@@ -1,0 +1,8 @@
+<div>
+
+  <tabset>
+    <tab heading="Summarized"> <pre>{{doc.explainSummary()}}</pre></tab>
+    <tab heading="Hot Matches"><pre>{{doc.hotMatches()}}</pre></tab>
+    <tab heading="Full Explain"><json-explorer json-data="{{doc.explain().rawStr()}}"></json-explorer></tab>
+  </tabset>
+</div>

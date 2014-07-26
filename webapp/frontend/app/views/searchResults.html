@@ -2,27 +2,7 @@
     <div ng-show="main.state === main.WAITING_FOR_SEARCH" class="loading"><img src="ajax-loader.gif"><img></div>
     <div ng-show="main.state === main.IN_ERROR">Error with your solr query</div>
     <div ng-show="main.state === main.DID_SEARCH" ng-repeat="doc in main.docs">
-      <div class="row">
-        <div class="col-md-3">
-          <h4>{{doc.score}}</h4>
-          <stacked-chart hots="doc.hots"></stacked-chart>
-          <a style="font-size: 10px" href="#">Detailed</a>
-        </div>
-        <div class="col-md-9">
-          <h4>{{doc.title}}</h4>
-            <div ng-repeat="sub in doc.subsList">
-              {{sub.value}}
-            </div> 
-            <!--<tabset>
-              <tab heading="Summarized"> <pre>{{doc.explainSummary()}}</pre></tab>
-              <tab heading="Hot Matches"><pre>{{doc.hotMatches()}}</pre></tab>
-              <tab heading="Full Explain"><json-explorer json-data="{{doc.explain().rawStr()}}"></json-explorer></tab>
-              </tabset>-->
-          </div>
-
-        </div>
-        <hr/>
-      </div>
+      <doc-row doc="doc"></doc-row>
       <hr/>
     </div>
 </div>
