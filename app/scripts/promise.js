@@ -2,6 +2,7 @@
 // basic promise
 (function() {
   var Promise = function(taskFn, taskThis, taskArgs) {
+    this.completed = false;
     // when taskFn signals done, do this
     this.$$myFn = taskFn;
     this.then = function(nextTaskFn, nextTaskThisOrArgs, nextTaskArgs) {
@@ -10,6 +11,9 @@
         nextTaskThisOrArgs = undefined;
       }
       this.next = new Promise(nextTaskFn, nextTaskThisOrArgs, nextTaskArgs);
+      if (this.completed) {
+        this.completer();
+      }
       return this.next;
     };
     
@@ -21,8 +25,10 @@
     
     // We're done, the next thing can run
     this.completer = function() {
+      this.completed = true;
       if (this.next) {
         this.next.apply();
+        this.completed = false;
       }
     };
     this.complete = this.completer.bind(this);

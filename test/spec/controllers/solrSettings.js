@@ -4,7 +4,6 @@ describe('solrSettingsCtrl', function() {
 
   var createController = null;
   var scope = null;
-  var httpBackend = null;
   var localStorage = null;
 
   beforeEach(module('splain-app'));
@@ -18,12 +17,16 @@ describe('solrSettingsCtrl', function() {
     });
     
     
-    inject(function($httpBackend, $rootScope, $controller) {
-      httpBackend = $httpBackend;
+    inject(function($rootScope, $controller) {
 
       createController = function() {
         scope = $rootScope.$new();
         scope.main = {};
+        scope.main.search = function() {
+          var p = Promise.create(scope.main.search);
+          p.complete();
+          return p;
+        };
         scope.main.searcher = null;
         scope.main.docs = [];
         return $controller('SolrSettingsCtrl', {'$scope': scope});
@@ -74,37 +77,7 @@ describe('solrSettingsCtrl', function() {
   });
 
   describe('save settings', function() {
-    /*global mockExplain*/
-    var mockSolrResp = {
-      response: {
-        numFound: 10,
-        docs : [
-          {id: 'doc1', field1: 'title1'},
-          {id: 'doc2', field1: 'title2'},
-          {id: 'doc3', field1: 'title3'},
-          {id: 'doc4', field1: 'title4'},
-          {id: 'doc5', field1: 'title5'},
-          {id: 'doc6', field1: 'title6'},
-          {id: 'doc7', field1: 'title7'},
-          {id: 'doc8', field1: 'title8'},
-          {id: 'doc9', field1: 'title9'},
-          {id: 'doc10', field1: 'title10'}
-        ]
-      },
-      debug: { explain: {
-          'doc1': mockExplain,
-          'doc2': mockExplain,
-          'doc3': mockExplain,
-          'doc4': mockExplain,
-          'doc5': mockExplain,
-          'doc6': mockExplain,
-          'doc7': mockExplain,
-          'doc8': mockExplain,
-          'doc9': mockExplain,
-          'doc10': mockExplain}
-      }
-    };
-
+    
     describe('multiple setting input', function() {
       var testUrl = 'http://localhost:8983/solr/collection1/select';
       var testFieldSpec = 'field1';
@@ -112,19 +85,16 @@ describe('solrSettingsCtrl', function() {
 
       /* global urlContainsParams*/
       beforeEach(function() {
-        httpBackend.expectJSONP(urlContainsParams(testUrl, {q: ['*:*']}))
-                   .respond(200, mockSolrResp);
         createController();
         scope.solrSettings.solrUrl = testUrl;
         scope.solrSettings.solrArgsStr = testArgsStr;
         scope.solrSettings.fieldSpecStr = testFieldSpec;
+        spyOn(scope.main, 'search').andCallThrough();        
         scope.solrSettings.publishSearcher();
-        httpBackend.flush();
       });
 
       it('searches on submit', function() {
-        expect(scope.main.docs.length).toEqual(mockSolrResp.response.docs.length);
-        expect(scope.main.solrSearcher).not.toBe(null);
+        expect(scope.main.search).toHaveBeenCalled();
       });
 
       it('saves settings in local storage', function() {
@@ -133,12 +103,6 @@ describe('solrSettingsCtrl', function() {
         expect(localStorage.get('solrArgsStr')).toEqual(testArgsStr);
       });
       
-      it('populates field spec', function() {
-      });
-      
-      afterEach(function() {
-        httpBackend.verifyNoOutstandingExpectation();
-      });
     });
 
     // someone just pastes in a big URL
@@ -152,12 +116,9 @@ describe('solrSettingsCtrl', function() {
       });
 
       it('sets inputs up', function() {
-        httpBackend.expectJSONP(urlContainsParams(testUserUrlBase, {q: ['*:*'], 'fl': ['id field1']}))
-                   .respond(200, mockSolrResp);
         createController();
         scope.solrSettings.solrUrl = testUserUrl;
         scope.solrSettings.publishSearcher();
-        httpBackend.flush();
 
         expect(scope.solrSettings.fieldSpecStr).toEqual('field1');
         expect(scope.solrSettings.solrArgsStr).toEqual('q=*:*');
@@ -165,12 +126,9 @@ describe('solrSettingsCtrl', function() {
       });
 
       it('url decodes URL', function() {
-        httpBackend.expectJSONP(urlContainsParams(testUserUrlBase, {q: ['choice of law'], 'fl': ['id catch_line text']}))
-                   .respond(200, mockSolrResp);
         createController();
         scope.solrSettings.solrUrl = testUrlEncodedUrl;
         scope.solrSettings.publishSearcher();
-        httpBackend.flush();
 
         expect(scope.solrSettings.fieldSpecStr).toEqual('catch_line text');
         expect(scope.solrSettings.solrArgsStr).toEqual('q=choice of law&defType=edismax&qf=catch_line text&pf=catch_line');
@@ -178,9 +136,6 @@ describe('solrSettingsCtrl', function() {
 
       });
       
-      afterEach(function() {
-        httpBackend.verifyNoOutstandingExpectation();
-      });
     });
     
     describe('url and preexisting input', function() {
@@ -189,7 +144,6 @@ describe('solrSettingsCtrl', function() {
       var testFieldSpecStr = 'field1';
       var testArgsStr = 'q=*:*';
       
-      /* global urlContainsParams*/
       beforeEach(function() {
         localStorage.store.solrArgsStr = testArgsStr;
         localStorage.store.fieldSpecStr = testFieldSpecStr;
@@ -197,16 +151,10 @@ describe('solrSettingsCtrl', function() {
       });
 
       it('sets params to new url', function() {
-        httpBackend.expectJSONP(urlContainsParams(testNewUserUrlBase, {q: ['field:foo'], 'fl': ['id field1']}))
-                   .respond(200, mockSolrResp);
         scope.solrSettings.solrUrl = testNewUserUrl;
         scope.solrSettings.publishSearcher();
-        httpBackend.flush();
       });
       
-      afterEach(function() {
-        httpBackend.verifyNoOutstandingExpectation();
-      });
     });
 
 
