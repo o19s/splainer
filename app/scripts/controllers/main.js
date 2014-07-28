@@ -15,8 +15,10 @@ angular.module('splain-app')
     $scope.main.NO_SEARCH = 0;
     $scope.main.DID_SEARCH = 1;
     $scope.main.WAITING_FOR_SEARCH = 2;
-    $scope.main.IN_ERROR = 2;
+    $scope.main.IN_ERROR = 3;
     $scope.main.state = $scope.main.NO_SEARCH;
+    $scope.main.linkUrl = '#';
+    $scope.main.numFound = 0;
 
     
     var solrSettings = settingsStoreSvc.get();
@@ -30,6 +32,13 @@ angular.module('splain-app')
       $scope.main.state = $scope.main.WAITING_FOR_SEARCH;
       $scope.main.solrSearcher.search()
       .then(function() {
+        $scope.main.linkUrl = $scope.main.solrSearcher.linkUrl;
+        $scope.main.numFound = $scope.main.solrSearcher.numFound;
+        if ($scope.main.solrSearcher.inError) {
+          $scope.main.state = $scope.main.IN_ERROR;
+          return;
+        }
+
         $scope.main.docs.length = 0;
         var maxScore = null;
         angular.forEach($scope.main.solrSearcher.docs, function(doc) {

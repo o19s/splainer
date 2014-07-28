@@ -27,14 +27,15 @@
         <div class="pane_main">
           <div class="container">
             <div class="navbar">
-              <h3 class="pull-left">Splainer</h3>
+              <div class="pull-left">
+                <h3 style="margin-bottom: 0px">Splainer</h3>
+                <small class="tiny_sub">By <a href="http://opensourceconnections.com">OpenSource Connections</a></small>
+              </div>
               <a ng-show="main.state !== main.NO_SEARCH" dispatch-on-click="toggleEast" href="#" type="button" class="btn btn-default navbar-btn pull-right">
                 Tweak ->
               </a>
             </div>
 
-            <hr/>
-            
             <div ng-include="'views/searchResults.html'"></div>
             <div ng-controller="StartUrlCtrl" ng-show="main.state === main.NO_SEARCH" ng-include="'views/startUrl.html'"></div>
           </div>

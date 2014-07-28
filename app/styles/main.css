@@ -77,3 +77,34 @@
     background-image:url('ajax-loader.gif');
     text-align: center
 }
+
+.tiny_sub {
+    font-size: 65%;
+    margin-left: 1em;
+}
+
+.showOnDocHover {
+    display: none;
+}
+
+.docRow:hover .showOnDocHover {
+    display: inline-block;
+}
+
+.alert {
+  padding: 8px 35px 8px 14px;
+  margin-bottom: 18px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  background-color: #fcf8e3;
+  border: 1px solid #fbeed5;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  color: #c09853;
+}
+
+.alert-error {
+  background-color: #f2dede;
+  border-color: #eed3d7;
+  color: #b94a48;
+}

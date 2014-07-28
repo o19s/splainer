@@ -3,17 +3,6 @@
   <div class="graph-explain" ng-repeat="match in hots.matches">
     <div class="graph-label">{{match.label}}</div>
     <progressbar value="match.percentage"></progressbar>
-    
   </div> 
 
 </div>
-<!---
-<div class="chart-container">
-  <div class="stacked-chart" style="height: 100%">
-    <div class="chart-area" ng-style="hots.matches | stackChartLeftover"></div>
-    <div ng-repeat="match in hots.matches" ng-class="$index | stackChartColor" ng-style="match.percentage | stackChartHeight">
-
-      <div class="tooltip">{{match.label}}</div>
-    </div>
-  </div>
-</div>-->
