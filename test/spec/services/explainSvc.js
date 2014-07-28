@@ -1,5 +1,5 @@
 'use strict';
-/* global urlContainsParams*/
+
 describe('Service: explainSvc', function () {
 
   // load the service's module
@@ -10,7 +10,8 @@ describe('Service: explainSvc', function () {
     explainSvc = _explainSvc_;
   }));
 
+  /* global mockExplain */
   it('parses mockData1', function() {
-    var expl = explainSvc.createExplain(mockExplain);
+    explainSvc.createExplain(mockExplain);
   });
 });

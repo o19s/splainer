@@ -282,9 +282,6 @@ describe('Service: solrSearchSvc', function () {
                             .respond(200, mockResults);
     searcher.search().then(function() {
       var solrDocs = searcher.docs;
-      var expectedFacetField = {
-        'facet.field': ['field1', 'field']
-      };
       angular.forEach(solrDocs, function(doc) {
         var tokenUrl = doc.url('id', 'http://12');
         expect(tokenUrl.indexOf('http://12')).toBe(-1);

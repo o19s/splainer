@@ -83,7 +83,6 @@ describe('solrSettingsCtrl', function() {
       var testFieldSpec = 'field1';
       var testArgsStr = 'q=*:*';
 
-      /* global urlContainsParams*/
       beforeEach(function() {
         createController();
         scope.solrSettings.solrUrl = testUrl;
@@ -111,7 +110,6 @@ describe('solrSettingsCtrl', function() {
       var testUrlEncodedUrl = 'http://localhost:8983/solr/collection1/select?q=choice%20of%20law&defType=edismax&qf=catch_line%20text&pf=catch_line&fl=catch_line%20text';
       var testUserUrlBase = 'http://localhost:8983/solr/collection1/select';
       
-      /* global urlContainsParams*/
       beforeEach(function() {
       });
 
@@ -140,7 +138,6 @@ describe('solrSettingsCtrl', function() {
     
     describe('url and preexisting input', function() {
       var testNewUserUrl = 'http://localhost:8983/solr/collection1/select?q=field:foo&fl=field1';
-      var testNewUserUrlBase = 'http://localhost:8983/solr/collection1/select';
       var testFieldSpecStr = 'field1';
       var testArgsStr = 'q=*:*';
       

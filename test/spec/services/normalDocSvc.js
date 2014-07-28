@@ -11,6 +11,7 @@ describe('Service: normalDocsSvc', function () {
     normalDocsSvc = _normalDocsSvc_;
   }));
 
+  /* global mockExplain */
   describe('attached url tests', function() {
     var solrDoc = null;
     var normalDoc = null;
