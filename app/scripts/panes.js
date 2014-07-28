@@ -2,6 +2,8 @@
 /*
  * Code for managing the fixed slide-out drawer
  * */
+
+/* global $ */
 (function () {
   var slider = document.getElementsByClassName('east-slider')[0];
 
@@ -60,6 +62,12 @@
     }
   };
 
+  var openEast = function() {
+    if (!toggled) {
+      toggleEast();
+    }
+  };
+
   $(window).on('resize', function() {
     if (toggled) {
       moveEastTo(container.offsetWidth - 300);
@@ -70,4 +78,5 @@
   });
   
   $(document).on('toggleEast', toggleEast);
+  $(document).on('openEast', openEast);
 })();
