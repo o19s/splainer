@@ -8,7 +8,8 @@
     "bootstrap": "~3.2.0",
     "angular-local-storage": "~0.0.5",
     "angular-bootstrap": "~0.11.0",
-    "ng-json-explorer": "*"
+    "ng-json-explorer": "*",
+    "splainer-search": "../splainer-search"
   },
   "devDependencies": {
     "angular-mocks": "1.2.16",
