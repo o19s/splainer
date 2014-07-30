@@ -83,14 +83,6 @@
     margin-left: 1em;
 }
 
-.showOnDocHover {
-    display: none;
-}
-
-.docRow:hover .showOnDocHover {
-    display: inline-block;
-}
-
 .alert {
   padding: 8px 35px 8px 14px;
   margin-bottom: 18px;
