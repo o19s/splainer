@@ -1,11 +1,11 @@
 <div>
-    <div ng-show="main.state === main.WAITING_FOR_SEARCH" class="loading"><img src="ajax-loader.gif"><img></div>
-    <div ng-show="main.state === main.IN_ERROR" class="alert alert-error">Error with your solr query. Double check that the URL is correct. Try accessing <a href="{{main.linkUrl}}">Solr directly</a> to troubleshoot the error.</div>
-    <div ng-show="main.state === main.DID_SEARCH">
-      <small><a href="{{main.linkUrl}}">{{main.numFound}} Total Results</a></small>
+    <div ng-show="search.state === search.WAITING_FOR_SEARCH" class="loading"><img src="ajax-loader.gif"><img></div>
+    <div ng-show="search.state === search.IN_ERROR" class="alert alert-error">Error with your solr query. Double check that the URL is correct. Try accessing <a href="{{search.linkUrl}}">Solr directly</a> to troubleshoot the error.</div>
+    <div ng-show="search.state === search.DID_SEARCH">
+      <small><a href="{{search.linkUrl}}">{{search.numFound}} Total Results</a></small>
       <hr style="margin-top: 5px"/>
-      <div ng-repeat="doc in main.docs">
-        <doc-row doc="doc"></doc-row>
+      <div ng-repeat="doc in search.docs">
+        <doc-row doc="doc" max-score="search.maxScore"></doc-row>
         <hr/>
       </div>
     </div>

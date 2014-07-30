@@ -13,7 +13,7 @@ angular.module('splain-app')
     $scope.start.submit = function() {
       // push start URL into settings and go!
       settingsStoreSvc.fromStartUrl($scope.start.startUrl);
-      $scope.main.search()
+      $scope.search.search()
       .then(function() {
         settingsStoreSvc.commit();
         if (localStorageService.isSupported) {

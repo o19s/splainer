@@ -21,14 +21,14 @@ describe('solrSettingsCtrl', function() {
 
       createController = function() {
         scope = $rootScope.$new();
-        scope.main = {};
-        scope.main.search = function() {
-          var p = Promise.create(scope.main.search);
+        scope.search = {};
+        scope.search.search = function() {
+          var p = Promise.create(scope.search.search);
           p.complete();
           return p;
         };
-        scope.main.searcher = null;
-        scope.main.docs = [];
+        scope.search.searcher = null;
+        scope.search.docs = [];
         return $controller('SolrSettingsCtrl', {'$scope': scope});
       };
     });
@@ -88,12 +88,12 @@ describe('solrSettingsCtrl', function() {
         scope.solrSettings.solrUrl = testUrl;
         scope.solrSettings.solrArgsStr = testArgsStr;
         scope.solrSettings.fieldSpecStr = testFieldSpec;
-        spyOn(scope.main, 'search').andCallThrough();        
+        spyOn(scope.search, 'search').andCallThrough();        
         scope.solrSettings.publishSearcher();
       });
 
       it('searches on submit', function() {
-        expect(scope.main.search).toHaveBeenCalled();
+        expect(scope.search.search).toHaveBeenCalled();
       });
 
       it('saves settings in local storage', function() {

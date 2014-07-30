@@ -23,7 +23,7 @@
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
     <!-- Add your site or application content here -->
-    <div class="pane_container" ng-controller="MainCtrl">
+    <div class="pane_container" ng-controller="SearchResultsCtrl">
         <div class="pane_main">
           <div class="container">
             <div class="navbar">
@@ -102,10 +102,7 @@
     <script src="bower_components/angular-local-storage/angular-local-storage.js"></script>
     <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
     <script src="bower_components/ng-json-explorer/src/gd-ui-jsonexplorer.js"></script>
-    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
-    <script src="bower_components/angular-route/angular-route.js"></script>
-    <script src="bower_components/angular-touch/angular-touch.js"></script>
-    <script src="bower_components/splainer-search/splainer-search.min.js"></script>
+    <script src="bower_components/splainer-search/splainer-search.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -117,15 +114,10 @@
       <script src="scripts/directives/dispatchOnClick.js"></script>
       <script src="scripts/directives/docRow.js"></script>
       <script src="scripts/directives/stackedChart.js"></script>
-      <script src="scripts/services/explainSvc.js"></script>
-      <script src="scripts/services/normalDocSvc.js"></script>
-      <script src="scripts/services/vectorSvc.js"></script>
       <script src="scripts/services/settingsStoreSvc.js"></script>
-      <script src="scripts/services/solrSearchSvc.js"></script>
-      <script src="scripts/services/fieldSpecSvc.js"></script>
       <script src="scripts/controllers/docRow.js"></script>
       <script src="scripts/controllers/detailedExplain.js"></script>
-      <script src="scripts/controllers/main.js"></script>
+      <script src="scripts/controllers/searchResults.js"></script>
       <script src="scripts/controllers/solrSettings.js"></script>
       <script src="scripts/controllers/startUrl.js"></script>
       <!-- endbuild -->

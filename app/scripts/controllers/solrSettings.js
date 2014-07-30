@@ -8,7 +8,7 @@ angular.module('splain-app')
     $scope.solrSettings.publishSearcher = function() {
       settingsStoreSvc.parse();
 
-      $scope.main.search()
+      $scope.search.search()
       .then(function() {
         settingsStoreSvc.commit();
       });
