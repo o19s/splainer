@@ -29,7 +29,8 @@
 /* Customize container */
 @media (min-width: 768px) {
   .container {
-    max-width: 730px;
+    max-width: 1200px;
+    width: 100%;
   }
 }
 .container-narrow > hr {
@@ -78,11 +79,6 @@
     text-align: center
 }
 
-.tiny_sub {
-    font-size: 65%;
-    margin-left: 1em;
-}
-
 .alert {
   padding: 8px 35px 8px 14px;
   margin-bottom: 18px;
@@ -99,4 +95,63 @@
   background-color: #f2dede;
   border-color: #eed3d7;
   color: #b94a48;
+}
+
+.pane_main .navbar-inverse {
+  background: #428bca;
+  margin: 0 0 20px 0;
+} 
+
+.pane_main .navbar-brand {
+  font-style: italic;
+  color: #FFF;
+  padding: 10px 0 0 0;
+  margin: 0;
+  height: auto;
+  font-size: 25px;
+  float: none;
+}
+
+.navbar-header small {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  display: block;
+  margin: 3px 0 10px 25px;
+}
+
+.navbar-header small a {
+  color: rgba(255,255,255,0.75);
+}
+
+.pane_east h3 {
+  margin: 20px;
+  padding: 0;
+}
+
+.pane_east label {
+  font-weight: normal;
+  color: #999;
+}
+
+.starter-URL {
+  margin: 0 0 20px 0;
+}
+
+.dev-header{
+  background:#222;
+  background:-webkit-gradient(linear,0 0,0 100%,from(#282828),to(#222));
+  color:#F0F0F0;
+  padding:15px;
+  border-bottom:1px solid #363636;
+  cursor:pointer
+}
+
+.dev-header .glyphicon{
+  margin-left:10px;
+  font-size:14px;
+  font-weight:400
+}
+
+.dev-section {
+  padding: 15px;
 }

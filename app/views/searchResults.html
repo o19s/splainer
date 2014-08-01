@@ -2,7 +2,7 @@
     <div ng-show="search.state === search.WAITING_FOR_SEARCH" class="loading"><img src="ajax-loader.gif"><img></div>
     <div ng-show="search.state === search.IN_ERROR" class="alert alert-error">Error with your solr query. Double check that the URL is correct. Try accessing <a href="{{search.linkUrl}}">Solr directly</a> to troubleshoot the error.</div>
     <div ng-show="search.state === search.DID_SEARCH">
-      <small><a href="{{search.linkUrl}}">{{search.numFound}} Total Results</a></small>
+      <small><a href="{{search.linkUrl}}" target="_blank">{{search.numFound}} Total Results</a></small>
       <hr style="margin-top: 5px"/>
       <div ng-repeat="doc in search.docs">
         <doc-row doc="doc" max-score="search.maxScore"></doc-row>
