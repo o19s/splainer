@@ -9,4 +9,4 @@
  * Main module of the application.
  */
 angular
-  .module('splain-app', ['LocalStorageModule', 'ui.bootstrap', 'gd.ui.jsonexplorer', 'o19s.splainer-search']);
+  .module('splain-app', ['ngSanitize','LocalStorageModule', 'ui.bootstrap', 'gd.ui.jsonexplorer', 'o19s.splainer-search']);
