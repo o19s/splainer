@@ -9,12 +9,14 @@ angular.module('splain-app')
         delete argsToUse.rows;
     };
 
+    var that = this;
+
     var parseUserSettings = function(userSettings) {
       var parsedUrl = solrSearchSvc.parseSolrUrl(userSettings.searchUrl);
       // es testing TODO determine if this is an elasticsearch endpoint better
       if (parsedUrl.port === '9200') {
         userSettings.searchUrl = parsedUrl.solrEndpoint();
-        userSettings.whichEngine = this.ENGINES.ELASTICSEARCH;
+        userSettings.whichEngine = that.ENGINES.ELASTICSEARCH;
         return;
       }
 
@@ -69,6 +71,7 @@ angular.module('splain-app')
     // init from local storage if there
     var searchSettings = initSearchArgs();
 
+    this.ENGINES = {};
     this.ENGINES.SOLR = 0;
     this.ENGINES.ELASTICSEARCH = 1;
 

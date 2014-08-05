@@ -35,14 +35,19 @@ angular.module('splain-app')
       var fieldSpec = fieldSpecSvc.createFieldSpec(searchSettings.fieldSpecStr);
       var parsedArgs = null;
       if (searchSettings.whichEngine === settingsStoreSvc.ENGINES.ELASTICSEARCH) {
-        parsedArgs = angular.fromJson(searchSettings.solrArgsStr); 
+        try {
+          parsedArgs = angular.fromJson(searchSettings.searchArgsStr); 
+        } catch (SyntaxError) {
+          parsedArgs = '';
+        }
+          
         $scope.search.searcher = esSearchSvc.createSearcher(fieldSpec.fieldList(),
-                                                                searchSettings.solrUrl, parsedArgs, '');
+                                                                searchSettings.searchUrl, parsedArgs, '');
         
       } else {
-        parsedArgs = solrSearchSvc.parseSolrArgs(searchSettings.solrArgsStr);
+        parsedArgs = solrSearchSvc.parseSolrArgs(searchSettings.searchArgsStr);
         $scope.search.searcher = solrSearchSvc.createSearcher(fieldSpec.fieldList(),
-                                                                searchSettings.solrUrl, parsedArgs, '');
+                                                                searchSettings.searchUrl, parsedArgs, '');
       }
       reset();
       

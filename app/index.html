@@ -67,7 +67,7 @@
               Solr URL <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsSolr.toggle]" class="glyphicon glyphicon-minus-sign"></span>
             </div>
             <div class="dev-section" ng-show="!devSettingsSolr.toggle">
-              <input type="text" ng-model="solrSettings.solrUrl" placeholder="Enter URL to your request handler" class="form-control"></input>
+              <input type="text" ng-model="solrSettings.searchUrl" placeholder="Enter URL to your request handler" class="form-control"></input>
             </div>
 
             <div class="dev-header" ng-click="devSettingsFields.toggle = !devSettingsFields.toggle">
@@ -81,7 +81,7 @@
               Sorl Args <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsArgs.toggle]" class="glyphicon glyphicon-minus-sign"></span>
             </div>
             <div class="dev-section" ng-show="!devSettingsArgs.toggle">
-              <textarea id="inputSolrArgsStr" ng-model="solrSettings.solrArgsStr" rows="10" class="form-control"></textarea>
+              <textarea id="inputSolrArgsStr" ng-model="solrSettings.searchArgsStr" rows="10" class="form-control"></textarea>
             </div>
             <!--<fieldset>
               <label>Solr URL</label>
@@ -133,6 +133,7 @@
     <script src="bower_components/ng-json-explorer/src/gd-ui-jsonexplorer.js"></script>
     <script src="bower_components/splainer-search/splainer-search.js"></script>
     <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="bower_components/angular-ui-ace/ui-ace.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
