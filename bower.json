@@ -10,7 +10,9 @@
     "angular-bootstrap": "~0.11.0",
     "ng-json-explorer": "*",
     "splainer-search": "git://github.com/o19s/splainer-search.git",
-    "angular-sanitize": "~1.2.21"
+    "angular-sanitize": "~1.2.21",
+    "angular-ui-ace": "bower",
+    "ace": "~1.1.5"
   },
   "devDependencies": {
     "angular-mocks": "1.2.16",

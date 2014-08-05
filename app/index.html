@@ -78,10 +78,10 @@
             </div>
 
             <div class="dev-header" ng-click="devSettingsArgs.toggle = !devSettingsArgs.toggle">
-              Sorl Args <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsArgs.toggle]" class="glyphicon glyphicon-minus-sign"></span>
+              Search Args <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsArgs.toggle]" class="glyphicon glyphicon-minus-sign"></span>
             </div>
             <div class="dev-section" ng-show="!devSettingsArgs.toggle">
-              <textarea id="inputSolrArgsStr" ng-model="solrSettings.searchArgsStr" rows="10" class="form-control"></textarea>
+              <div ui-ace="{mode: 'json'}" style="height: 200px" id="inputSolrArgsStr" ng-model="solrSettings.searchArgsStr"></div>
             </div>
             <!--<fieldset>
               <label>Solr URL</label>
@@ -121,7 +121,7 @@
     <script src="bower_components/json3/lib/json3.min.js"></script>
     <![endif]-->
     <!-- endbuild -->
-
+    <script type="text/javascript" src="bower_components/ace-builds/src-min-noconflict/ace.js"></script>
     <!-- build:js(app) scripts/vendor.js -->
     <!-- bower:js -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
