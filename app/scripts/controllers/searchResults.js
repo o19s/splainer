@@ -8,7 +8,7 @@
  * Controller of the frontendApp
  */
 angular.module('splain-app')
-  .controller('SearchResultsCtrl', function ($scope, solrSearchSvc, fieldSpecSvc, normalDocsSvc, settingsStoreSvc) {
+  .controller('SearchResultsCtrl', function ($scope, solrSearchSvc, esSearchSvc, fieldSpecSvc, normalDocsSvc, settingsStoreSvc) {
     $scope.search = {};
     $scope.search.searcher = null;
     $scope.search.docs = [];
@@ -33,9 +33,17 @@ angular.module('splain-app')
     $scope.search.search = function() {
       var promise = Promise.create($scope.search.search);
       var fieldSpec = fieldSpecSvc.createFieldSpec(solrSettings.fieldSpecStr);
-      var parsedArgs = solrSearchSvc.parseSolrArgs(solrSettings.solrArgsStr);
-      $scope.search.solrSearcher = solrSearchSvc.createSearcher(fieldSpec.fieldList(),
-                                                              solrSettings.solrUrl, parsedArgs, '');
+      var parsedArgs = null;
+      if (solrSettings.hasOwnProperty('elasticsearch')) {
+        parsedArgs = angular.fromJson(solrSettings.solrArgsStr); 
+        $scope.search.solrSearcher = esSearchSvc.createSearcher(fieldSpec.fieldList(),
+                                                                solrSettings.solrUrl, parsedArgs, '');
+        
+      } else {
+        parsedArgs = solrSearchSvc.parseSolrArgs(solrSettings.solrArgsStr);
+        $scope.search.solrSearcher = solrSearchSvc.createSearcher(fieldSpec.fieldList(),
+                                                                solrSettings.solrUrl, parsedArgs, '');
+      }
       reset();
       
       $scope.search.solrSearcher.search()

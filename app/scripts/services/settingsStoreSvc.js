@@ -13,6 +13,13 @@ angular.module('splain-app')
 
     var parseUserSettings = function(userSettings) {
       var parsedUrl = solrSearchSvc.parseSolrUrl(userSettings.solrUrl);
+      // es testing
+      if (parsedUrl.port === '9200') {
+        userSettings.solrUrl = parsedUrl.solrEndpoint();
+        userSettings.elasticsearch = true;
+        return;
+      }
+
       if (parsedUrl !== null && parsedUrl.solrArgs && Object.keys(parsedUrl.solrArgs).length > 0) {
         var argsToUse = angular.copy(parsedUrl.solrArgs);
         deleteUnwantedArgs(argsToUse);
@@ -28,7 +35,13 @@ angular.module('splain-app')
     var initSolrArgs = function() {
       var solrSettings = {solrUrl: '', fieldSpecStr: '', solrArgsStr: ''};
       var localStorageTryGet = function(key) {
-        var val = localStorageService.get(key);
+        var val;
+        try {
+          val = localStorageService.get(key);
+        } catch (SyntaxError) {
+          val = null;
+        }
+          
         if (val !== null) {
           solrSettings[key] = val;
         } else {
@@ -40,6 +53,7 @@ angular.module('splain-app')
         localStorageTryGet('fieldSpecStr');
         localStorageTryGet('solrArgsStr');
       }
+      solrSettings.solrArgsStr = solrSettings.solrArgsStr.slice(1);
       return solrSettings;
     };
     
@@ -47,7 +61,7 @@ angular.module('splain-app')
       if (localStorageService.isSupported) {
         localStorageService.set('solrUrl', solrSettings.solrUrl);
         localStorageService.set('fieldSpecStr', solrSettings.fieldSpecStr);
-        localStorageService.set('solrArgsStr', solrSettings.solrArgsStr);
+        localStorageService.set('solrArgsStr', '?' + solrSettings.solrArgsStr);
       }
     };
 
