@@ -18,7 +18,7 @@ angular.module('splain-app')
     $scope.search.IN_ERROR = 3;
 
     
-    var solrSettings = settingsStoreSvc.get();
+    var searchSettings = settingsStoreSvc.get();
 
     var reset = function() {
       $scope.search.linkUrl = '#';
@@ -32,30 +32,30 @@ angular.module('splain-app')
 
     $scope.search.search = function() {
       var promise = Promise.create($scope.search.search);
-      var fieldSpec = fieldSpecSvc.createFieldSpec(solrSettings.fieldSpecStr);
+      var fieldSpec = fieldSpecSvc.createFieldSpec(searchSettings.fieldSpecStr);
       var parsedArgs = null;
-      if (solrSettings.hasOwnProperty('elasticsearch')) {
-        parsedArgs = angular.fromJson(solrSettings.solrArgsStr); 
-        $scope.search.solrSearcher = esSearchSvc.createSearcher(fieldSpec.fieldList(),
-                                                                solrSettings.solrUrl, parsedArgs, '');
+      if (searchSettings.whichEngine === settingsStoreSvc.ENGINES.ELASTICSEARCH) {
+        parsedArgs = angular.fromJson(searchSettings.solrArgsStr); 
+        $scope.search.searcher = esSearchSvc.createSearcher(fieldSpec.fieldList(),
+                                                                searchSettings.solrUrl, parsedArgs, '');
         
       } else {
-        parsedArgs = solrSearchSvc.parseSolrArgs(solrSettings.solrArgsStr);
-        $scope.search.solrSearcher = solrSearchSvc.createSearcher(fieldSpec.fieldList(),
-                                                                solrSettings.solrUrl, parsedArgs, '');
+        parsedArgs = solrSearchSvc.parseSolrArgs(searchSettings.solrArgsStr);
+        $scope.search.searcher = solrSearchSvc.createSearcher(fieldSpec.fieldList(),
+                                                                searchSettings.solrUrl, parsedArgs, '');
       }
       reset();
       
-      $scope.search.solrSearcher.search()
+      $scope.search.searcher.search()
       .then(function() {
-        $scope.search.linkUrl = $scope.search.solrSearcher.linkUrl;
-        $scope.search.numFound = $scope.search.solrSearcher.numFound;
-        if ($scope.search.solrSearcher.inError) {
+        $scope.search.linkUrl = $scope.search.searcher.linkUrl;
+        $scope.search.numFound = $scope.search.searcher.numFound;
+        if ($scope.search.searcher.inError) {
           $scope.search.state = $scope.search.IN_ERROR;
           return;
         }
 
-        angular.forEach($scope.search.solrSearcher.docs, function(doc) {
+        angular.forEach($scope.search.searcher.docs, function(doc) {
           var normalDoc = normalDocsSvc.createNormalDoc(fieldSpec, doc);
           if (normalDoc.score > $scope.search.maxScore) {
             $scope.search.maxScore = normalDoc.score;

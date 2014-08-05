@@ -1,7 +1,5 @@
 'use strict';
 
-// Executes a solr search and returns
-// a set of queryDocs
 angular.module('splain-app')
   .service('settingsStoreSvc', function settingsStoreSvc(localStorageService, solrSearchSvc) {
     
@@ -12,28 +10,29 @@ angular.module('splain-app')
     };
 
     var parseUserSettings = function(userSettings) {
-      var parsedUrl = solrSearchSvc.parseSolrUrl(userSettings.solrUrl);
-      // es testing
+      var parsedUrl = solrSearchSvc.parseSolrUrl(userSettings.searchUrl);
+      // es testing TODO determine if this is an elasticsearch endpoint better
       if (parsedUrl.port === '9200') {
-        userSettings.solrUrl = parsedUrl.solrEndpoint();
-        userSettings.elasticsearch = true;
+        userSettings.searchUrl = parsedUrl.solrEndpoint();
+        userSettings.whichEngine = this.ENGINES.ELASTICSEARCH;
         return;
       }
 
+      userSettings.whichEngine = this.ENGINES.SOLR;
       if (parsedUrl !== null && parsedUrl.solrArgs && Object.keys(parsedUrl.solrArgs).length > 0) {
         var argsToUse = angular.copy(parsedUrl.solrArgs);
         deleteUnwantedArgs(argsToUse);
-        userSettings.solrArgsStr = solrSearchSvc.formatSolrArgs(argsToUse);
+        userSettings.searchArgsStr = solrSearchSvc.formatSolrArgs(argsToUse);
         if (parsedUrl.solrArgs.hasOwnProperty('fl')) {
           var fl = parsedUrl.solrArgs.fl;
           userSettings.fieldSpecStr = fl[0];
         }
       } 
-      userSettings.solrUrl = parsedUrl.solrEndpoint();
+      userSettings.searchUrl = parsedUrl.solrEndpoint();
     };
     
-    var initSolrArgs = function() {
-      var solrSettings = {solrUrl: '', fieldSpecStr: '', solrArgsStr: ''};
+    var initSearchArgs = function() {
+      var searchSettings = {searchUrl: '', fieldSpecStr: '', searchArgsStr: ''};
       var localStorageTryGet = function(key) {
         var val;
         try {
@@ -43,48 +42,53 @@ angular.module('splain-app')
         }
           
         if (val !== null) {
-          solrSettings[key] = val;
+          searchSettings[key] = val;
         } else {
-          solrSettings[key] = '';
+          searchSettings[key] = '';
         }
       };
       if (localStorageService.isSupported) {
-        localStorageTryGet('solrUrl');
+        localStorageTryGet('searchUrl');
         localStorageTryGet('fieldSpecStr');
-        localStorageTryGet('solrArgsStr');
+        localStorageTryGet('searchArgsStr');
+        localStorageTryGet('whichEngine');
       }
-      solrSettings.solrArgsStr = solrSettings.solrArgsStr.slice(1);
-      return solrSettings;
+      searchSettings.searchArgsStr = searchSettings.searchArgsStr.slice(1);
+      return searchSettings;
     };
     
-    var trySaveSolrArgs= function(solrSettings) {
+    var trySaveSolrArgs= function(searchSettings) {
       if (localStorageService.isSupported) {
-        localStorageService.set('solrUrl', solrSettings.solrUrl);
-        localStorageService.set('fieldSpecStr', solrSettings.fieldSpecStr);
-        localStorageService.set('solrArgsStr', '?' + solrSettings.solrArgsStr);
+        localStorageService.set('searchUrl', searchSettings.searchUrl);
+        localStorageService.set('fieldSpecStr', searchSettings.fieldSpecStr);
+        localStorageService.set('searchArgsStr', '?' + searchSettings.searchArgsStr);
+        localStorageService.set('whichEngine', searchSettings.whichEngine);
       }
     };
 
     // init from local storage if there
-    var solrSettings = initSolrArgs();
+    var searchSettings = initSearchArgs();
+
+    this.ENGINES.SOLR = 0;
+    this.ENGINES.ELASTICSEARCH = 1;
 
     this.get = function() {
-      return solrSettings;
+      return searchSettings;
     };
 
     /*
      * save changes to settings
      * */
     this.parse = function() {
-      parseUserSettings(solrSettings);
+      parseUserSettings(searchSettings);
     };
 
     this.commit = function() {
-      trySaveSolrArgs(solrSettings);
+      trySaveSolrArgs(searchSettings);
     };
 
     this.fromStartUrl = function(startUrl) {
-      solrSettings.solrUrl = startUrl;
+      searchSettings.searchUrl = startUrl;
       this.parse();
     };
   });
