@@ -20,7 +20,7 @@ angular.module('splain-app')
         return;
       }
 
-      userSettings.whichEngine = this.ENGINES.SOLR;
+      userSettings.whichEngine = that.ENGINES.SOLR;
       if (parsedUrl !== null && parsedUrl.solrArgs && Object.keys(parsedUrl.solrArgs).length > 0) {
         var argsToUse = angular.copy(parsedUrl.solrArgs);
         deleteUnwantedArgs(argsToUse);
@@ -63,7 +63,7 @@ angular.module('splain-app')
       if (localStorageService.isSupported) {
         localStorageService.set('searchUrl', searchSettings.searchUrl);
         localStorageService.set('fieldSpecStr', searchSettings.fieldSpecStr);
-        localStorageService.set('searchArgsStr', '?' + searchSettings.searchArgsStr);
+        localStorageService.set('searchArgsStr', '!' + searchSettings.searchArgsStr);
         localStorageService.set('whichEngine', searchSettings.whichEngine);
       }
     };

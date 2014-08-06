@@ -27,16 +27,6 @@
     <div class="pane_container" ng-controller="SearchResultsCtrl">
         <div class="pane_main">
 
-          <!-- <header class="navbar navbar-default navbar-fixed-top">
-              <div class="container">
-                  <div class="pull-left">
-                    <h3 style="margin-bottom: 0px">Splainer</h3>
-                    <small class="tiny_sub">By <a href="http://opensourceconnections.com">OpenSource Connections</a></small>
-                  </div>
-                  <a ng-show="main.state == main.NO_SEARCH" dispatch-on-click="toggleEast" href="#" type="button" class="btn btn-default navbar-btn pull-right">Tweak -></a>
-                </div>
-          </header> -->
-
           <header class="navbar-inverse navbar-secondary clearfix ng-scope">
             <div class="container">
               <div class="pull-right">
@@ -83,18 +73,6 @@
             <div class="dev-section" ng-show="!devSettingsArgs.toggle">
               <div ui-ace="{mode: 'json'}" style="height: 200px" id="inputSolrArgsStr" ng-model="solrSettings.searchArgsStr"></div>
             </div>
-            <!--<fieldset>
-              <label>Solr URL</label>
-              <input id="inputSolrUrl" type="text" ng-model="solrSettings.solrUrl" placeholder="Enter URL to your request handler" class="form-control"></input>
-
-              <label>Displayed Fields</label>
-              <input id="inputFieldSpec" type="text" ng-model="solrSettings.fieldSpecStr" placeholder="Fields you'd like to display" class="form-control"></input>
-
-              <label>Solr Args</label>
-              <textarea id="inputSolrArgsStr" ng-model="solrSettings.solrArgsStr" rows="10" class="form-control"></textarea>
-
-              <button type="submit" class="btn btn-default">Rerun Query</button>
-            </fieldset> -->
             <div class="dev-section">
               <button type="submit" class="btn btn-default">Rerun Query</button>
             </div>

@@ -19,18 +19,20 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'app/bower_components/angular/angular.js',
+      'app/bower_components/angular-sanitize/angular-sanitize.js',
       'app/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
       'app/bower_components/ng-json-explorer/src/gd-ui-jsonexplorer.js',
       'app/bower_components/angular-local-storage/angular-local-storage.js',
       'app/bower_components/splainer-search/splainer-search.js',
       'app/bower_components/angular-mocks/angular-mocks.js',
+      'app/bower_components/angular-ui-ace/ui-ace.js',
       'app/scripts/**/*.js',
       'test/mock/**/*.js',
       'test/spec/**/*.js'
     ],
 
     // list of files / patterns to exclude
-    exclude: [],
+    exclude: ['app/scripts/panes.js'],
 
     // web server port
     port: 8080,

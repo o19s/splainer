@@ -9,12 +9,16 @@ describe('searchResultsCtrl', function() {
   var testUrl = 'http://localhost:8983/solr/collection1/select';
   var testArgsStr = 'q=*:*&fq=blah&qq=blarg';
   var testFieldSpecStr = 'id field1';
-  var mockSolrSettings = {solrUrl: testUrl, solrArgsStr: testArgsStr,
+  var mockSolrSettings = {searchUrl: testUrl, searchArgsStr: testArgsStr,
                           fieldSpecStr: testFieldSpecStr};
   var httpBackend = null;
 
   beforeEach(function() {
     var mockSolrSettingsSvc = {
+      ENGINES: {
+        SOLR: 0,
+        ELASTICSEARCH: 1
+      },
       get: function() {
         return mockSolrSettings;
       }

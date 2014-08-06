@@ -3,9 +3,9 @@
 angular.module('splain-app')
   .controller('SolrSettingsCtrl', function ($scope, solrSearchSvc, fieldSpecSvc, normalDocsSvc, settingsStoreSvc) {
 
-    $scope.solrSettings = settingsStoreSvc.get();
+    $scope.searchSettings = settingsStoreSvc.get();
 
-    $scope.solrSettings.publishSearcher = function() {
+    $scope.searchSettings.publishSearcher = function() {
       settingsStoreSvc.parse();
 
       $scope.search.search()

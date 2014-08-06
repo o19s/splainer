@@ -40,39 +40,39 @@ describe('solrSettingsCtrl', function() {
 
   it('initializes with default settings', function() {
     createController();
-    expect(scope.solrSettings.solrUrl).toEqual('');
-    expect(scope.solrSettings.fieldSpecStr).toEqual('');
-    expect(scope.solrSettings.solrArgsStr).toEqual('');
+    expect(scope.searchSettings.searchUrl).toEqual('');
+    expect(scope.searchSettings.fieldSpecStr).toEqual('');
+    expect(scope.searchSettings.searchArgsStr).toEqual('');
   });
 
   describe('local storage init', function() {
     it('loads partial', function() {
       localStorage.isSupported = true;
       var  testUrl = 'http://localhost:8983/solr/collection1/select';
-      localStorage.store.solrUrl = testUrl;
+      localStorage.store.searchUrl = testUrl;
       createController();
-      expect(scope.solrSettings.solrUrl).toEqual(testUrl);
-      expect(scope.solrSettings.fieldSpecStr).toEqual('');
-      expect(scope.solrSettings.solrArgsStr).toEqual('');
+      expect(scope.searchSettings.searchUrl).toEqual(testUrl);
+      expect(scope.searchSettings.fieldSpecStr).toEqual('');
+      expect(scope.searchSettings.searchArgsStr).toEqual('');
     });
     
     it('loads all', function() {
       localStorage.isSupported = true;
       var testUrl = 'http://localhost:8983/solr/collection1/select';
       var testArgsStr = 'q=*:*&fq=blah&qq=blarg';
-      localStorage.store.solrUrl = testUrl;
-      localStorage.store.solrArgsStr = testArgsStr;
+      localStorage.store.searchUrl = testUrl;
+      localStorage.store.searchArgsStr = '!' + testArgsStr;
       createController();
-      expect(scope.solrSettings.solrUrl).toEqual(testUrl);
-      expect(scope.solrSettings.solrArgsStr).toEqual(testArgsStr);
+      expect(scope.searchSettings.searchUrl).toEqual(testUrl);
+      expect(scope.searchSettings.searchArgsStr).toEqual(testArgsStr);
     });
 
     it('gets ""s if unsupported', function() {
       localStorage.isSupported = false;
       createController();
-      expect(scope.solrSettings.solrUrl).toEqual('');
-      expect(scope.solrSettings.fieldSpecStr).toEqual('');
-      expect(scope.solrSettings.solrArgsStr).toEqual('');
+      expect(scope.searchSettings.searchUrl).toEqual('');
+      expect(scope.searchSettings.fieldSpecStr).toEqual('');
+      expect(scope.searchSettings.searchArgsStr).toEqual('');
     });
   });
 
@@ -85,11 +85,11 @@ describe('solrSettingsCtrl', function() {
 
       beforeEach(function() {
         createController();
-        scope.solrSettings.solrUrl = testUrl;
-        scope.solrSettings.solrArgsStr = testArgsStr;
-        scope.solrSettings.fieldSpecStr = testFieldSpec;
+        scope.searchSettings.searchUrl = testUrl;
+        scope.searchSettings.searchArgsStr = testArgsStr;
+        scope.searchSettings.fieldSpecStr = testFieldSpec;
         spyOn(scope.search, 'search').andCallThrough();        
-        scope.solrSettings.publishSearcher();
+        scope.searchSettings.publishSearcher();
       });
 
       it('searches on submit', function() {
@@ -97,9 +97,9 @@ describe('solrSettingsCtrl', function() {
       });
 
       it('saves settings in local storage', function() {
-        expect(localStorage.get('solrUrl')).toEqual(testUrl);
+        expect(localStorage.get('searchUrl')).toEqual(testUrl);
         expect(localStorage.get('fieldSpecStr')).toEqual(testFieldSpec);
-        expect(localStorage.get('solrArgsStr')).toEqual(testArgsStr);
+        expect(localStorage.get('searchArgsStr').slice(1)).toEqual(testArgsStr);
       });
       
     });
@@ -115,22 +115,22 @@ describe('solrSettingsCtrl', function() {
 
       it('sets inputs up', function() {
         createController();
-        scope.solrSettings.solrUrl = testUserUrl;
-        scope.solrSettings.publishSearcher();
+        scope.searchSettings.searchUrl = testUserUrl;
+        scope.searchSettings.publishSearcher();
 
-        expect(scope.solrSettings.fieldSpecStr).toEqual('field1');
-        expect(scope.solrSettings.solrArgsStr).toEqual('q=*:*');
-        expect(scope.solrSettings.solrUrl).toEqual(testUserUrlBase);
+        expect(scope.searchSettings.fieldSpecStr).toEqual('field1');
+        expect(scope.searchSettings.searchArgsStr).toEqual('q=*:*');
+        expect(scope.searchSettings.searchUrl).toEqual(testUserUrlBase);
       });
 
       it('url decodes URL', function() {
         createController();
-        scope.solrSettings.solrUrl = testUrlEncodedUrl;
-        scope.solrSettings.publishSearcher();
+        scope.searchSettings.searchUrl = testUrlEncodedUrl;
+        scope.searchSettings.publishSearcher();
 
-        expect(scope.solrSettings.fieldSpecStr).toEqual('catch_line text');
-        expect(scope.solrSettings.solrArgsStr).toEqual('q=choice of law&defType=edismax&qf=catch_line text&pf=catch_line');
-        expect(scope.solrSettings.solrUrl).toEqual(testUserUrlBase);
+        expect(scope.searchSettings.fieldSpecStr).toEqual('catch_line text');
+        expect(scope.searchSettings.searchArgsStr).toEqual('q=choice of law&defType=edismax&qf=catch_line text&pf=catch_line');
+        expect(scope.searchSettings.searchUrl).toEqual(testUserUrlBase);
 
       });
       
@@ -142,14 +142,14 @@ describe('solrSettingsCtrl', function() {
       var testArgsStr = 'q=*:*';
       
       beforeEach(function() {
-        localStorage.store.solrArgsStr = testArgsStr;
+        localStorage.store.searchArgsStr = testArgsStr;
         localStorage.store.fieldSpecStr = testFieldSpecStr;
         createController();
       });
 
       it('sets params to new url', function() {
-        scope.solrSettings.solrUrl = testNewUserUrl;
-        scope.solrSettings.publishSearcher();
+        scope.searchSettings.searchUrl = testNewUserUrl;
+        scope.searchSettings.publishSearcher();
       });
       
     });
