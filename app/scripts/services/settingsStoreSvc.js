@@ -14,12 +14,6 @@ angular.module('splain-app')
     var parseUserSettings = function(userSettings) {
       var parsedUrl = solrSearchSvc.parseSolrUrl(userSettings.searchUrl);
       // es testing TODO determine if this is an elasticsearch endpoint better
-      if (parsedUrl.port === '9200') {
-        userSettings.searchUrl = parsedUrl.solrEndpoint();
-        userSettings.whichEngine = that.ENGINES.ELASTICSEARCH;
-        return;
-      }
-
       userSettings.whichEngine = that.ENGINES.SOLR;
       if (parsedUrl !== null && parsedUrl.solrArgs && Object.keys(parsedUrl.solrArgs).length > 0) {
         var argsToUse = angular.copy(parsedUrl.solrArgs);

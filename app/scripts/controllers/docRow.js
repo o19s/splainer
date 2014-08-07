@@ -5,7 +5,7 @@ angular.module('splain-app')
 
     $scope.doc.highlighted = function(val) {
       var hls = solrSearchSvc.markedUpFieldValue(val, '<b>', '</b>');
-      return hls;
+      return '...' + hls + '...';
     };
 
     $scope.doc.showDetailed = function() {

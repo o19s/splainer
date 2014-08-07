@@ -155,3 +155,8 @@
 .dev-section {
   padding: 15px;
 }
+
+.fieldLabel {
+    text-decoration: bold
+}
+

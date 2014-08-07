@@ -297,7 +297,7 @@ module.exports = function (grunt) {
         cdn: require('google-cdn-data')
       },  
       dist: {
-        html: ['<%= yeoman.dist %>/*.html']
+        html: ['<%= yeoman.dist %>/*.html'],
       }
     },
 
@@ -324,7 +324,7 @@ module.exports = function (grunt) {
           src: ['generated/*']
         }, {
           expand: true,
-          cwd: 'bower_components/bootstrap/dist',
+          cwd: 'app/bower_components/bootstrap/dist',
           src: 'fonts/*',
           dest: '<%= yeoman.dist %>'
         }]
@@ -403,7 +403,7 @@ module.exports = function (grunt) {
     'concat',
     'ngmin',
     'copy:dist',
-    //'cdnify',
+    'cdnify',
     'cssmin',
     'uglify',
     'filerev',
