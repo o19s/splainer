@@ -4,9 +4,12 @@
     <div ng-show="search.state === search.DID_SEARCH">
       <small><a href="{{search.linkUrl}}" target="_blank">{{search.numFound}} Total Results</a></small>
       <hr style="margin-top: 5px"/>
-      <div ng-repeat="doc in search.docs">
-        <doc-row doc="doc" max-score="search.maxScore"></doc-row>
-        <hr/>
-      </div>
+        <div ng-repeat="doc in search.docs">
+          <doc-row doc="doc" max-score="search.maxScore"></doc-row>
+          <hr/>
+        </div>
+        <div class="row">
+          <div ng-show="!search.paging && search.moreResults()" id="pager" class="col-md-2 col-md-offset-5"><a href="#" ng-click="search.page()">Show More Results</a></div>
+        </div>
     </div>
 </div>
