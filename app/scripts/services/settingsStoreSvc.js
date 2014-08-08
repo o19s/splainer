@@ -1,24 +1,18 @@
 'use strict';
 
 angular.module('splain-app')
-  .service('settingsStoreSvc', function settingsStoreSvc(localStorageService, solrSearchSvc) {
+  .service('settingsStoreSvc', function settingsStoreSvc(localStorageService, solrUrlSvc) {
     
-    var deleteUnwantedArgs = function(argsToUse) {
-        delete argsToUse.fl;
-        delete argsToUse.wt;
-        delete argsToUse.rows;
-    };
-
     var that = this;
 
     var parseUserSettings = function(userSettings) {
-      var parsedUrl = solrSearchSvc.parseSolrUrl(userSettings.searchUrl);
+      var parsedUrl = solrUrlSvc.parseSolrUrl(userSettings.searchUrl);
       // es testing TODO determine if this is an elasticsearch endpoint better
       userSettings.whichEngine = that.ENGINES.SOLR;
       if (parsedUrl !== null && parsedUrl.solrArgs && Object.keys(parsedUrl.solrArgs).length > 0) {
         var argsToUse = angular.copy(parsedUrl.solrArgs);
-        deleteUnwantedArgs(argsToUse);
-        userSettings.searchArgsStr = solrSearchSvc.formatSolrArgs(argsToUse);
+        solrUrlSvc.removeUnsupported(argsToUse);
+        userSettings.searchArgsStr = solrUrlSvc.formatSolrArgs(argsToUse);
         if (parsedUrl.solrArgs.hasOwnProperty('fl')) {
           var fl = parsedUrl.solrArgs.fl;
           userSettings.fieldSpecStr = fl[0];
@@ -52,13 +46,14 @@ angular.module('splain-app')
       searchSettings.searchArgsStr = searchSettings.searchArgsStr.slice(1);
       return searchSettings;
     };
-    
+
     var trySaveSolrArgs= function(searchSettings) {
       if (localStorageService.isSupported) {
         localStorageService.set('searchUrl', searchSettings.searchUrl);
         localStorageService.set('fieldSpecStr', searchSettings.fieldSpecStr);
         localStorageService.set('searchArgsStr', '!' + searchSettings.searchArgsStr);
         localStorageService.set('whichEngine', searchSettings.whichEngine);
+
       }
     };
 

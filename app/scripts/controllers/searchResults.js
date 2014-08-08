@@ -8,7 +8,7 @@
  * Controller of the frontendApp
  */
 angular.module('splain-app')
-  .controller('SearchResultsCtrl', function ($scope, solrSearchSvc, esSearchSvc, fieldSpecSvc, normalDocsSvc, settingsStoreSvc) {
+  .controller('SearchResultsCtrl', function ($scope, solrSearchSvc, solrUrlSvc, esSearchSvc, fieldSpecSvc, normalDocsSvc, settingsStoreSvc) {
     $scope.search = {};
     $scope.search.searcher = null;
     $scope.search.docs = [];
@@ -44,7 +44,7 @@ angular.module('splain-app')
                                           searchSettings.searchUrl, parsedArgs, '');
         
       } else {
-        parsedArgs = solrSearchSvc.parseSolrArgs(searchSettings.searchArgsStr);
+        parsedArgs = solrUrlSvc.parseSolrArgs(searchSettings.searchArgsStr);
         return solrSearchSvc.createSearcher(fieldSpec.fieldList(),
                                             searchSettings.searchUrl, parsedArgs, '');
       }
