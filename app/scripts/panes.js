@@ -67,6 +67,12 @@
       toggleEast();
     }
   };
+  
+  var closeEast = function() {
+    if (toggled) {
+      toggleEast();
+    }
+  };
 
   $(window).on('resize', function() {
     if (toggled) {
@@ -79,4 +85,5 @@
   
   $(document).on('toggleEast', toggleEast);
   $(document).on('openEast', openEast);
+  $(document).on('closeEast', closeEast);
 })();

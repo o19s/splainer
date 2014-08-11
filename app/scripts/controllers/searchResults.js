@@ -84,6 +84,11 @@ angular.module('splain-app')
     $scope.search.moreResults = function() {
       return ($scope.search.displayedResults < $scope.search.numFound);
     };
+
+    $scope.search.restart = function() {
+      reset();
+      $scope.search.state = $scope.search.NO_SEARCH;
+    };
     
     $scope.search.page = function() {
       if ($scope.search.searcher === null) {

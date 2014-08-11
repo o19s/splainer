@@ -33,7 +33,7 @@
                 <a ng-show="search.state !== search.NO_SEARCH" dispatch-on-click="toggleEast" href="#" type="button" class="btn btn-default navbar-btn pull-right">Tweak -></a>
               </div>
               <div class="navbar-header">
-                <h3 class="navbar-brand">Splainer</h3>
+                <h3 class="navbar-brand" style="cursor: pointer" dispatch-on-click="closeEast" ng-click="search.restart()">Splainer</h3>
                 <small class="tiny_sub">By <a href="http://opensourceconnections.com">OpenSource Connections</a></small>
               </div> 
             </div>
