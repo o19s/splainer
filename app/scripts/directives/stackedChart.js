@@ -36,7 +36,8 @@ angular.module('splain-app')
       restrict: 'E',
       priority: 1000,
       scope: {
-          hots: '='
+          hots: '=',
+          detailed: '='
       },
       templateUrl: 'views/stackedChart.html',
       controller: function($scope) {

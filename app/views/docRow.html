@@ -1,8 +1,7 @@
 <div class="row docRow">
   <div class="col-md-4">
     <h4>{{doc.score}}</h4>
-    <stacked-chart hots="doc.hotMatchesOutOf(maxScore)"></stacked-chart>
-    <a style="font-size: 10px" ng-click="doc.showDetailed()" href="#">Detailed</a>
+    <stacked-chart detailed="doc.showDetailed" hots="doc.hotMatchesOutOf(maxScore)"></stacked-chart>
   </div>
   <div class="col-md-8">
     <h4>{{doc.title}}</h4>

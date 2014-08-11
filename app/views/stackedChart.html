@@ -5,20 +5,24 @@
       <div class="graph-label">{{match.description}}</div>
       <progressbar value="match.percentage"></progressbar>
     </div> 
+    <a style="font-size: 10px" ng-click="detailed()" href="#">Detailed</a>
   </div>
+
+  <!-- collapse if > 3-->
   <div ng-if="hots.length > 3">
     <div class="graph-explain" ng-repeat="match in hots.slice(0,3)">
       <div class="graph-label">{{match.description}}</div>
       <progressbar value="match.percentage"></progressbar>
     </div> 
-    <div collapse="showAll">
+    <div collapse="!showAll">
       <div class="graph-explain" ng-repeat="match in hots.slice(3)">
         <div class="graph-label">{{match.description}}</div>
         <progressbar value="match.percentage"></progressbar>
       </div> 
-      Hello!
     </div>
-    <a href="#" style="font-size: 10px" ng-click="showAll=!showAll">Show More</a>
+    <a style="font-size: 10px" ng-click="detailed()" href="#">Detailed</a>
+    &nbsp;&nbsp;&nbsp;
+    <a href="#" style="font-size: 10px" ng-click="showAll=!showAll">Show {{showAll ? 'Less' : 'More'}}</a>
   </div>
 
 </div>
