@@ -18,7 +18,7 @@ angular.module('splain-app')
     $scope.search.IN_ERROR = 3;
 
     
-    var searchSettings = settingsStoreSvc.get();
+    var searchSettings = settingsStoreSvc.settings;
 
     var reset = function() {
       $scope.search.linkUrl = '#';

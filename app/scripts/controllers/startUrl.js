@@ -5,8 +5,8 @@ angular.module('splain-app')
     // initialize the start URL
     $scope.start = {};
     $scope.start.startUrl = 'http://localhost:8983/solr/collection1/select';
-    if (localStorageService.isSupported) {
-      var storedStartUrl = localStorageService.get('startUrl');
+    var storedStartUrl = settingsStoreSvc.get().startUrl;
+    if (storedStartUrl !== null) {
       $scope.start.startUrl = storedStartUrl;
     }
 
@@ -16,9 +16,6 @@ angular.module('splain-app')
       $scope.search.search()
       .then(function() {
         settingsStoreSvc.commit();
-        if (localStorageService.isSupported) {
-          localStorageService.set('startUrl', $scope.start.startUrl);
-        }
       });
     
     };

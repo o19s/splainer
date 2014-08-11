@@ -19,9 +19,7 @@ describe('searchResultsCtrl', function() {
         SOLR: 0,
         ELASTICSEARCH: 1
       },
-      get: function() {
-        return mockSolrSettings;
-      }
+      settings: mockSolrSettings
     };
     
     module(function($provide) {

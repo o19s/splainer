@@ -1,16 +1,16 @@
 'use strict';
 
 angular.module('splain-app')
-  .controller('SolrSettingsCtrl', function ($scope, solrSearchSvc, fieldSpecSvc, normalDocsSvc, settingsStoreSvc) {
+  .controller('SolrSettingsCtrl', function ($scope, settingsStoreSvc, solrSettingsSvc) {
 
-    $scope.searchSettings = settingsStoreSvc.get();
+    $scope.searchSettings = settingsStoreSvc.settings;
 
     $scope.searchSettings.publishSearcher = function() {
-      settingsStoreSvc.parse();
+      solrSettingsSvc.fromTweakedSettings($scope.searchSettings);
 
       $scope.search.search()
       .then(function() {
-        settingsStoreSvc.commit();
+        settingsStoreSvc.save();
       });
     };
     

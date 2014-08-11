@@ -38,7 +38,10 @@ angular.module('splain-app')
       scope: {
           hots: '='
       },
-      templateUrl: 'views/stackedChart.html'
+      templateUrl: 'views/stackedChart.html',
+      controller: function($scope) {
+        $scope.showAll = false;
+      }
     };
   });
     

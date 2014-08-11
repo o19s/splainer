@@ -1,8 +1,24 @@
 <div>
 
-  <div class="graph-explain" ng-repeat="match in hots">
-    <div class="graph-label">{{match.description}}</div>
-    <progressbar value="match.percentage"></progressbar>
-  </div> 
+  <div ng-if="hots.length <= 3">
+    <div class="graph-explain" ng-repeat="match in hots">
+      <div class="graph-label">{{match.description}}</div>
+      <progressbar value="match.percentage"></progressbar>
+    </div> 
+  </div>
+  <div ng-if="hots.length > 3">
+    <div class="graph-explain" ng-repeat="match in hots.slice(0,3)">
+      <div class="graph-label">{{match.description}}</div>
+      <progressbar value="match.percentage"></progressbar>
+    </div> 
+    <div collapse="showAll">
+      <div class="graph-explain" ng-repeat="match in hots.slice(3)">
+        <div class="graph-label">{{match.description}}</div>
+        <progressbar value="match.percentage"></progressbar>
+      </div> 
+      Hello!
+    </div>
+    <a href="#" style="font-size: 10px" ng-click="showAll=!showAll">Show More</a>
+  </div>
 
 </div>
