@@ -5,7 +5,10 @@ angular.module('splain-app')
 
     var reconstructFullUrl = function(userSettings) {
       var fieldSpec = fieldSpecSvc.createFieldSpec(userSettings.fieldSpecStr);
-      var fl = fieldSpec.fieldList();
+      var fl = [fieldSpec.title];
+      angular.forEach(fieldSpec.subs, function(subFieldName) {
+        fl.push(subFieldName);
+      });
       var parsedArgs = solrUrlSvc.parseSolrArgs(userSettings.searchArgsStr);
       parsedArgs.fl = [fl.join(' ')];
       return solrUrlSvc.buildUrl(userSettings.searchUrl, parsedArgs);
@@ -42,7 +45,7 @@ angular.module('splain-app')
       searchSettings.whichEngine = 0;
       searchSettings.startUrl = newStartUrl;
       var parsedUrl = solrUrlSvc.parseSolrUrl(newStartUrl);
-      if (parsedUrl !== null && parsedUrl.solrArgs && Object.keys(parsedUrl.solrArgs).length > 0) {
+      if (parsedUrl !== null) {
         fromParsedUrl(searchSettings, parsedUrl);
       }
       return searchSettings;

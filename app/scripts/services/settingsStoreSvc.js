@@ -37,7 +37,7 @@ angular.module('splain-app')
 
     var trySaveSolrArgs= function(searchSettings) {
       if (localStorageService.isSupported) {
-        localStorageService.set('startUrl', searchSettings.searchUrl);
+        localStorageService.set('startUrl', searchSettings.startUrl);
         localStorageService.set('searchUrl', searchSettings.searchUrl);
         localStorageService.set('fieldSpecStr', searchSettings.fieldSpecStr);
         localStorageService.set('searchArgsStr', '!' + searchSettings.searchArgsStr);

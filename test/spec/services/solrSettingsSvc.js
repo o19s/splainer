@@ -6,8 +6,10 @@ describe('Service: solrSettingsSvc', function () {
   beforeEach(module('splain-app'));
   
   var solrSettingsSvc = null;
-  beforeEach(inject(function (_solrSettingsSvc_) {
+  var solrUrlSvc = null;
+  beforeEach(inject(function (_solrSettingsSvc_, _solrUrlSvc_) {
     solrSettingsSvc = _solrSettingsSvc_;
+    solrUrlSvc = _solrUrlSvc_;
   }));
   
   var stubSettings = function() {
@@ -31,6 +33,17 @@ describe('Service: solrSettingsSvc', function () {
     expect(settings.startUrl).toEqual('http://localhost:8983/solr/example?q=*:*&fl=title catch_line');
   });
   
+  it('uses start URL even with no args', function() {
+    var settings = stubSettings();
+    var startUrl = 'http://localhost:8983/solr/example';
+    solrSettingsSvc.fromStartUrl(startUrl, settings);
+    expect(settings.searchUrl).toEqual('http://localhost:8983/solr/example');    
+    expect(settings.fieldSpecStr).toEqual('');
+    expect(settings.searchArgsStr).toEqual('');
+    expect(settings.whichEngine).toEqual(0);
+    expect(settings.startUrl).toEqual('http://localhost:8983/solr/example');
+  });
+  
   it('updates start URL from args updates', function() {
     var settings = stubSettings();
     var startUrl = 'http://localhost:8983/solr/example?q=*:*&fl=title catch_line';
@@ -41,5 +54,14 @@ describe('Service: solrSettingsSvc', function () {
 
     console.log(settings.startUrl);
     expect(settings.startUrl.indexOf('blah')).not.toEqual(-1);
+  });
+
+  it('updates start URL with only title & sub field', function() {
+    var settings = stubSettings();
+    settings.searchUrl = 'http://localhost:8983/solr/example';
+    settings.fieldSpecStr = 'title sub1 sub2';
+    solrSettingsSvc.fromTweakedSettings(settings);
+    var startArgs = solrUrlSvc.parseSolrUrl(settings.startUrl).solrArgs;
+    expect(startArgs.fl).toEqual(['title sub1 sub2']);
   });
 });
