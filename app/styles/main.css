@@ -75,7 +75,7 @@
 }
 
 .loading {
-    background-image:url('ajax-loader.gif');
+    background-image:url('../images/ajax-loader.gif');
     text-align: center
 }
 
@@ -160,3 +160,6 @@
     text-decoration: bold
 }
 
+.osc_logo {
+    height: 2em;
+}
