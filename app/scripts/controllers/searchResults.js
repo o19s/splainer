@@ -11,6 +11,7 @@ angular.module('splain-app')
   .controller('SearchResultsCtrl', function ($scope, solrSearchSvc, solrUrlSvc, esSearchSvc, fieldSpecSvc, normalDocsSvc, settingsStoreSvc) {
     $scope.search = {};
     $scope.search.searcher = null;
+    $scope.search.settings = {searchArgsStr: ''};
     $scope.search.docs = [];
     $scope.search.NO_SEARCH = 0;
     $scope.search.DID_SEARCH = 1;
@@ -21,6 +22,7 @@ angular.module('splain-app')
     var searchSettings = settingsStoreSvc.settings;
 
     var reset = function() {
+      $scope.search.settings = {searchArgsStr: ''};
       $scope.search.linkUrl = '#';
       $scope.search.state = $scope.search.WAITING_FOR_SEARCH;
       $scope.search.paging = false;
@@ -56,6 +58,7 @@ angular.module('splain-app')
       var parsedArgs = null;
       $scope.search.searcher = createSearcher(fieldSpec, parsedArgs);
       reset();
+      $scope.search.settings = angular.copy(searchSettings);
       
       $scope.search.searcher.search()
       .then(function() {
