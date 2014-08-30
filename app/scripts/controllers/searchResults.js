@@ -71,8 +71,8 @@ angular.module('splain-app')
 
         angular.forEach($scope.search.searcher.docs, function(doc) {
           var normalDoc = normalDocsSvc.createNormalDoc(fieldSpec, doc);
-          if (normalDoc.score > $scope.search.maxScore) {
-            $scope.search.maxScore = normalDoc.score;
+          if (normalDoc.score() > $scope.search.maxScore) {
+            $scope.search.maxScore = normalDoc.score();
             console.log('new max score' + $scope.search.maxScore);
           }
           $scope.search.docs.push(normalDoc);
