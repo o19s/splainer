@@ -10,6 +10,8 @@ You're probably stuck with the question of *why*? Why do search results come bac
 
 Splainer is different by being a *sandbox*. Paste in your Solr URL, query parameters and all. Showing you parsed explain information while giving you the power to tweak Solr paramaters, instantly seeing important matches and summarized explain information alongside your documents. Continue working and see how the search results change. 
 
+Read the blog post introducing Splainer [here](http://opensourceconnections.com/blog/2014/08/18/introducing-splainer-the-open-source-search-sandbox-that-tells-you-why/)
+
 ## Using Splainer
 
 Take the [tour](http://splainer.io/help.html) to see how you'd use Splainer.
