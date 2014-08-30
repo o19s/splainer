@@ -33,13 +33,24 @@ describe('Service: solrSettingsSvc', function () {
     expect(settings.startUrl).toEqual('http://localhost:8983/solr/example?q=*:*&fl=title catch_line');
   });
   
+  it('uses default (*) fieldspec when no fl specified', function() {
+    var settings = stubSettings();
+    var startUrl = 'http://localhost:8983/solr/example?q=*:*';
+    solrSettingsSvc.fromStartUrl(startUrl, settings);
+    expect(settings.searchUrl).toEqual('http://localhost:8983/solr/example');    
+    expect(settings.fieldSpecStr).toEqual('*');
+    expect(settings.searchArgsStr).toEqual('q=*:*');
+    expect(settings.whichEngine).toEqual(0);
+    expect(settings.startUrl).toEqual('http://localhost:8983/solr/example?q=*:*');
+  });
+  
   it('uses start URL even with no args', function() {
     var settings = stubSettings();
     var startUrl = 'http://localhost:8983/solr/example';
     solrSettingsSvc.fromStartUrl(startUrl, settings);
     expect(settings.searchUrl).toEqual('http://localhost:8983/solr/example');    
-    expect(settings.fieldSpecStr).toEqual('');
-    expect(settings.searchArgsStr).toEqual('');
+    expect(settings.fieldSpecStr).toEqual('*');
+    expect(settings.searchArgsStr).toEqual('q=*:*');
     expect(settings.whichEngine).toEqual(0);
     expect(settings.startUrl).toEqual('http://localhost:8983/solr/example');
   });
@@ -52,8 +63,20 @@ describe('Service: solrSettingsSvc', function () {
     settings.searchArgsStr = 'q=*:*&fq=blah';
     solrSettingsSvc.fromTweakedSettings(settings);
 
-    console.log(settings.startUrl);
     expect(settings.startUrl.indexOf('blah')).not.toEqual(-1);
+  });
+  
+  it('updates start URL from args updates, empty fl', function() {
+    var settings = stubSettings();
+    var startUrl = 'http://localhost:8983/solr/example?q=*:*';
+    solrSettingsSvc.fromStartUrl(startUrl, settings);
+
+    settings.searchArgsStr = 'q=*:*&fq=blah';
+    solrSettingsSvc.fromTweakedSettings(settings);
+
+    expect(settings.startUrl.indexOf('blah')).not.toEqual(-1);
+    expect(settings.startUrl.indexOf('fl')).toEqual(-1);
+    console.log(settings.startUrl)
   });
 
   it('updates start URL with only title & sub field', function() {

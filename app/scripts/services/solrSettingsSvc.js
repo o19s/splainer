@@ -5,12 +5,18 @@ angular.module('splain-app')
 
     var reconstructFullUrl = function(userSettings) {
       var fieldSpec = fieldSpecSvc.createFieldSpec(userSettings.fieldSpecStr);
-      var fl = [fieldSpec.title];
-      angular.forEach(fieldSpec.subs, function(subFieldName) {
-        fl.push(subFieldName);
-      });
+      var fl = null;
+      if (fieldSpec.subs !== '*') {
+        fl = [fieldSpec.title];
+        angular.forEach(fieldSpec.subs, function(subFieldName) {
+          fl.push(subFieldName);
+        });
+        fl = [fl.join(' ')];
+      }
       var parsedArgs = solrUrlSvc.parseSolrArgs(userSettings.searchArgsStr);
-      parsedArgs.fl = [fl.join(' ')];
+      if (fl !== null) {
+        parsedArgs.fl = fl;
+      }
       return solrUrlSvc.buildUrl(userSettings.searchUrl, parsedArgs);
     };
 
@@ -18,9 +24,14 @@ angular.module('splain-app')
       var argsToUse = angular.copy(parsedUrl.solrArgs);
       solrUrlSvc.removeUnsupported(argsToUse);
       userSettings.searchArgsStr = solrUrlSvc.formatSolrArgs(argsToUse);
+      if (userSettings.searchArgsStr.trim().length === 0) {
+        userSettings.searchArgsStr = 'q=*:*';
+      }
       if (parsedUrl.solrArgs.hasOwnProperty('fl')) {
         var fl = parsedUrl.solrArgs.fl;
         userSettings.fieldSpecStr = fl[0];
+      } else {
+        userSettings.fieldSpecStr = '*';
       }
       userSettings.searchUrl = parsedUrl.solrEndpoint();
     };
