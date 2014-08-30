@@ -12,6 +12,8 @@ Splainer is different by being a *sandbox*. Paste in your Solr URL, query parame
 
 Read the blog post introducing Splainer [here](http://opensourceconnections.com/blog/2014/08/18/introducing-splainer-the-open-source-search-sandbox-that-tells-you-why/)
 
+Splainer forms the core of our product [Quepid](http://quepid.com) that allows you to do this over multiple queries against expert-graded search results to track search changes over a longer period of time.
+
 ## Using Splainer
 
 Take the [tour](http://splainer.io/help.html) to see how you'd use Splainer.
@@ -32,6 +34,6 @@ To build the project, simply run "grunt" static build artifacts will be placed i
 
 Created by [OpenSource Connections](http://opensourceconnections.com)
 
-## Licenne
+## License
 
 Released under [Apache 2](LICENSE.txt)
