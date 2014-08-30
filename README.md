@@ -1,3 +1,20 @@
-## The Splainer! ##
+## The Splainer!
 
-The sandbox that explains your search results for you so you don't have to go digging through explain debug! Try it out [here](http://splainer.io). 
+The sandbox that explains your search results for you so you don't have to go digging through explain debug! Paste in your Solr URL and go. Try it out [here](http://splainer.io). 
+
+## Why?
+
+You're a search developer trying to tune search results with Solr. You're engaged in [search relevancy](http://opensourceconnections.com/blog/2014/06/10/what-is-search-relevancy/) work. 
+
+You're probably stuck with teh question of *why*? Why do search results come back in the order that they do? Solr/Lucene exposes an explain syntax for you to try to explain search scoring. Unfortunately outside the simplest tasks, its a nightmare to read through. There are parsers like [explain.solr.pl](http://explain.solr.pl) but they require a lot of manual copy/pasting of explain information to the tool.
+
+Splainer is different by being a *sandbox*. Paste in your Solr URL, query parameters and all. Showing you parsed explain information while giving you the power to tweak Solr paramaters, instantly seeing important matches and summarized explain information alongside your documents. Continue working and see how the search results change. 
+
+## Using Splainer
+
+Take the [tour](http://splainer.io/help.html) to see how you'd use Splainer.
+
+
+## Who
+
+Created by [OpenSource Connections](http://opensourceconnections.com)
