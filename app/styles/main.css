@@ -119,6 +119,17 @@
   margin: 3px 0 10px 25px;
 }
 
+.tweak-button small {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  display: block;
+  margin: 3px 0 10px 25px;
+}
+
+.tweak-button small a {
+  color: rgba(255,255,255,0.75);
+}
+
 .navbar-header small a {
   color: rgba(255,255,255,0.75);
 }
