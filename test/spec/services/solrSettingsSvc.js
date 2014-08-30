@@ -76,7 +76,7 @@ describe('Service: solrSettingsSvc', function () {
 
     expect(settings.startUrl.indexOf('blah')).not.toEqual(-1);
     expect(settings.startUrl.indexOf('fl')).toEqual(-1);
-    console.log(settings.startUrl)
+    console.log(settings.startUrl);
   });
 
   it('updates start URL with only title & sub field', function() {
