@@ -4,5 +4,6 @@ node_modules
 bower_components
 dist/
 
+deploy.sh
 # vim swp
 *.swp
