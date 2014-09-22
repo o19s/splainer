@@ -4,9 +4,9 @@
     <stacked-chart detailed="doc.showDetailed" hots="doc.hotMatchesOutOf(maxScore)"></stacked-chart>
   </div>
   <div class="col-md-8">
-    <h4>{{doc.title}}</h4>
-      <div ng-repeat="sub in doc.subsList">
-        <label class="fieldLabel">{{sub.field}}:</label> <span ng-bind-html="doc.highlighted(sub.value)"></span>
+    <h4><a href="" ng-click="doc.showDoc()"> {{doc.title}}</a></h4>
+      <div ng-repeat="(fieldName, fieldSnippet) in docRow.snippets(doc)">
+        <label class="fieldLabel">{{fieldName}}:</label> <span ng-bind-html="fieldSnippet"></span>
       </div> 
     </div>
 
