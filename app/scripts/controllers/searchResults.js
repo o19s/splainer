@@ -79,6 +79,15 @@ angular.module('splain-app')
           $scope.search.docs.push(normalDoc);
           $scope.search.displayedResults++;
         });
+
+        $scope.search.grouped = angular.copy($scope.search.searcher.grouped);
+        angular.forEach($scope.search.grouped, function(groupedBys) {
+          angular.forEach(groupedBys, function(group) {
+            for (var i = 0; i < group.docs.length; i++) {
+              group.docs[i] = normalDocsSvc.createNormalDoc(fieldSpec, group.docs[i]);
+            }
+          });
+        });
         $scope.search.state = $scope.search.DID_SEARCH;
         promise.complete();
       });
@@ -87,6 +96,10 @@ angular.module('splain-app')
 
     $scope.search.moreResults = function() {
       return ($scope.search.displayedResults < $scope.search.numFound);
+    };
+
+    $scope.search.hasGrouped = function() {
+      return Object.keys($scope.search.grouped).length > 0;
     };
 
     $scope.search.restart = function() {

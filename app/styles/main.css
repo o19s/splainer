@@ -174,3 +174,7 @@
 .osc_logo {
     height: 2em;
 }
+
+.grouped .docRow {
+    margin-left: 0.5em;
+}
