@@ -13,6 +13,7 @@ angular.module('splain-app')
     $scope.search.searcher = null;
     $scope.search.settings = {searchArgsStr: ''};
     $scope.search.docs = [];
+    $scope.search.grouped = {};
     $scope.search.NO_SEARCH = 0;
     $scope.search.DID_SEARCH = 1;
     $scope.search.WAITING_FOR_SEARCH = 2;

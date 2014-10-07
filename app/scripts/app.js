@@ -13,4 +13,5 @@ angular
                          'LocalStorageModule',
                          'ui.bootstrap',
                          'gd.ui.jsonexplorer',
+                         'swd.inspector-gadget',
                          'o19s.splainer-search']);

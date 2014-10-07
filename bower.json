@@ -11,7 +11,8 @@
     "ng-json-explorer": "*",
     "splainer-search": "git://github.com/o19s/splainer-search.git#0.0.7",
     "angular-sanitize": "~1.2.21",
-    "jquery": "~2.1.1"
+    "jquery": "~2.1.1",
+    "inspector-gadget": "~0.1.0"
   },
   "devDependencies": {
     "angular-mocks": "1.2.16",

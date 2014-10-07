@@ -37,21 +37,18 @@ describe('solrSettingsWarningCtrl', function() {
     expect(Object.keys(condensedWarnings).length).toEqual(0);
   });
 
-  it('outputs single warnings', function() {
+  it('no longer words on group', function() {
     createController();
     var condensedWarnings = scope.warnings.messages('group=true');
     var shouldWarn = scope.warnings.shouldWarn('group=true');
-    expect(shouldWarn).toBe(true);
-    expectArgs(condensedWarnings, 'group');
+    expect(shouldWarn).toBe(false);
   });
   
   it('condenses warnings', function() {
     createController();
     var condensedWarnings = scope.warnings.messages('group=true&group.main=true');
     var shouldWarn = scope.warnings.shouldWarn('group=true&group.main=true');
-    expect(shouldWarn).toBe(true);
-    expectArgs(condensedWarnings, 'group');
-    expectArgs(condensedWarnings, 'group.main');
+    expect(shouldWarn).toBe(false);
   });
 });
 

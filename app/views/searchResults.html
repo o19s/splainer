@@ -11,9 +11,13 @@
 
       <small><a href="{{search.linkUrl}}" target="_blank">{{search.numFound}} Total Results</a></small>
       <hr style="margin-top: 5px"/>
-        <div ng-repeat="doc in search.docs">
+        <div ng-if="Object.keys(search.grouped).length == 0" ng-repeat="doc in search.docs">
           <doc-row doc="doc" max-score="search.maxScore"></doc-row>
           <hr/>
+        </div>
+        <div ng-if="Object.keys(search.grouped).length > 0" ng-repeat="(group, groupedBy) in search.grouped">
+          here
+          <div>{{groupedBy}}</div>
         </div>
         <div class="row">
           <div ng-show="!search.paging && search.moreResults()" id="pager" class="col-md-2 col-md-offset-5"><a href="#" ng-click="search.page()">Show More Results</a></div>

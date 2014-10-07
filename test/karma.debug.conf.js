@@ -25,6 +25,7 @@ module.exports = function(config) {
       'app/bower_components/angular-local-storage/angular-local-storage.js',
       'app/bower_components/splainer-search/splainer-search.js',
       'app/bower_components/angular-mocks/angular-mocks.js',
+      'app/bower_components/inspector-gadget/inspector-gadget.js',
       'app/scripts/**/*.js',
       'test/mock/**/*.js',
       'test/spec/**/*.js'
@@ -57,7 +58,7 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, it capture browsers, run tests and exit
-    singleRun: true,
+    singleRun: false,
 
     colors: true,
 
