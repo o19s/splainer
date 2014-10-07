@@ -2,8 +2,16 @@
 
   <div ng-if="hots.length <= 3">
     <div class="graph-explain" ng-repeat="match in hots">
-      <div class="graph-label">{{match.description}}</div>
-      <progressbar value="match.percentage"></progressbar>
+      <inspector-gadget data-container="body" data-placement="right">
+        <div class="graph-label">{{match.description}}</div>
+        <progressbar value="match.percentage"></progressbar>
+      <inspector-title>
+        Match Metadata
+      </inspector-title>
+      <inspector-content>
+      {{match.metadata}}
+      </inspector-content>
+      </inspector-gadget>
     </div> 
     <a style="font-size: 10px" ng-click="detailed()" href="#">Detailed</a>
   </div>
@@ -11,13 +19,29 @@
   <!-- collapse if > 3-->
   <div ng-if="hots.length > 3">
     <div class="graph-explain" ng-repeat="match in hots.slice(0,3)">
-      <div class="graph-label">{{match.description}}</div>
-      <progressbar value="match.percentage"></progressbar>
+      <inspector-gadget>
+        <div class="graph-label">{{match.description}}</div>
+        <progressbar value="match.percentage"></progressbar>
+      <inspector-title>
+        Match Metadata
+      </inspector-title>
+      <inspector-content>
+      {{match.metadata}}
+      </inspector-content>
+      </inspector-gadget>
     </div> 
     <div collapse="!showAll">
       <div class="graph-explain" ng-repeat="match in hots.slice(3)">
-        <div class="graph-label">{{match.description}}</div>
-        <progressbar value="match.percentage"></progressbar>
+        <inspector-gadget>
+          <div class="graph-label">{{match.description}}</div>
+          <progressbar value="match.percentage"></progressbar>
+        <inspector-title>
+          Match Metadata
+        </inspector-title>
+        <inspector-content>
+         blah
+        </inspector-content>
+        </inspector-gadget>
       </div> 
     </div>
     <a style="font-size: 10px" ng-click="detailed()" href="#">Detailed</a>
