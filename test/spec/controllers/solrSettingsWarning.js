@@ -20,7 +20,7 @@ describe('solrSettingsWarningCtrl', function() {
     });
   });
 
-  var expectArgs = function(condensed, arg) {
+  /*var expectArgs = function(condensed, arg) {
     var args = [];
     angular.forEach(condensed, function(cArgs) {
       angular.forEach(cArgs, function(arg) {
@@ -28,7 +28,7 @@ describe('solrSettingsWarningCtrl', function() {
       });
     });
     expect(args).toContain(arg);
-  };
+  };*/
 
   it('no warnings reported when no warnings...', function() {
     createController();
@@ -39,14 +39,14 @@ describe('solrSettingsWarningCtrl', function() {
 
   it('no longer words on group', function() {
     createController();
-    var condensedWarnings = scope.warnings.messages('group=true');
+    //var condensedWarnings = scope.warnings.messages('group=true');
     var shouldWarn = scope.warnings.shouldWarn('group=true');
     expect(shouldWarn).toBe(false);
   });
   
   it('condenses warnings', function() {
     createController();
-    var condensedWarnings = scope.warnings.messages('group=true&group.main=true');
+    //var condensedWarnings = scope.warnings.messages('group=true&group.main=true');
     var shouldWarn = scope.warnings.shouldWarn('group=true&group.main=true');
     expect(shouldWarn).toBe(false);
   });
