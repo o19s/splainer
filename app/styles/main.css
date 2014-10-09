@@ -185,3 +185,7 @@
         max-width: 800px;
             width: auto;
 }
+
+.modal-content {
+    overflow-x: scroll;
+}
