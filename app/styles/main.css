@@ -178,3 +178,10 @@
 .grouped .docRow {
     margin-left: 0.5em;
 }
+
+/*dont style inspector-* tags, style the corresponding bootstrap
+ *   classes (or your own)*/
+.popover {
+        max-width: 800px;
+            width: auto;
+}
