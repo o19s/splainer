@@ -31,11 +31,12 @@ Be sure you've installed npm, bower, and grunt on your machine.
 * On a Mac [follow these instructions](http://thechangelog.com/install-node-js-with-homebrew-on-os-x/)
 * On Ubuntu [follow these instructions](https://rtcamp.com/tutorials/nodejs/node-js-npm-install-ubuntu/)
 * 
-Use npm to install Grunt and Bower globally
+Use npm to install Grunt and Bower globally on your system (may require sudo)
 
-
-    npm install -g grunt-cli
-    npm install -g bower
+```
+npm install -g grunt-cli
+npm install -g bower
+```
     
 ### With Npm/Bower installed
 
