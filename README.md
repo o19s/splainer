@@ -33,6 +33,7 @@ Be sure you've installed npm, bower, and grunt on your machine.
 * 
 Use npm to install Grunt and Bower globally
 
+
     npm install -g grunt-cli
     npm install -g bower
     
