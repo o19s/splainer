@@ -5,4 +5,5 @@
 
 .graph-explain .graph-label {
     font-size: 12px;
+    word-wrap: break-word;
 }
