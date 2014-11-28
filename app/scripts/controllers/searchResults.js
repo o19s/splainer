@@ -53,6 +53,16 @@ angular.module('splain-app')
       }
     };
 
+    var groupedResultToNormalDocs = function(fieldSpec, groupedByResp) {
+      angular.forEach(groupedByResp, function(groupedBys) {
+        angular.forEach(groupedBys, function(group) {
+          for (var i = 0; i < group.docs.length; i++) {
+            group.docs[i] = normalDocsSvc.createNormalDoc(fieldSpec, group.docs[i]);
+          }
+        });
+      });
+    };
+
     $scope.search.search = function() {
       var promise = Promise.create($scope.search.search);
       var fieldSpec = fieldSpecSvc.createFieldSpec(searchSettings.fieldSpecStr);
@@ -81,13 +91,7 @@ angular.module('splain-app')
         });
 
         $scope.search.grouped = angular.copy($scope.search.searcher.grouped);
-        angular.forEach($scope.search.grouped, function(groupedBys) {
-          angular.forEach(groupedBys, function(group) {
-            for (var i = 0; i < group.docs.length; i++) {
-              group.docs[i] = normalDocsSvc.createNormalDoc(fieldSpec, group.docs[i]);
-            }
-          });
-        });
+        groupedResultToNormalDocs(fieldSpec, $scope.search.grouped);
         $scope.search.state = $scope.search.DID_SEARCH;
         promise.complete();
       });
@@ -127,6 +131,15 @@ angular.module('splain-app')
               var normalDoc = normalDocsSvc.createNormalDoc(fieldSpec, doc);
               $scope.search.docs.push(normalDoc);
               $scope.search.displayedResults++;
+          });
+
+          var grouped = angular.copy($scope.search.searcher.grouped);
+          groupedResultToNormalDocs(fieldSpec, grouped);
+          angular.forEach(grouped, function(groupedBys, groupByKey) {
+            if ($scope.search.grouped.hasOwnProperty(groupByKey)) {
+              var groupByToAppend = $scope.search.grouped[groupByKey];
+              groupByToAppend.push.apply(groupByToAppend, groupedBys);
+            }
           });
         });
       }
