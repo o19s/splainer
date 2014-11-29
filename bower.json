@@ -21,6 +21,7 @@
   "appPath": "app",
   "resolutions": {
     "json3": "~3.3.1",
-    "es5-shim": "~3.1.0"
+    "es5-shim": "~3.1.0",
+    "angular": "1.2.27"
   }
 }
