@@ -13,6 +13,12 @@ if (typeof String.prototype.hasSubstr !== 'function') {
   };
 }
 
+if (typeof String.prototype.contains !== 'function') {
+  String.prototype.contains = function(str) {
+    return this.indexOf(str) !== -1;
+  };
+}
+
 if (typeof String.prototype.endsWith !== 'function') {
   String.prototype.endsWith = function(suffix) {
       return this.indexOf(suffix, this.length - suffix.length) !== -1;
