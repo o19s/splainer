@@ -25,19 +25,25 @@
     <!-- Add your site or application content here -->
     <div class="pane_container" ng-controller="SearchResultsCtrl">
         <div class="pane_main">
-
           <header class="navbar-inverse navbar-secondary clearfix ng-scope">
     <a  ng-show="search.state === search.NO_SEARCH" style="z-index:10000" href="https://github.com/o19s/splainer"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
-            <div class="container">
-              <div class="pull-right tweak-button">
-                <small ng-show="search.state !==search.NO_SEARCH" style="position:absolute; top: 0; right: 20px;"><a href="help.html" target="_blank">Confused? Take a Tour</a></small>
-                <a ng-show="search.state !== search.NO_SEARCH" dispatch-on-click="toggleEast" href="#" type="button" class="btn btn-default navbar-btn pull-right">Tweak -></a>
-              </div>
               <div class="navbar-header">
                 <h3 class="navbar-brand" style="cursor: pointer" dispatch-on-click="closeEast" ng-click="search.restart()">Splainer</h3>
                 <small class="tiny_sub">By <a href="http://opensourceconnections.com">OpenSource Connections</a></small>
-              </div> 
-            </div>
+              </div>
+              <ul class="nav navbar-nav navbar-right">
+                <li>
+                  <a ng-show="search.state !==search.NO_SEARCH" data-toggle="tooltip" title="Take a Tour" href="help.html" target="_blank">
+                    <span class="glyphicon glyphicon-question-sign"></span> Take a Tour
+                  </a>
+                </li>
+                <li>
+                  <a ng-show="search.state !== search.NO_SEARCH" dispatch-on-click="toggleEast" href="#" type="button" ng-click="devSettingsSolr.sidebar = !devSettingsSolr.sidebar">
+                    <span ng-class="{true: 'glyphicon glyphicon-chevron-left', false: ''}[devSettingsSolr.sidebar]"></span>
+                    Tweak <span ng-class="{true: 'glyphicon-chevron-right', false: ''}[!devSettingsSolr.sidebar]" class="glyphicon glyphicon-chevron-right"></span>
+                  </a>
+                </li>
+              </ul>
           </header>
           <div class="container">
             
