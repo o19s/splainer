@@ -1,13 +1,13 @@
 'use strict';
 
 angular.module('splain-app')
-  .service('settingsStoreSvc', function settingsStoreSvc(localStorageService) {
+  .service('settingsStoreSvc', function settingsStoreSvc(localStorageService, $location) {
 
     this.ENGINES = {};
     this.ENGINES.SOLR = 0;
     this.ENGINES.ELASTICSEARCH = 1;
-    
-    
+
+    // Next is Local Storage 
     var initSearchArgs = function() {
       var searchSettings = {searchUrl: '', fieldSpecStr: '', searchArgsStr: ''};
       var localStorageTryGet = function(key) {
@@ -42,8 +42,8 @@ angular.module('splain-app')
         localStorageService.set('fieldSpecStr', searchSettings.fieldSpecStr);
         localStorageService.set('searchArgsStr', '!' + searchSettings.searchArgsStr);
         localStorageService.set('whichEngine', searchSettings.whichEngine);
-
       }
+      $location.search({'solr':  searchSettings.startUrl});
     };
 
     // init from local storage if there
