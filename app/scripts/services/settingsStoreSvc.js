@@ -43,7 +43,7 @@ angular.module('splain-app')
         localStorageService.set('searchArgsStr', '!' + searchSettings.searchArgsStr);
         localStorageService.set('whichEngine', searchSettings.whichEngine);
       }
-      $location.search({'solr':  searchSettings.startUrl});
+      $location.search({'solr':  LZString.compressToEncodedURIComponent(searchSettings.startUrl)});
     };
 
     // init from local storage if there

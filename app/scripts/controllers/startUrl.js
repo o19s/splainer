@@ -24,8 +24,8 @@ angular.module('splain-app')
       return $location.search().solr;
     }, function() {
       var solrParam = $location.search().solr;
-      if (solrParam.indexOf('http') === 0) {
-        $scope.start.settings.startUrl = $location.search().solr;
+      if (solrParam) {
+        $scope.start.settings.startUrl = LZString.decompressFromEncodedURIComponent($location.search().solr);
         onStartUrl();
       }
     });
