@@ -20,10 +20,14 @@ angular.module('splain-app')
       return solrUrlSvc.buildUrl(userSettings.searchUrl, parsedArgs);
     };
 
+    var newlineSolrArgs = function(searchArgsStr) {
+      return searchArgsStr.split('&').join('\n&');
+    };
+
     var fromParsedUrl = function(userSettings, parsedUrl) {
       var argsToUse = angular.copy(parsedUrl.solrArgs);
       solrUrlSvc.removeUnsupported(argsToUse);
-      userSettings.searchArgsStr = solrUrlSvc.formatSolrArgs(argsToUse);
+      userSettings.searchArgsStr = newlineSolrArgs(solrUrlSvc.formatSolrArgs(argsToUse));
       if (userSettings.searchArgsStr.trim().length === 0) {
         userSettings.searchArgsStr = 'q=*:*';
       }

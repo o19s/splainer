@@ -129,7 +129,7 @@ describe('solrSettingsCtrl', function() {
         scope.searchSettings.publishSearcher();
 
         expect(scope.searchSettings.fieldSpecStr).toEqual('catch_line text');
-        expect(scope.searchSettings.searchArgsStr).toEqual('q=choice of law&defType=edismax&qf=catch_line text&pf=catch_line');
+        expect(scope.searchSettings.searchArgsStr).toEqual('q=choice of law\n&defType=edismax\n&qf=catch_line text\n&pf=catch_line');
         expect(scope.searchSettings.searchUrl).toEqual(testUserUrlBase);
 
       });

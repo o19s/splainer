@@ -60,7 +60,7 @@ describe('Service: solrSettingsSvc', function () {
     var startUrl = 'http://localhost:8983/solr/example?q=*:*&fl=title catch_line';
     solrSettingsSvc.fromStartUrl(startUrl, settings);
 
-    settings.searchArgsStr = 'q=*:*&fq=blah';
+    settings.searchArgsStr = 'q=*:*\n&fq=blah';
     solrSettingsSvc.fromTweakedSettings(settings);
 
     expect(settings.startUrl.indexOf('blah')).not.toEqual(-1);
@@ -71,12 +71,23 @@ describe('Service: solrSettingsSvc', function () {
     var startUrl = 'http://localhost:8983/solr/example?q=*:*';
     solrSettingsSvc.fromStartUrl(startUrl, settings);
 
-    settings.searchArgsStr = 'q=*:*&fq=blah';
+    settings.searchArgsStr = 'q=*:*\n&fq=blah';
     solrSettingsSvc.fromTweakedSettings(settings);
 
     expect(settings.startUrl.indexOf('blah')).not.toEqual(-1);
     expect(settings.startUrl.indexOf('fl')).toEqual(-1);
     console.log(settings.startUrl);
+  });
+
+  it('adds newlines to ampersands from startUrl', function() {
+    var settings = stubSettings();
+    var startUrl = 'http://localhost:8983/solr/example?q=*:*&fq=cat:meow&fl=title catch_line';
+    solrSettingsSvc.fromStartUrl(startUrl, settings);
+    expect(settings.searchUrl).toEqual('http://localhost:8983/solr/example');    
+    expect(settings.fieldSpecStr).toEqual('title catch_line');
+    expect(settings.searchArgsStr).toEqual('q=*:*\n&fq=cat:meow');
+    expect(settings.whichEngine).toEqual(0);
+    expect(settings.startUrl).toEqual('http://localhost:8983/solr/example?q=*:*&fq=cat:meow&fl=title catch_line');
   });
 
   it('updates start URL with only title & sub field', function() {

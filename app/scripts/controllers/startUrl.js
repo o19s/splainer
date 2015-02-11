@@ -7,9 +7,7 @@ angular.module('splain-app')
     $scope.start.settings = settingsStoreSvc.settings;
 
     var onStartUrl = function() {
-      // push start URL into settings and go!
       solrSettingsSvc.fromStartUrl($scope.start.settings.startUrl, $scope.start.settings);
-      console.log('updated from startUrl');
       $scope.search.search()
       .then(function() {
         settingsStoreSvc.save();
