@@ -7,16 +7,20 @@ describe('Service: settingsStoreSvc', function () {
   
   var settingsStoreSvc = null;
   var localStorageSvc = null;
+  var locationSvc = null;
 
   var setupSvc = null;
   
   beforeEach(function() {
 
     /* global MockLocalStorageService*/
+    /* global MockLocationSvc*/
     localStorageSvc = new MockLocalStorageService();
+    locationSvc = new MockLocationSvc();
     
     module(function($provide) {
       $provide.value('localStorageService', localStorageSvc);
+      $provide.value('$location', locationSvc);
     });
 
     setupSvc = function() {
@@ -76,6 +80,7 @@ describe('Service: settingsStoreSvc', function () {
     expect(localStorageSvc.get('fieldSpecStr')).toEqual(testFieldSpecStr);
     expect(localStorageSvc.get('searchArgsStr')).toEqual('!' + testSearchArgsStr);
     expect(localStorageSvc.get('whichEngine')).toEqual(testWhichEngine);
+    expect(locationSvc.lastParams.solr).toEqual(testStartUrl);
 
 
   });

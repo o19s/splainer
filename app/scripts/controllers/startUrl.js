@@ -9,6 +9,7 @@ angular.module('splain-app')
     var onStartUrl = function() {
       // push start URL into settings and go!
       solrSettingsSvc.fromStartUrl($scope.start.settings.startUrl, $scope.start.settings);
+      console.log('updated from startUrl');
       $scope.search.search()
       .then(function() {
         settingsStoreSvc.save();
@@ -16,19 +17,9 @@ angular.module('splain-app')
     };
 
     if ($location.search().hasOwnProperty('solr')) {
-      /*$scope.start.settings.startUrl = $location.search().solr;
-      onStartUrl();*/
+      $scope.start.settings.startUrl = $location.search().solr;
+      onStartUrl();
     }
-
-    $scope.$watch(function() {
-      return $location.search().solr;
-    }, function() {
-      var solrParam = $location.search().solr;
-      if (solrParam.indexOf('http') === 0) {
-        $scope.start.settings.startUrl = $location.search().solr;
-        onStartUrl();
-      }
-    });
 
     $scope.start.submit = function() {
       onStartUrl();
