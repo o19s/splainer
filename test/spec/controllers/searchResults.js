@@ -50,12 +50,28 @@ describe('searchResultsCtrl', function() {
         'doc2': mockExplain
       } 
     }
-
   };
+
+  var set = function(aList) {
+    // this is a rather naive implementation as it casts everything to strings
+    var aSet = {};
+    angular.forEach(aList, function(element) {
+      aSet['' + element] = true;
+    });
+    return Object.keys(aSet);
+  };
+  
+  it('currSearch has states', function() {
+    createController();
+    var states = set([scope.currSearch.NO_SEARCH, scope.currSearch.WAITING_FOR_SEARCH,
+                     scope.currSearch.DID_SEARCH, scope.currSearch.IN_ERROR]);
+    expect(states.length).toBe(4);
+  });
 
   it('starts in NO_SEARCH', function() {
     createController();
-    expect(scope.search.state).toBe(scope.search.NO_SEARCH);
+    expect(scope.currSearch.hasOwnProperty('state')).toBeTruthy();
+    expect(scope.currSearch.state).toEqual(scope.currSearch.NO_SEARCH);
   });
 
   it('goes to WAITING_FOR_SERACH -> DID_SEARCH on search execute', function() {
@@ -63,9 +79,9 @@ describe('searchResultsCtrl', function() {
                .respond(200, mockSolrResp);
     createController();
     scope.search.search();
-    expect(scope.search.state).toBe(scope.search.WAITING_FOR_SEARCH);
+    expect(scope.currSearch.state).toBe(scope.currSearch.WAITING_FOR_SEARCH);
     httpBackend.flush();
-    expect(scope.search.state).toBe(scope.search.DID_SEARCH);
+    expect(scope.currSearch.state).toBe(scope.currSearch.DID_SEARCH);
     httpBackend.verifyNoOutstandingExpectation();
   });
   
@@ -74,9 +90,9 @@ describe('searchResultsCtrl', function() {
                .respond(404);
     createController();
     scope.search.search();
-    expect(scope.search.state).toBe(scope.search.WAITING_FOR_SEARCH);
+    expect(scope.currSearch.state).toBe(scope.currSearch.WAITING_FOR_SEARCH);
     httpBackend.flush();
-    expect(scope.search.state).toBe(scope.search.IN_ERROR);
+    expect(scope.currSearch.state).toBe(scope.currSearch.IN_ERROR);
     httpBackend.verifyNoOutstandingExpectation();
   });
   
@@ -86,7 +102,17 @@ describe('searchResultsCtrl', function() {
     createController();
     scope.search.search();
     httpBackend.flush();
-    expect(scope.search.docs.length).toEqual(mockSolrResp.response.docs.length);
+    expect(scope.currSearch.docs.length).toEqual(mockSolrResp.response.docs.length);
+    httpBackend.verifyNoOutstandingExpectation();
+  });
+
+  it('tracks max score', function() {
+    httpBackend.expectJSONP(urlContainsParams(testUrl, {q: ['*:*']}))
+               .respond(200, mockSolrResp);
+    createController();
+    scope.search.search();
+    httpBackend.flush();
+    expect(scope.currSearch.maxScore).toBeGreaterThan(0);
     httpBackend.verifyNoOutstandingExpectation();
   });
   
@@ -96,13 +122,13 @@ describe('searchResultsCtrl', function() {
     createController();
     scope.search.search();
     httpBackend.flush();
-    expect(scope.search.docs.length).toEqual(mockSolrResp.response.docs.length);
+    expect(scope.currSearch.docs.length).toEqual(mockSolrResp.response.docs.length);
     
     httpBackend.expectJSONP(urlContainsParams(testUrl, {q: ['*:*']}))
                .respond(404);
     scope.search.search();
     httpBackend.flush();
-    expect(scope.search.docs.length).toEqual(0);
+    expect(scope.currSearch.docs.length).toEqual(0);
     httpBackend.verifyNoOutstandingExpectation();
   });
   

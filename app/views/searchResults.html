@@ -1,33 +1,33 @@
 <div>
-    <div ng-show="search.state === search.WAITING_FOR_SEARCH" style="text-align: center"><img src="images/ajax-loader.gif"><img></div>
-    <div ng-show="search.state === search.IN_ERROR" class="alert alert-error">Error with your solr query. Double check that the URL is correct. Try accessing <a href="{{search.linkUrl}}">Solr directly</a> to troubleshoot the error.</div>
-    <div ng-show="search.state === search.DID_SEARCH">
+    <div ng-show="currSearch.state === currSearch.WAITING_FOR_SEARCH" style="text-align: center"><img src="images/ajax-loader.gif"><img></div>
+    <div ng-show="currSearch.state === currSearch.IN_ERROR" class="alert alert-error">Error with your solr query. Double check that the URL is correct. Try accessing <a href="{{currSearch.linkUrl}}">Solr directly</a> to troubleshoot the error.</div>
+    <div ng-show="currSearch.state === currSearch.DID_SEARCH">
 
-      <div ng-controller="SolrSettingsWarningCtrl" class="alert alert-warning" ng-show="warnings.shouldWarn(search.settings.searchArgsStr)">
-        <ul ng-repeat="(warning, arguments) in warnings.messages(search.settings.searchArgsStr)">
+      <div ng-controller="SolrSettingsWarningCtrl" class="alert alert-warning" ng-show="warnings.shouldWarn(currSearch.settings.searchArgsStr)">
+        <ul ng-repeat="(warning, arguments) in warnings.messages(currSearch.settings.searchArgsStr)">
           <li>Arguments Removed: <span ng-repeat="argument in arguments"> <em>{{argument}} </em></span> because: {{warning}}</li>
         </ul>
       </div>
 
-      <small><a href="{{search.linkUrl}}" target="_blank">{{search.numFound}} Total Results</a></small>
+      <small><a href="{{currSearch.linkUrl}}" target="_blank">{{currSearch.numFound}} Total Results</a></small>
       <hr style="margin-top: 5px"/>
-        <div ng-if="!search.hasGrouped()" ng-repeat="doc in search.docs">
-          <doc-row doc="doc" max-score="search.maxScore"></doc-row>
+        <div ng-if="!currSearch.hasGrouped()" ng-repeat="doc in currSearch.docs">
+          <doc-row doc="doc" max-score="currSearch.maxScore"></doc-row>
           <hr/>
         </div>
-        <div class="grouped" ng-if="search.hasGrouped()" ng-repeat="(group, groupedBy) in search.grouped">
+        <div class="grouped" ng-if="currSearch.hasGrouped()" ng-repeat="(group, groupedBy) in currSearch.grouped">
           <h4>Grouped by: {{group}}</h4>
           <div ng-repeat="grouped in groupedBy">
             <h4 style="margin-left: 10px" title = "Group: {{group}}, {{grouped.value}}">Value: <em>{{grouped.value}}</em></h4>
             <div ng-repeat="doc in grouped.docs">
-              <doc-row doc="doc" max-score="search.maxScore"></doc-row>
+              <doc-row doc="doc" max-score="currSearch.maxScore"></doc-row>
             </div>
             <hr/>
 
           </div>
         </div>
         <div class="row">
-          <div ng-show="!search.paging && search.moreResults()" id="pager" class="col-md-2 col-md-offset-5"><a href="" ng-click="search.page()">Show More Results</a></div>
+          <div ng-show="!currSearch.paging && currSearch.moreResults()" id="pager" class="col-md-2 col-md-offset-5"><a href="" ng-click="currSearch.page()">Show More Results</a></div>
         </div>
     </div>
 </div>
