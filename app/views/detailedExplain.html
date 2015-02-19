@@ -1,11 +1,24 @@
 <div>
 
-  <tabset>
-    <tab heading="Summarized"> <pre>{{doc.explain().toStr()}}</pre></tab>
-    <tab heading="Hot Matches"><pre>{{doc.hotMatches().toStr()}}</pre></tab>
-    <tab heading="Full Explain"><json-explorer json-data="{{doc.explain().rawStr()}}"></json-explorer></tab>
-  </tabset>
+  <div class="row">
+    <div class="col-md-6">
+      <tabset>
+        <tab heading="Summarized"> <pre>{{doc.explain().toStr()}}</pre></tab>
+        <tab heading="Hot Matches"><pre>{{doc.hotMatches().toStr()}}</pre></tab>
+        <tab heading="Full Explain"><json-explorer json-data="{{doc.explain().rawStr()}}"></json-explorer></tab>
+      </tabset>
+    </div>
+    <div ng-show="altDoc" class="col-md-6">
+      <tabset>
+        <tab heading="Summarized"> <pre>{{altDoc.explain().toStr()}}</pre></tab>
+        <tab heading="Hot Matches"><pre>{{altDoc.hotMatches().toStr()}}</pre></tab>
+        <tab heading="Full Explain"><json-explorer json-data="{{altDoc.explain().rawStr()}}"></json-explorer></tab>
+      </tabset>
+    </div>
   <div>
     <label for="compare-to">Compare To:</label> <input id="compare-to" type="checkbox"></input>
+  </div>
+  <div style="max-height: 300px; overflow: auto">
+    <doc-selector doc-selection="altDoc"></doc-selector>
   </div>
 </div>

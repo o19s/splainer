@@ -5,4 +5,5 @@ angular.module('splain-app')
     // this controller is a bit silly just because
     // modals need their own controller
     $scope.doc = doc;
+    $scope.altDoc = null;
   });

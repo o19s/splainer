@@ -5,7 +5,7 @@
       <div class="graph-label">{{match.description}}</div>
       <progressbar value="match.percentage"></progressbar>
     </div> 
-    <a style="font-size: 10px" ng-click="detailed()" >Detailed</a>
+    <a ng-if="detailed" style="font-size: 10px" ng-click="detailed()" >Detailed</a>
   </div>
 
   <!-- collapse if > 3-->

@@ -1,0 +1,31 @@
+
+  <div ng-if="!currSearch.hasGrouped()" ng-repeat="doc in currSearch.docs">
+  <div ng-click="selectDoc(doc)" class="row">
+    <div class="col-sm-3">
+      <h4>{{doc.score}}</h4>
+      <stacked-chart detailed="doc.showDetailed" hots="doc.hotMatchesOutOf(maxScore)"></stacked-chart>
+    </div>
+    <div class="col-sm-9">
+      <h4>{{doc.title}}</h4> 
+      {{doc.id}}
+    </div>
+    <hr/>
+   </div>
+  </div>
+  <div class="grouped" ng-if="currSearch.hasGrouped()" ng-repeat="(group, groupedBy) in currSearch.grouped">
+    <h4>Grouped by: {{group}}</h4>
+    <div ng-repeat="grouped in groupedBy">
+      <h4 style="margin-left: 10px" title = "Group: {{group}}, {{grouped.value}}">Value: <em>{{grouped.value}}</em></h4>
+      <div ng-repeat="doc in grouped.docs">
+        <div class="col-md-4">
+          <h4>{{doc.score}}</h4>
+          <stacked-chart detailed="doc.showDetailed" hots="doc.hotMatchesOutOf(maxScore)"></stacked-chart>
+        </div>
+        <div class="col-md-8">
+          <h4>{{doc.id}}  {{doc.title}}</h4>
+        </div>
+      </div>
+      <hr/>
+
+    </div>
+  </div>
