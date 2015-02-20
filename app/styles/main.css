@@ -205,3 +205,8 @@
 .navbar-inverse .navbar-nav > li > a {
   color: rgb(205, 221, 235);
 }
+
+.selectableDoc:hover {
+    background-color: #FFFFFF;
+    cursor:pointer;
+}

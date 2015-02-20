@@ -6,4 +6,11 @@ angular.module('splain-app')
     // modals need their own controller
     $scope.doc = doc;
     $scope.altDoc = null;
+    $scope.toggled = false;
+    $scope.toggleCompare = function() {
+      $scope.toggled = !$scope.toggled;
+      if (!$scope.toggled) {
+        $scope.altDoc = null;
+      }
+    };
   });

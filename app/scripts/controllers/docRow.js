@@ -12,6 +12,7 @@ angular.module('splain-app')
       $modal.open({
         templateUrl: 'views/detailedExplain.html',
         controller: 'DocExplainCtrl',
+        size: 'lg',
         resolve: {
           doc: function() {
             return $scope.doc;
