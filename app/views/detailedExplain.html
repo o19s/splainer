@@ -5,18 +5,18 @@
       <h3>Explain for "{{doc.title}}" <span ng-if="altDoc">vs "{{altDoc.title}}"</span></h3>
       <tabset>
         <tab heading="Summarized">
-        <div ng-class="{true: 'col-md-6', false: 'col-md-12'}[altDoc !== null]">
+        <div class="explain-view" ng-class="{true: 'col-md-6', false: 'col-md-12'}[altDoc !== null]">
           <pre>{{doc.explain().toStr()}}</pre>
         </div>
-        <div ng-if="altDoc" ng-class="{true: 'col-md-6', false: 'col-md-0'}[altDoc !== null]">
+        <div  class="explain-view" ng-if="altDoc" ng-class="{true: 'col-md-6', false: 'col-md-0'}[altDoc !== null]">
           <pre>{{altDoc.explain().toStr()}}</pre>
         </div> 
         </tab>
         <tab heading="Hot Matches">
-        <div ng-class="{true: 'col-md-6', false: 'col-md-12'}[altDoc !== null]">
+        <div  class="explain-view" ng-class="{true: 'col-md-6', false: 'col-md-12'}[altDoc !== null]">
           <pre>{{doc.hotMatches().toStr()}}</pre>
         </div>
-        <div ng-if="altDoc" ng-class="{true: 'col-md-6', false: 'col-md-0'}[altDoc !== null]">
+        <div  class="explain-view" ng-if="altDoc" ng-class="{true: 'col-md-6', false: 'col-md-0'}[altDoc !== null]">
           <pre>{{altDoc.hotMatches().toStr()}}</pre>
         </div> 
         </tab>

@@ -210,3 +210,8 @@
     background-color: #EEE;
     cursor:pointer;
 }
+
+.explain-view {
+    max-height: 400px;
+    overflow-y: auto;
+}
