@@ -30,20 +30,10 @@
         </tab>
       </tabset>
     </div>
-    <!--
-    <div ng-if="altDoc" ng-class="{true: 'col-md-6', false: 'col-md-0'}[altDoc !== null]">
-      <h3>Explain for "{{altDoc.title}}"</h3>
-      <tabset>
-        <tab heading="Summarized"> <pre>{{altDoc.explain().toStr()}}</pre></tab>
-        <tab heading="Hot Matches"><pre>{{altDoc.hotMatches().toStr()}}</pre></tab>
-        <tab heading="Full Explain"><json-explorer json-data="{{altDoc.explain().rawStr()}}"></json-explorer></tab>
-      </tabset>
-    </div>
-    -->
   </div>
   <div class="row">
     <div class="col-md-12">
-      <input ng-click="toggleCompare()" id="compare-to" type="checkbox"></input><label for="compare-to">Also Examine...</label>
+      <input ng-click="toggleCompare()" id="compare-to" type="checkbox"></input><label for="compare-to">Compare to Other Doc</label>
       <div ng-show="toggled" style="max-height: 300px; overflow-y: auto; overflow-x: none;">
         <doc-selector doc-selection="altDoc"></doc-selector>
       </div>

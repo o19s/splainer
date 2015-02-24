@@ -45,8 +45,8 @@ angular.module('splain-app')
       });
     };
 
-    this.createSearch = function(searchSettings) {
-      var search = new Search(searchSettings);
+    this.createSearch = function(searchSettings, overridingExplains) {
+      var search = new Search(searchSettings, overridingExplains);
       search.NO_SEARCH = this.states.NO_SEARCH;
       search.DID_SEARCH = this.states.DID_SEARCH;
       search.WAITING_FOR_SEARCH = this.states.WAITING_FOR_SEARCH;
@@ -54,7 +54,7 @@ angular.module('splain-app')
       return search;
     };
 
-    var Search = function(searchSettings) {
+    var Search = function(searchSettings, overridingExplains) {
       this.searcher = null;
       this.reset = function() {
         this.displayedResults = 0;
@@ -66,6 +66,12 @@ angular.module('splain-app')
         this.settings = {searchArgsStr: ''};
         this.paging = false;
         this.state = thisSvc.states.NO_SEARCH;
+        this.overridingExplains = {};
+        if (overridingExplains) {
+          // we might not be explaining this search, but being used
+          // in conjunction with explainOther
+          this.overridingExplains = overridingExplains;
+        }
       };
 
       this.reset();
@@ -75,6 +81,16 @@ angular.module('splain-app')
       };
       this.moreResults = function() {
         return (this.displayedResults < this.numFound);
+      };
+
+      this.getOverridingExplain = function(doc, fieldSpec) {
+        var idFieldName = fieldSpec.id;
+        var id = doc[idFieldName];
+
+        if (id && this.overridingExplains.hasOwnProperty(id)) {
+          return this.overridingExplains[id];
+        }
+        return null;
       };
 
       this.search = function() {
@@ -96,7 +112,8 @@ angular.module('splain-app')
             return;
           }
           angular.forEach(thisSearch.searcher.docs, function(doc) {
-            var normalDoc = normalDocsSvc.createNormalDoc(fieldSpec, doc);
+            var overridingExpl = thisSearch.getOverridingExplain(doc, fieldSpec);
+            var normalDoc = normalDocsSvc.createNormalDoc(fieldSpec, doc, overridingExpl);
             if (normalDoc.score() > thisSearch.maxScore) {
               thisSearch.maxScore = normalDoc.score();
               console.log('new max score' + thisSearch.maxScore);
@@ -133,7 +150,8 @@ angular.module('splain-app')
               return;
             }
             angular.forEach(thisSearch.searcher.docs, function(doc) {
-                var normalDoc = normalDocsSvc.createNormalDoc(fieldSpec, doc);
+                var overridingExpl = thisSearch.getOverridingExplain(doc, fieldSpec);
+                var normalDoc = normalDocsSvc.createNormalDoc(fieldSpec, doc, overridingExpl);
                 thisSearch.docs.push(normalDoc);
                 thisSearch.displayedResults++;
             });
