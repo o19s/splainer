@@ -1,42 +1,40 @@
-<div class="container">
+<p class="modal-header">Explain for: <i>{{doc.title}}</i> <span ng-if="altDoc">vs <i>{{altDoc.title}}</i></span></p>
+<div class="modal-body">
 
-  <div class="row">
-    <div >
-      <h3>Explain for "{{doc.title}}" <span ng-if="altDoc">vs "{{altDoc.title}}"</span></h3>
-      <tabset>
-        <tab heading="Summarized">
-        <div class="explain-view" ng-class="{true: 'col-md-6', false: 'col-md-12'}[altDoc !== null]">
-          <pre>{{doc.explain().toStr()}}</pre>
-        </div>
-        <div  class="explain-view" ng-if="altDoc" ng-class="{true: 'col-md-6', false: 'col-md-0'}[altDoc !== null]">
-          <pre>{{altDoc.explain().toStr()}}</pre>
-        </div> 
-        </tab>
-        <tab heading="Hot Matches">
-        <div  class="explain-view" ng-class="{true: 'col-md-6', false: 'col-md-12'}[altDoc !== null]">
-          <pre>{{doc.hotMatches().toStr()}}</pre>
-        </div>
-        <div  class="explain-view" ng-if="altDoc" ng-class="{true: 'col-md-6', false: 'col-md-0'}[altDoc !== null]">
-          <pre>{{altDoc.hotMatches().toStr()}}</pre>
-        </div> 
-        </tab>
-        <tab heading="Full Explain">
-          <div ng-class="{true: 'col-md-6', false: 'col-md-12'}[altDoc !== null]">
-            <json-explorer json-data="{{doc.explain().rawStr()}}"></json-explorer>
+    <div class="row">
+      <div>
+        <tabset>
+          <tab heading="Summarized">
+          <div class="explain-view" ng-class="{true: 'col-md-6', false: 'col-md-12'}[altDoc !== null]">
+            <pre>{{doc.explain().toStr()}}</pre>
           </div>
-          <div ng-if="altDoc" ng-class="{true: 'col-md-6', false: 'col-md-0'}[altDoc !== null]">
-            <json-explorer json-data="{{altDoc.explain().rawStr()}}"></json-explorer>
+          <div  class="explain-view" ng-if="altDoc" ng-class="{true: 'col-md-6', false: 'col-md-0'}[altDoc !== null]">
+            <pre>{{altDoc.explain().toStr()}}</pre>
+          </div> 
+          </tab>
+          <tab heading="Hot Matches">
+          <div  class="explain-view" ng-class="{true: 'col-md-6', false: 'col-md-12'}[altDoc !== null]">
+            <pre>{{doc.hotMatches().toStr()}}</pre>
           </div>
-        </tab>
-      </tabset>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-12">
-      <input ng-click="toggleCompare()" id="compare-to" type="checkbox"></input><label for="compare-to">Compare to Other Doc</label>
-      <div ng-show="toggled" style="max-height: 300px; overflow-y: auto; overflow-x: none;">
-        <doc-selector doc-selection="altDoc"></doc-selector>
+          <div  class="explain-view" ng-if="altDoc" ng-class="{true: 'col-md-6', false: 'col-md-0'}[altDoc !== null]">
+            <pre>{{altDoc.hotMatches().toStr()}}</pre>
+          </div> 
+          </tab>
+          <tab heading="Full Explain">
+            <div ng-class="{true: 'col-md-6', false: 'col-md-12'}[altDoc !== null]">
+              <json-explorer json-data="{{doc.explain().rawStr()}}"></json-explorer>
+            </div>
+            <div ng-if="altDoc" ng-class="{true: 'col-md-6', false: 'col-md-0'}[altDoc !== null]">
+              <json-explorer json-data="{{altDoc.explain().rawStr()}}"></json-explorer>
+            </div>
+          </tab>
+        </tabset>
       </div>
     </div>
-  </div>
+    
+</div>
+<div class="container">
+    <div class="row" style="max-height: 300px; overflow-y: auto; overflow-x: hidden">
+      <doc-selector doc-selection="altDoc"></doc-selector>
+    </div>
 </div>
