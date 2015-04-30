@@ -11,12 +11,12 @@ describe('solrSettingsCtrl', function() {
   beforeEach(function() {
     /* global MockLocalStorageService*/
     localStorage = new MockLocalStorageService();
-    
+
     module(function($provide) {
       $provide.value('localStorageService', localStorage);
     });
-    
-    
+
+
     inject(function($rootScope, $controller) {
 
       createController = function() {
@@ -55,7 +55,7 @@ describe('solrSettingsCtrl', function() {
       expect(scope.searchSettings.fieldSpecStr).toEqual('');
       expect(scope.searchSettings.searchArgsStr).toEqual('');
     });
-    
+
     it('loads all', function() {
       localStorage.isSupported = true;
       var testUrl = 'http://localhost:8983/solr/collection1/select';
@@ -77,7 +77,7 @@ describe('solrSettingsCtrl', function() {
   });
 
   describe('save settings', function() {
-    
+
     describe('multiple setting input', function() {
       var testUrl = 'http://localhost:8983/solr/collection1/select';
       var testFieldSpec = 'field1';
@@ -88,7 +88,7 @@ describe('solrSettingsCtrl', function() {
         scope.searchSettings.searchUrl = testUrl;
         scope.searchSettings.searchArgsStr = testArgsStr;
         scope.searchSettings.fieldSpecStr = testFieldSpec;
-        spyOn(scope.search, 'search').andCallThrough();        
+        spyOn(scope.search, 'search').andCallThrough();
         scope.searchSettings.publishSearcher();
       });
 
@@ -101,7 +101,7 @@ describe('solrSettingsCtrl', function() {
         expect(localStorage.get('fieldSpecStr')).toEqual(testFieldSpec);
         expect(localStorage.get('searchArgsStr').slice(1)).toEqual(testArgsStr);
       });
-      
+
     });
 
     // someone just pastes in a big URL
@@ -109,7 +109,7 @@ describe('solrSettingsCtrl', function() {
       var testUserUrl = 'http://localhost:8983/solr/collection1/select?q=*:*&fl=field1';
       var testUrlEncodedUrl = 'http://localhost:8983/solr/collection1/select?q=choice%20of%20law&defType=edismax&qf=catch_line%20text&pf=catch_line&fl=catch_line%20text';
       var testUserUrlBase = 'http://localhost:8983/solr/collection1/select';
-      
+
       beforeEach(function() {
       });
 
@@ -129,18 +129,18 @@ describe('solrSettingsCtrl', function() {
         scope.searchSettings.publishSearcher();
 
         expect(scope.searchSettings.fieldSpecStr).toEqual('catch_line text');
-        expect(scope.searchSettings.searchArgsStr).toEqual('q=choice of law\n&defType=edismax\n&qf=catch_line text\n&pf=catch_line');
+        expect(scope.searchSettings.searchArgsStr).toEqual('q=choice of law&defType=edismax&qf=catch_line text&pf=catch_line');
         expect(scope.searchSettings.searchUrl).toEqual(testUserUrlBase);
 
       });
-      
+
     });
-    
+
     describe('url and preexisting input', function() {
       var testNewUserUrl = 'http://localhost:8983/solr/collection1/select?q=field:foo&fl=field1';
       var testFieldSpecStr = 'field1';
       var testArgsStr = 'q=*:*';
-      
+
       beforeEach(function() {
         localStorage.store.searchArgsStr = testArgsStr;
         localStorage.store.fieldSpecStr = testFieldSpecStr;
@@ -151,11 +151,11 @@ describe('solrSettingsCtrl', function() {
         scope.searchSettings.searchUrl = testNewUserUrl;
         scope.searchSettings.publishSearcher();
       });
-      
+
     });
 
 
   });
-  
+
 
 });
