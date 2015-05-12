@@ -7,9 +7,9 @@ angular.module('splain-app')
     this.ENGINES.SOLR = 0;
     this.ENGINES.ELASTICSEARCH = 1;
 
-    // Next is Local Storage 
+    // Next is Local Storage
     var initSearchArgs = function() {
-      var searchSettings = {searchUrl: '', fieldSpecStr: '', searchArgsStr: ''};
+      var searchSettings = {searchUrl: '', fieldSpecStr: '', searchArgsStr: '', searchArgsStrShow: ''};
       var localStorageTryGet = function(key) {
         var val;
         try {
@@ -17,7 +17,7 @@ angular.module('splain-app')
         } catch (SyntaxError) {
           val = null;
         }
-          
+
         if (val !== null) {
           searchSettings[key] = val;
         } else {
@@ -29,6 +29,7 @@ angular.module('splain-app')
         localStorageTryGet('startUrl');
         localStorageTryGet('fieldSpecStr');
         localStorageTryGet('searchArgsStr');
+        localStorageTryGet('searchArgsStrShow');
         localStorageTryGet('whichEngine');
       }
       searchSettings.searchArgsStr = searchSettings.searchArgsStr.slice(1);
@@ -41,6 +42,7 @@ angular.module('splain-app')
         localStorageService.set('searchUrl', searchSettings.searchUrl);
         localStorageService.set('fieldSpecStr', searchSettings.fieldSpecStr);
         localStorageService.set('searchArgsStr', '!' + searchSettings.searchArgsStr);
+        localStorageService.set('searchArgsStrShow', searchSettings.searchArgsStr.split('&').join('\n'));
         localStorageService.set('whichEngine', searchSettings.whichEngine);
       }
       $location.search({'solr':  searchSettings.startUrl});
