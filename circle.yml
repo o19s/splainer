@@ -1,4 +1,4 @@
 dependencies:
-    post:
-        npm install
-        bower install
+  post:
+    - npm install
+    - bower install
