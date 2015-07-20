@@ -4,7 +4,7 @@ angular.module('splain-app')
   .controller('DocSelectorCtrl', function DocExplainCtrl($scope, searchSvc, solrUrlSvc, settingsStoreSvc) {
     // this controller is a bit silly just because
     // modals need their own controller
-    
+
     var addToSolrArgs = function(solrArgsStr, newParams) {
       var solrArgs = solrUrlSvc.parseSolrArgs(solrArgsStr);
       angular.forEach(newParams, function(value, arg) {
@@ -19,11 +19,11 @@ angular.module('splain-app')
     $scope.explainOther = function(altQuery) {
       var searchSettings = settingsStoreSvc.settings;
 
-      // explainOther by passing a explainOther=<luceneQuery> to 
+      // explainOther by passing a explainOther=<luceneQuery> to
       // the user's current settings and rerunning the search
       searchSettings = angular.copy(searchSettings);
       // we should be using the solrUrlSvc to do this
-      searchSettings.searchArgsStr = addToSolrArgs(searchSettings.searchArgsStr, 
+      searchSettings.searchArgsStr = addToSolrArgs(searchSettings.searchArgsStr,
                                                    {'explainOther': [altQuery]});
       var explainOtherSearch = searchSvc.createSearch(searchSettings);
       explainOtherSearch.search()

@@ -46,7 +46,7 @@
               </ul>
           </header>
           <div class="container">
-            
+
             <div ng-include="'views/searchResults.html'"></div>
             <div ng-controller="StartUrlCtrl" ng-show="currSearch.state === currSearch.NO_SEARCH" ng-include="'views/startUrl.html'"></div>
           </div>
@@ -56,7 +56,7 @@
           </div>
       </div>
       <div class="east-slider">
-      </div>    
+      </div>
       <div class="pane_east">
           <h3>Search Controls</h3>
           <form class="form-horizontal" role="form" ng-controller="SolrSettingsCtrl" ng-submit="searchSettings.publishSearcher()">
@@ -78,7 +78,7 @@
               Search Args <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsArgs.toggle]" class="glyphicon glyphicon-minus-sign"></span>
             </div>
             <div class="dev-section" ng-show="!devSettingsArgs.toggle">
-              <textarea id="inputSolrArgsStr" ng-model="searchSettings.searchArgsStr" rows="10" class="form-control ng-pristine ng-valid"></textarea> 
+              <textarea id="inputSolrArgsStr" ng-model="searchSettings.searchArgsStrShow" rows="10" class="form-control ng-pristine ng-valid"></textarea> 
             </div>
             <div class="dev-section">
               <button type="submit" class="btn btn-default">Rerun Query</button>

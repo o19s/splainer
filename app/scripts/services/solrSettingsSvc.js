@@ -21,7 +21,7 @@ angular.module('splain-app')
     };
 
     var newlineSolrArgs = function(searchArgsStr) {
-      return searchArgsStr.split('&').join('\n&');
+      return searchArgsStr;//.split('&').join('\n&'); // remove &
     };
 
     var fromParsedUrl = function(userSettings, parsedUrl) {
@@ -39,23 +39,28 @@ angular.module('splain-app')
       }
       userSettings.searchUrl = parsedUrl.solrEndpoint();
     };
-    
+
     /* Update/sanitize settings from user input when tweaking
      * (ie user updates solr URL or search args, fields, etc)
-     * */ 
+     * */
     this.fromTweakedSettings = function(searchSettings) {
+      if (searchSettings.searchArgsStrShow) {
+        searchSettings.searchArgsStr = searchSettings.searchArgsStrShow.split('\n').join('&');
+      }
+
       var parsedUrl = solrUrlSvc.parseSolrUrl(searchSettings.searchUrl);
       if (parsedUrl !== null && parsedUrl.solrArgs && Object.keys(parsedUrl.solrArgs).length > 0) {
         fromParsedUrl(searchSettings, parsedUrl);
       }
       searchSettings.startUrl = reconstructFullUrl(searchSettings);
+
       return searchSettings;
     };
 
     /* Create settings from a pasted in user URL
      * (ie from start screen)
      *
-     * */ 
+     * */
     this.fromStartUrl = function(newStartUrl, searchSettings) {
       searchSettings.whichEngine = 0;
       searchSettings.startUrl = newStartUrl;
@@ -63,6 +68,9 @@ angular.module('splain-app')
       if (parsedUrl !== null) {
         fromParsedUrl(searchSettings, parsedUrl);
       }
+
+      searchSettings.searchArgsStrShow = searchSettings.searchArgsStr.split('&').join('\n');
+
       return searchSettings;
     };
 
