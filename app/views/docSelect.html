@@ -3,7 +3,7 @@
     <form ng-submit="explainOther(altQuery)">
       <div class="col-md-1"></div>
       <div class="col-md-7">
-        <input class="form-control" id="altQuery" ng-model="altQuery" placeholder="Search For Other Docs To Explain (use Solr Query syntax)" type="text"></input>
+        <input class="form-control" id="altQuery" ng-model="altQuery" placeholder="Search For Other Docs To Compare (use Solr Query syntax)" type="text"></input>
       </div>
       <div class="col-md-3">
         <input class="btn btn-primary form-control" type="submit" value="Find Others"></input>
@@ -19,9 +19,11 @@
   <div class="grouped " ng-if="currSearch.hasGrouped()" ng-repeat="(group, groupedBy) in currSearch.grouped">
     <h4>Grouped by: {{group}}</h4>
     <div class="container" ng-repeat="grouped in groupedBy">
-      <doc-row detailed-explain-link="false" max-score="currSearch.maxScore" doc="doc" ng-click="selectDoc(doc)"></doc-row>
+     <h4 style="margin-left: 10px" title = "Group: {{group}}, {{grouped.value}}">Value: <em>{{grouped.value}}</em></h4>
+     <div ng-repeat="doc in grouped.docs">
+       <doc-row detailed-explain-link="false" max-score="currSearch.maxScore" doc="doc" ng-click="selectDoc(doc)"></doc-row>
+      </div>
       <hr/>
-
     </div>
   </div>
   <!--div>
