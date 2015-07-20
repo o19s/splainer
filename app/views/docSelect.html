@@ -12,19 +12,9 @@
     </form>
   </div>
   </hr>
-  <div class="container" ng-if="!currSearch.hasGrouped()" ng-repeat="doc in currSearch.docs">
+  <div class="container" ng-repeat="doc in currSearch.docs">
     <doc-row detailed-explain-link="false" max-score="currSearch.maxScore" doc="doc" ng-click="selectDoc(doc)"></doc-row>
     <hr/>
-  </div>
-  <div class="grouped " ng-if="currSearch.hasGrouped()" ng-repeat="(group, groupedBy) in currSearch.grouped">
-    <h4>Grouped by: {{group}}</h4>
-    <div class="container" ng-repeat="grouped in groupedBy">
-     <h4 style="margin-left: 10px" title = "Group: {{group}}, {{grouped.value}}">Value: <em>{{grouped.value}}</em></h4>
-     <div ng-repeat="doc in grouped.docs">
-       <doc-row detailed-explain-link="false" max-score="currSearch.maxScore" doc="doc" ng-click="selectDoc(doc)"></doc-row>
-      </div>
-      <hr/>
-    </div>
   </div>
   <!--div>
     <div ng-show="!currSearch.paging && currSearch.moreResults()" id="pager" class="col-sm-3 col-sm-offset-5"><a href="" ng-click="currSearch.page()">Select From More Results</a></div>
