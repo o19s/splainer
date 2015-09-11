@@ -10,9 +10,10 @@ dependencies:
     - echo $GCLOUD_AUTH_KEY | base64 --decode > ~/gcloud_auth.json
     - gcloud auth activate-service-account $GCLOUD_AUTH_EMAIL --key-file ~/gcloud_auth.json
     - gcloud config set project $GCLOUD_PROJECT_ID
+    - npm install -g bower
+    - npm install -g grunt-cli
   override:
     - npm install
-    - npm install -g bower
     - bower install
 
 test:
