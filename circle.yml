@@ -12,6 +12,7 @@ dependencies:
     - gcloud config set project $GCLOUD_PROJECT_ID
   override:
     - npm install
+    - npm install -g bower
     - bower install
 
 test:
