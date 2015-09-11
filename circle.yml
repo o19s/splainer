@@ -4,8 +4,6 @@ machine:
 
 dependencies:
   cache_directories:
-    - splainer/app/bower_components
-    - splainer/node_modules
     - /home/ubuntu/bin
   pre:
     - if [[ ! -f /home/ubuntu/bin/optipng ]]; then curl -L http://downloads.sourceforge.net/project/optipng/OptiPNG/optipng-0.7.5/optipng-0.7.5.tar.gz | tar xvzf - ; cd optipng-0.7.5; prefix=/home/ubuntu ./configure; make; make install; fi
