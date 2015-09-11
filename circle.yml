@@ -3,8 +3,12 @@ machine:
     version: 0.12.7
 
 dependencies:
-  # cache_directories:
+  cache_directories:
+    - splainer/app/bower_components
+    - splainer/node_modules
+    - /home/ubuntu/bin
   pre:
+    - if [[ ! -f /home/ubuntu/bin/optipng ]]; then curl -L http://downloads.sourceforge.net/project/optipng/OptiPNG/optipng-0.7.5/optipng-0.7.5.tar.gz | tar xvzf - ; cd optipng-0.7.5; prefix=/home/ubuntu ./configure; make; make install; fi
     - sudo /opt/google-cloud-sdk/bin/gcloud -q components update
     - sudo chown -R ubuntu:ubuntu ~/.config/gcloud
     - echo $GCLOUD_AUTH_KEY | base64 --decode > ~/gcloud_auth.json
