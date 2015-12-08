@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('splain-app')
-  .service('spl_searchSvc', function solrSettingsSvc(solrUrlSvc, fieldSpecSvc, searchSvc, normalDocsSvc) {
+  .service('splSearchSvc', function splSearchSvc(solrUrlSvc, fieldSpecSvc, searchSvc, normalDocsSvc) {
 
     this.states = {
       NO_SEARCH: 0,
@@ -110,13 +110,9 @@ angular.module('splain-app')
 
         var thisSearch = this;
         this.searcher.search()
-        .then(function() {
+        .then(function success() {
           thisSearch.linkUrl = thisSearch.searcher.linkUrl;
           thisSearch.numFound = thisSearch.searcher.numFound;
-          if (thisSearch.searcher.inError) {
-            thisSearch.state = thisSvc.states.IN_ERROR;
-            return;
-          }
           angular.forEach(thisSearch.searcher.docs, function(doc) {
             var overridingExpl = thisSearch.getOverridingExplain(doc, fieldSpec);
             var normalDoc = normalDocsSvc.createNormalDoc(fieldSpec, doc, overridingExpl);
@@ -132,6 +128,9 @@ angular.module('splain-app')
           groupedResultToNormalDocs(fieldSpec, thisSearch.grouped);
           thisSearch.state = thisSvc.states.DID_SEARCH;
           promise.complete();
+        }, function searchFailure() {
+          thisSearch.state = thisSvc.states.IN_ERROR;
+          return;
         });
 
         return promise;

@@ -8,7 +8,7 @@
  * Controller of the frontendApp
  */
 angular.module('splain-app')
-  .controller('SearchResultsCtrl', function ($scope, spl_searchSvc, settingsStoreSvc) {
+  .controller('SearchResultsCtrl', function ($scope, splSearchSvc, settingsStoreSvc) {
 
 
     $scope.search = {};
@@ -27,7 +27,7 @@ angular.module('splain-app')
 
     $scope.search.reset = function() {
       var searchSettings = settingsStoreSvc.settings;
-      $scope.currSearch = spl_searchSvc.createSearch(searchSettings);
+      $scope.currSearch = splSearchSvc.createSearch(searchSettings);
     };
 
     $scope.search.reset();

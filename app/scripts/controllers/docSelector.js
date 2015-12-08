@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('splain-app')
-  .controller('DocSelectorCtrl', function DocExplainCtrl($scope, spl_searchSvc, solrUrlSvc, settingsStoreSvc) {
+  .controller('DocSelectorCtrl', function DocExplainCtrl($scope, splSearchSvc, solrUrlSvc, settingsStoreSvc) {
     // this controller is a bit silly just because
     // modals need their own controller
 
@@ -25,14 +25,14 @@ angular.module('splain-app')
       // we should be using the solrUrlSvc to do this
       searchSettings.searchArgsStr = addToSolrArgs(searchSettings.searchArgsStr,
                                                    {'explainOther': [altQuery]});
-      var explainOtherSearch = spl_searchSvc.createSearch(searchSettings);
+      var explainOtherSearch = splSearchSvc.createSearch(searchSettings);
       explainOtherSearch.search()
       .then(function() {
         // but we don't get anything but an explain, so let's re-search
         // and try to pull back the right data
         searchSettings = angular.copy(searchSettings);
         searchSettings.searchArgsStr = 'q=' + altQuery;
-        $scope.currSearch = spl_searchSvc.createSearch(searchSettings, explainOtherSearch.searcher.othersExplained);
+        $scope.currSearch = splSearchSvc.createSearch(searchSettings, explainOtherSearch.searcher.othersExplained);
         $scope.currSearch.search();
       });
     };
