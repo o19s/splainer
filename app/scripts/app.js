@@ -14,4 +14,5 @@ angular
                          'ui.bootstrap',
                          'gd.ui.jsonexplorer',
                          'swd.inspector-gadget',
+                         'ui.ace',
                          'o19s.splainer-search']);

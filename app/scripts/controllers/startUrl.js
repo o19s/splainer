@@ -8,6 +8,10 @@ angular.module('splain-app')
 
     var onStartUrl = function(overridingFieldSpec) {
       solrSettingsSvc.fromStartUrl($scope.start.settings.startUrl, $scope.start.settings, overridingFieldSpec);
+      search();
+    };
+
+    var search = function() {
       $scope.search.search()
       .then(function() {
         settingsStoreSvc.save();
@@ -21,9 +25,20 @@ angular.module('splain-app')
         overridingFieldSpec = $location.search().fieldSpec;
       }
       onStartUrl(overridingFieldSpec);
+    } else if ($location.search().hasOwnProperty('esUrl')) {
+      $scope.start.settings.whichEngine = 'es';
+      $scope.start.settings.searchUrl = $location.search().esUrl;
+      $scope.start.settings.searchArgsStr = $location.search().esQuery;
+      search();
     }
 
-    $scope.start.submit = function() {
+    $scope.start.submitSolr = function() {
+      $scope.start.settings.whichEngine = 'solr';
       onStartUrl();
+    };
+
+    $scope.start.submitEs = function() {
+      $scope.start.settings.whichEngine = 'es';
+      search();
     };
   });

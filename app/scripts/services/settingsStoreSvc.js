@@ -4,8 +4,9 @@ angular.module('splain-app')
   .service('settingsStoreSvc', function settingsStoreSvc(localStorageService, $location) {
 
     this.ENGINES = {};
-    this.ENGINES.SOLR = 0;
-    this.ENGINES.ELASTICSEARCH = 1;
+    // these need to be angular values
+    this.ENGINES.SOLR = 'solr';
+    this.ENGINES.ELASTICSEARCH = 'es';
 
     // Next is Local Storage
     var initSearchArgs = function() {
@@ -43,7 +44,13 @@ angular.module('splain-app')
         localStorageService.set('searchArgsStr', '!' + searchSettings.searchArgsStr);
         localStorageService.set('whichEngine', searchSettings.whichEngine);
       }
-      $location.search({'solr':  searchSettings.startUrl, 'fieldSpec': searchSettings.fieldSpecStr});
+      if (searchSettings.whichEngine === 'solr') {
+        $location.search({'solr':  searchSettings.startUrl, 'fieldSpec': searchSettings.fieldSpecStr});
+      } else {
+        $location.search({'esUrl':  searchSettings.searchUrl,
+                          'esQuery': searchSettings.searchArgsStr});
+
+      }
     };
 
     // init from local storage if there

@@ -8,6 +8,7 @@
     "bootstrap": "~3.2.0",
     "angular-local-storage": "~0.0.5",
     "angular-bootstrap": "~0.11.0",
+    "angular-ui-ace": "bower",
     "ng-json-explorer": "git://github.com/softwaredoug/ng-json-explorer",
     "splainer-search": "1.4.0",
     "angular-sanitize": "~1.4.0",
