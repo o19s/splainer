@@ -12,7 +12,7 @@ angular.module('splain-app')
 
     this.engines = {
       SOLR: 'solr',
-      ELASTICSEARCH: 'elasticsearch'
+      ELASTICSEARCH: 'es'
     };
 
     var thisSvc = this;

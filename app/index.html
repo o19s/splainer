@@ -60,8 +60,28 @@
       <div class="pane_east">
           <h3>Search Controls</h3>
           <form class="form-horizontal" role="form" ng-controller="SolrSettingsCtrl" ng-submit="searchSettings.publishSearcher()">
+            <div class="dev-header" ng-click="devSettingsSearchEngine.toggle = !devSettingsSearchEngine.toggle">
+              Search Engine <span ng-class="{true: 'glyphicon-plus-sign', false: 'glyphicon-minus-sign'}[!devSettingsSearchEngine.toggle]" class="glyphicon"></span>
+            </div>
+            <div class="dev-section" ng-show="devSettingsSearchEngine.toggle">
+              Change Search Engine:<br />
+              <div>
+                <label>
+                   <input type="radio" value="solr" ng-model="searchSettings.whichEngine">
+                   Solr
+                </label>
+              </div>
+              <div>
+                <label>
+                  <input type="radio" value="es" ng-model="searchSettings.whichEngine">
+                  ElasticSearch
+                </label>
+              </div>
+            </div>
+
+            
             <div class="dev-header" ng-click="devSettingsSolr.toggle = !devSettingsSolr.toggle">
-              Solr URL <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsSolr.toggle]" class="glyphicon glyphicon-minus-sign"></span>
+              Search URL <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsSolr.toggle]" class="glyphicon glyphicon-minus-sign"></span>
             </div>
             <div class="dev-section" ng-show="!devSettingsSolr.toggle">
               <input type="text" ng-model="searchSettings.searchUrl" placeholder="Enter URL to your request handler" class="form-control"></input>
