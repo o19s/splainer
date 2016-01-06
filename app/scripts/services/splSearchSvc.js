@@ -1,18 +1,18 @@
 'use strict';
 
 angular.module('splain-app')
-  .service('searchSvc', function solrSettingsSvc(solrUrlSvc, fieldSpecSvc, solrSearchSvc, esSearchSvc, normalDocsSvc) {
+  .service('splSearchSvc', function splSearchSvc(solrUrlSvc, fieldSpecSvc, searchSvc, normalDocsSvc) {
 
     this.states = {
       NO_SEARCH: 0,
       DID_SEARCH: 1,
       WAITING_FOR_SEARCH: 2,
-      IN_ERROR: 3      
+      IN_ERROR: 3
     };
 
     this.engines = {
-      SOLR: 0,
-      ELASTICSEARCH: 1
+      SOLR: 'solr',
+      ELASTICSEARCH: 'elasticsearch'
     };
 
     var thisSvc = this;
@@ -20,19 +20,22 @@ angular.module('splain-app')
     var createSearcher = function(fieldSpec, parsedArgs, searchSettings) {
       if (searchSettings.whichEngine === thisSvc.engines.ELASTICSEARCH) {
         try {
-          parsedArgs = angular.fromJson(searchSettings.searchArgsStr); 
+          parsedArgs = angular.fromJson(searchSettings.searchArgsStr);
         } catch (SyntaxError) {
           parsedArgs = '';
         }
-          
-        return esSearchSvc.createSearcher(fieldSpec.fieldList(),
-                                          searchSettings.searchUrl, parsedArgs, '');
-        
       } else {
         parsedArgs = solrUrlSvc.parseSolrArgs(searchSettings.searchArgsStr);
-        return solrSearchSvc.createSearcher(fieldSpec.fieldList(),
-                                            searchSettings.searchUrl, parsedArgs, '');
       }
+
+      return searchSvc.createSearcher(fieldSpec.fieldList(),
+                                      searchSettings.searchUrl,
+                                      parsedArgs,
+                                      '',
+                                      {},
+                                      searchSettings.whichEngine);
+
+
     };
 
     var groupedResultToNormalDocs = function(fieldSpec, groupedByResp) {
@@ -51,6 +54,9 @@ angular.module('splain-app')
       search.DID_SEARCH = this.states.DID_SEARCH;
       search.WAITING_FOR_SEARCH = this.states.WAITING_FOR_SEARCH;
       search.IN_ERROR = this.states.IN_ERROR;
+      if (!searchSettings.whichEngine) {
+        searchSettings.whichEngine = this.engines.SOLR;
+      }
       return search;
     };
 
@@ -104,13 +110,9 @@ angular.module('splain-app')
 
         var thisSearch = this;
         this.searcher.search()
-        .then(function() {
+        .then(function success() {
           thisSearch.linkUrl = thisSearch.searcher.linkUrl;
           thisSearch.numFound = thisSearch.searcher.numFound;
-          if (thisSearch.searcher.inError) {
-            thisSearch.state = thisSvc.states.IN_ERROR;
-            return;
-          }
           angular.forEach(thisSearch.searcher.docs, function(doc) {
             var overridingExpl = thisSearch.getOverridingExplain(doc, fieldSpec);
             var normalDoc = normalDocsSvc.createNormalDoc(fieldSpec, doc, overridingExpl);
@@ -126,6 +128,9 @@ angular.module('splain-app')
           groupedResultToNormalDocs(fieldSpec, thisSearch.grouped);
           thisSearch.state = thisSvc.states.DID_SEARCH;
           promise.complete();
+        }, function searchFailure() {
+          thisSearch.state = thisSvc.states.IN_ERROR;
+          return;
         });
 
         return promise;
