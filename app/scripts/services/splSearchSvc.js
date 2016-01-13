@@ -130,6 +130,7 @@ angular.module('splain-app')
           promise.complete();
         }, function searchFailure() {
           thisSearch.state = thisSvc.states.IN_ERROR;
+          thisSearch.linkUrl = thisSearch.searcher.linkUrl;
           return;
         });
 
