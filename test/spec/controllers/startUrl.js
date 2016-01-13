@@ -8,7 +8,7 @@ describe('searchResultsCtrl', function() {
   var localStorageSvc = null;
 
   beforeEach(module('splain-app'));
-  
+
   beforeEach(function() {
     /* global MockLocationSvc*/
     /* global MockLocalStorageService*/
@@ -35,7 +35,7 @@ describe('searchResultsCtrl', function() {
       };
     });
   });
-  
+
   beforeEach(function() {
     localStorageSvc.reset();
   });
@@ -52,7 +52,29 @@ describe('searchResultsCtrl', function() {
     expect(scope.start.settings.fieldSpecStr).toBe('id banana');
     expect(localStorageSvc.get('fieldSpecStr')).toEqual(scope.start.settings.fieldSpecStr);
   });
-  
+
+  it('bootstraps fieldSpec arg in URL', function() {
+    var overridingFieldSpec = 'id:banana f:id';
+    locationSvc.lastParams = {solr: 'http://localhost:1234/solr/stuff?q=foo&fl=id banana', fieldSpec: overridingFieldSpec};
+    createController();
+    expect(scope.start.settings.startUrl).toBe(locationSvc.lastParams.solr);
+    expect(localStorageSvc.get('startUrl')).toEqual(scope.start.settings.startUrl);
+    expect(scope.start.settings.searchArgsStr).toContain('q=foo');
+    expect(localStorageSvc.get('searchArgsStr')).toEqual('!' + scope.start.settings.searchArgsStr);
+    expect(scope.start.settings.searchUrl).toBe('http://localhost:1234/solr/stuff');
+    expect(localStorageSvc.get('searchUrl')).toEqual(scope.start.settings.searchUrl);
+    expect(scope.start.settings.fieldSpecStr).toBe(overridingFieldSpec);
+    expect(localStorageSvc.get('fieldSpecStr')).toEqual(scope.start.settings.fieldSpecStr);
+  });
+
+  it('ignores fieldSpec w/o Solr URl', function() {
+    var overridingFieldSpec = 'id:banana f:id';
+    locationSvc.lastParams = {fieldSpec: overridingFieldSpec};
+    createController();
+    expect(scope.start.settings.startUrl).toBe('');
+    expect(scope.start.settings.fieldSpecStr).not.toBe(overridingFieldSpec);
+  });
+
   it('bootstraps submitted URL', function() {
     locationSvc.lastParams = {};
     createController();

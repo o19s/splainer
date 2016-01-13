@@ -4,20 +4,20 @@ describe('Service: settingsStoreSvc', function () {
 
   // load the service's module
   beforeEach(module('splain-app'));
-  
+
   var settingsStoreSvc = null;
   var localStorageSvc = null;
   var locationSvc = null;
 
   var setupSvc = null;
-  
+
   beforeEach(function() {
 
     /* global MockLocalStorageService*/
     /* global MockLocationSvc*/
     localStorageSvc = new MockLocalStorageService();
     locationSvc = new MockLocationSvc();
-    
+
     module(function($provide) {
       $provide.value('localStorageService', localStorageSvc);
       $provide.value('$location', locationSvc);
@@ -29,7 +29,7 @@ describe('Service: settingsStoreSvc', function () {
       });
     };
   });
-  
+
   beforeEach(function() {
     localStorageSvc.reset();
   });
@@ -64,7 +64,7 @@ describe('Service: settingsStoreSvc', function () {
     expect(settings.searchArgsStr).toEqual(testSearchArgsStr);
     expect(settings.whichEngine).toEqual(testWhichEngine);
   });
-  
+
   it('saves updates', function() {
     setupSvc();
     var settings = settingsStoreSvc.settings;
@@ -80,8 +80,19 @@ describe('Service: settingsStoreSvc', function () {
     expect(localStorageSvc.get('fieldSpecStr')).toEqual(testFieldSpecStr);
     expect(localStorageSvc.get('searchArgsStr')).toEqual('!' + testSearchArgsStr);
     expect(localStorageSvc.get('whichEngine')).toEqual(testWhichEngine);
-    expect(locationSvc.lastParams.solr).toEqual(testStartUrl);
-
-
   });
+
+  it('navigates on updates', function() {
+    setupSvc();
+    var settings = settingsStoreSvc.settings;
+    settings.startUrl = testStartUrl;
+    settings.searchUrl = testSearchUrl;
+    settings.fieldSpecStr = testFieldSpecStr;
+    settings.whichEngine = testWhichEngine;
+    settings.searchArgsStr = testSearchArgsStr;
+    settingsStoreSvc.save();
+    expect(locationSvc.lastParams.solr).toEqual(testStartUrl);
+    expect(locationSvc.lastParams.fieldSpec).toEqual(testFieldSpecStr);
+  });
+
 });
