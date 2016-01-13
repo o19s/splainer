@@ -30,3 +30,4 @@ deployment:
     owner: o19s
     commands:
       - gsutil rsync -R dist gs://splainer.io/
+      - gsutil -m setmeta -r -h "Cache-Control:public, max-age=3600" "gs://splainer.io/*"
