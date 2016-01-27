@@ -23,6 +23,7 @@ angular.module('splain-app')
           parsedArgs = angular.fromJson(searchSettings.searchArgsStr);
         } catch (SyntaxError) {
           parsedArgs = '';
+          console.error(SyntaxError);
         }
       } else {
         parsedArgs = solrUrlSvc.parseSolrArgs(searchSettings.searchArgsStr);
