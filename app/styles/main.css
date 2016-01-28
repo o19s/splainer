@@ -21,6 +21,8 @@
 
 /* Custom page footer */
 .footer {
+  margin-top: 100px;
+  margin-bottom: 10px;
   padding-top: 19px;
   color: #777;
   border-top: 1px solid #e5e5e5;
@@ -100,7 +102,7 @@
 .pane_main .navbar-inverse {
   background: #428bca;
   margin: 0 0 20px 0;
-} 
+}
 
 .pane_main .navbar-brand {
   font-style: italic;

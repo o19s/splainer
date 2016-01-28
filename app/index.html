@@ -45,18 +45,19 @@
                 </li>
               </ul>
           </header>
+
           <div class="container">
-            
             <div ng-include="'views/searchResults.html'"></div>
             <div ng-controller="StartUrlCtrl" ng-show="currSearch.state === currSearch.NO_SEARCH" ng-include="'views/startUrl.html'"></div>
           </div>
-          <div class="footer" style="margin-bottom:10px">
+
+          <div class="footer">
             <p style="margin: 0px">From the <a target="_blank" href="http://opensourceconnections.com"><img class="osc_logo" alt="OSC Logo" src="images/OSC-logomark-color-sm.png"></img></span> OpenSource Connections</a> team</p>
             <small>Expertise, Solutions, and Consulting for Apache Solr | <a target="_blank" href="http://www.opensourceconnections.com/blog">Blog</a> | <a target="_blank" href="http://www.opensourceconnections.com/what-we-do/">Services</a> | <a href="mailto:TalkToUs@opensourceconnections.com">Contact Us</a></small>
           </div>
       </div>
       <div class="east-slider">
-      </div>    
+      </div>
       <div class="pane_east">
           <h3>Search Controls</h3>
           <form class="form-horizontal" role="form" ng-controller="SolrSettingsCtrl" ng-submit="searchSettings.publishSearcher()">
@@ -79,7 +80,6 @@
               </div>
             </div>
 
-            
             <div class="dev-header" ng-click="devSettingsSolr.toggle = !devSettingsSolr.toggle">
               Search URL <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsSolr.toggle]" class="glyphicon glyphicon-minus-sign"></span>
             </div>
@@ -98,7 +98,7 @@
               Search Args <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsArgs.toggle]" class="glyphicon glyphicon-minus-sign"></span>
             </div>
             <div class="dev-section" ng-show="!devSettingsArgs.toggle">
-              <textarea id="inputSolrArgsStr" ng-model="searchSettings.searchArgsStr" rows="10" class="form-control ng-pristine ng-valid"></textarea> 
+              <textarea id="inputSolrArgsStr" ng-model="searchSettings.searchArgsStr" rows="10" class="form-control ng-pristine ng-valid"></textarea>
             </div>
             <div class="dev-section">
               <button type="submit" class="btn btn-default">Rerun Query</button>
@@ -106,9 +106,7 @@
           </form>
           <div ng-include="'views/helpBox.html'"></div>
       </div>
-
     </div>
-
 
     <!-- Google Analytics:-->
     <script>
@@ -137,6 +135,10 @@
     <!-- endbuild -->
     <!-- build:js(app) scripts/vendor.js -->
     <!-- bower:js -->
+    <script src="bower_components/ace-builds/src-min-noconflict/ace.js"></script>
+    <script src="bower_components/ace-builds/src-min-noconflict/ext-language_tools.js"></script>
+    <script src="bower_components/ace-builds/src-min-noconflict/mode-json.js"></script>
+    <script src="bower_components/ace-builds/src-min-noconflict/mode-javascript.js"></script>
     <script src="bower_components/json3/lib/json3.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
     <script src="bower_components/angular-local-storage/angular-local-storage.js"></script>
@@ -154,6 +156,7 @@
     <script src="scripts/promise.js"></script>
     <script src="scripts/stringPatch.js"></script>
     <script src="scripts/app.js"></script>
+    <script src="scripts/factories/Search.js"></script>
     <script src="scripts/controllers/helpBox.js"></script>
     <script src="scripts/controllers/docSelector.js"></script>
     <script src="scripts/directives/dispatchOnClick.js"></script>

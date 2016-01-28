@@ -166,7 +166,7 @@ module.exports = function (grunt) {
         cwd: '<%= yeoman.app %>'
       },
       app: {
-        src: ['<%= yeoman.app/help.html', '<%= yeoman.app %>/index.html'],
+        src: ['<%= yeoman.app %>/help.html', '<%= yeoman.app %>/index.html'],
         ignorePath:  /\.\.\//
       }
     },
@@ -295,7 +295,7 @@ module.exports = function (grunt) {
     cdnify: {
       options: {
         cdn: require('google-cdn-data')
-      },  
+      },
       dist: {
         html: ['<%= yeoman.dist %>/*.html'],
       }

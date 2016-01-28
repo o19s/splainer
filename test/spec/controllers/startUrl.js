@@ -1,6 +1,6 @@
 'use strict';
 
-describe('searchResultsCtrl', function() {
+describe('startUrlCtrl', function() {
   var createController = null;
   var scope = null;
   var httpBackend = null;
@@ -80,7 +80,7 @@ describe('searchResultsCtrl', function() {
     createController();
     expect(scope.start.settings.startUrl).toBeFalsy();
     scope.start.settings.startUrl = 'http://localhost:1234/solr/stuff?q=foto&fl=id apple';
-    scope.start.submit();
+    scope.start.submitSolr();
     expect(scope.start.settings.startUrl).toBe(locationSvc.lastParams.solr);
     expect(localStorageSvc.get('startUrl')).toEqual(scope.start.settings.startUrl);
     expect(scope.start.settings.searchArgsStr).toContain('q=foto');
