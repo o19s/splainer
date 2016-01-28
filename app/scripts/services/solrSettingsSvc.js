@@ -59,7 +59,7 @@ angular.module('splain-app')
      *
      * */
     this.fromStartUrl = function(newStartUrl, searchSettings, overrideFieldSpec) {
-      searchSettings.whichEngine = 0;
+      searchSettings.whichEngine = 'solr';
       searchSettings.startUrl = newStartUrl;
       var parsedUrl = solrUrlSvc.parseSolrUrl(newStartUrl);
       if (parsedUrl !== null) {

@@ -47,7 +47,7 @@ describe('Service: settingsStoreSvc', function () {
   var testStartUrl = 'http://localhost:8983/solr?q=*:*';
   var testSearchUrl = 'http://localhost:8983/solr';
   var testFieldSpecStr = 'id:foo title:bar';
-  var testWhichEngine = 0;
+  var testWhichEngine = 'solr';
   var testSearchArgsStr = 'q=*:*';
 
   it('loads whats stored', function() {
@@ -80,6 +80,7 @@ describe('Service: settingsStoreSvc', function () {
     expect(localStorageSvc.get('fieldSpecStr')).toEqual(testFieldSpecStr);
     expect(localStorageSvc.get('searchArgsStr')).toEqual('!' + testSearchArgsStr);
     expect(localStorageSvc.get('whichEngine')).toEqual(testWhichEngine);
+    expect(locationSvc.lastParams.solr).toEqual(testStartUrl);
   });
 
   it('navigates on updates', function() {
@@ -94,5 +95,4 @@ describe('Service: settingsStoreSvc', function () {
     expect(locationSvc.lastParams.solr).toEqual(testStartUrl);
     expect(locationSvc.lastParams.fieldSpec).toEqual(testFieldSpecStr);
   });
-
 });
