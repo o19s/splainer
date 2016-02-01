@@ -18,6 +18,17 @@ angular.module('splain-app')
       });
     };
 
+    var setEsSettings = function(settings) {
+      $scope.start.settings.whichEngine   = 'es';
+      $scope.start.settings.searchUrl     = settings.searchUrl;
+      $scope.start.settings.searchArgsStr = settings.searchArgsStr;
+    };
+
+    var runEsSearch = function(settings) {
+      setEsSettings(settings);
+      search();
+    };
+
     if ($location.search().hasOwnProperty('solr')) {
       $scope.start.settings.startUrl = $location.search().solr;
       var overridingFieldSpec;
@@ -26,10 +37,12 @@ angular.module('splain-app')
       }
       onStartUrl(overridingFieldSpec);
     } else if ($location.search().hasOwnProperty('esUrl')) {
-      $scope.start.settings.whichEngine = 'es';
-      $scope.start.settings.searchUrl = $location.search().esUrl;
-      $scope.start.settings.searchArgsStr = $location.search().esQuery;
-      search();
+      var settings = {
+        searchUrl:      $location.search().esUrl,
+        searchArgsStr:  $location.search().esQuery,
+      };
+
+      runEsSearch(settings);
     }
 
     $scope.start.submitSolr = function() {
@@ -38,7 +51,11 @@ angular.module('splain-app')
     };
 
     $scope.start.submitEs = function() {
-      $scope.start.settings.whichEngine = 'es';
-      search();
+      var settings = {
+        searchUrl:      $scope.start.settings.startUrl,
+        searchArgsStr:  $scope.start.settings.searchArgsStr,
+      };
+
+      runEsSearch(settings);
     };
   });
