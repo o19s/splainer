@@ -98,7 +98,19 @@
               Search Args <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsArgs.toggle]" class="glyphicon glyphicon-minus-sign"></span>
             </div>
             <div class="dev-section" ng-show="!devSettingsArgs.toggle">
-              <textarea id="inputSolrArgsStr" ng-model="searchSettings.searchArgsStr" rows="10" class="form-control ng-pristine ng-valid"></textarea>
+              <div ng-show="searchSettings.whichEngine === 'solr'">
+                <textarea id="inputSolrArgsStr" ng-model="searchSettings.searchArgsStr" rows="10" class="form-control ng-pristine ng-valid"></textarea>
+              </div>
+
+              <div ng-show="searchSettings.whichEngine === 'es'">
+                <div style="height: 300px;" ui-ace="{
+                    require: ['ace/ext/language_tools'],
+                    useWrapMode: false,
+                    mode: 'json'
+                  }"
+                  ng-model="searchSettings.searchArgsStr">
+                </div>
+              </div>
             </div>
             <div class="dev-section">
               <button type="submit" class="btn btn-default">Rerun Query</button>
