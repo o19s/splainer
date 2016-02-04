@@ -1,45 +1,82 @@
 'use strict';
 
 angular.module('splain-app')
-  .controller('DocSelectorCtrl', function DocExplainCtrl($scope, splSearchSvc, solrUrlSvc, settingsStoreSvc) {
-    // this controller is a bit silly just because
-    // modals need their own controller
+  .controller('DocSelectorCtrl', [
+    '$scope',
+    'searchSvc',
+    'splSearchSvc',
+    'solrUrlSvc',
+    'settingsStoreSvc',
+    'fieldSpecSvc',
+    'solrExplainExtractorSvc',
+    'esExplainExtractorSvc',
+    function DocExplainCtrl(
+      $scope,
+      searchSvc,
+      splSearchSvc,
+      solrUrlSvc,
+      settingsStoreSvc,
+      fieldSpecSvc,
+      solrExplainExtractorSvc,
+      esExplainExtractorSvc
+    ) {
+      var createSearcher = function(fieldSpec, settings) {
+        var args;
+        if (settings.whichEngine === 'es') {
+          try {
+            args = angular.fromJson(settings.searchArgsStr);
+          } catch (SyntaxError) {
+            args = '';
+          }
+        } else {
+          args = solrUrlSvc.parseSolrArgs(settings.searchArgsStr);
+        }
 
-    var addToSolrArgs = function(solrArgsStr, newParams) {
-      var solrArgs = solrUrlSvc.parseSolrArgs(solrArgsStr);
-      angular.forEach(newParams, function(value, arg) {
-        solrArgs[arg] = value;
-      });
-      return solrUrlSvc.formatSolrArgs(solrArgs);
-    };
+        return searchSvc.createSearcher(
+          fieldSpec.fieldList(),
+          settings.searchUrl,
+          args,
+          '',
+          {},
+          settings.whichEngine
+        );
+      };
 
+      $scope.currSearch = { maxScore: 0 };
+      $scope.altQuery = '';
 
-    $scope.altQuery = '';
+      $scope.explainOther = function(altQuery) {
+        var settings      = settingsStoreSvc.settings;
+        var fieldSpec     = fieldSpecSvc.createFieldSpec(settings.fieldSpecStr);
+        var searcher      = createSearcher(fieldSpec, settings);
 
-    $scope.explainOther = function(altQuery) {
-      var searchSettings = settingsStoreSvc.settings;
+        $scope.currSearch.docs = []; // reset the array for a new search
+        searcher.explainOther(altQuery, fieldSpec)
+          .then(function() {
+            $scope.currSearch.numFound   = searcher.numFound;
+            $scope.currSearch.lastQuery  = altQuery;
 
-      // explainOther by passing a explainOther=<luceneQuery> to
-      // the user's current settings and rerunning the search
-      searchSettings = angular.copy(searchSettings);
-      // we should be using the solrUrlSvc to do this
-      searchSettings.searchArgsStr = addToSolrArgs(searchSettings.searchArgsStr,
-                                                   {'explainOther': [altQuery]});
-      var explainOtherSearch = splSearchSvc.createSearch(searchSettings);
-      explainOtherSearch.search()
-      .then(function() {
-        // but we don't get anything but an explain, so let's re-search
-        // and try to pull back the right data
-        searchSettings = angular.copy(searchSettings);
-        searchSettings.searchArgsStr = 'q=' + altQuery;
-        $scope.currSearch = splSearchSvc.createSearch(searchSettings, explainOtherSearch.searcher.othersExplained);
-        $scope.currSearch.search();
-      });
-    };
+            var normalizedDocs;
+            if ( searcher.type === 'solr' ) {
+              normalizedDocs = solrExplainExtractorSvc.docsWithExplainOther(searcher.docs, fieldSpec, searcher.othersExplained);
+            } else if ( searcher.type === 'es' ) {
+              normalizedDocs = esExplainExtractorSvc.docsWithExplainOther(searcher.docs, fieldSpec);
+            }
 
+            $scope.currSearch.docs = normalizedDocs;
 
-    $scope.selectDoc = function(doc) {
-      console.log('selected: ' + doc.id);
-      $scope.docSelection = doc;
-    };
-  });
+            angular.forEach($scope.currSearch.docs, function(doc) {
+              if (doc.score() > $scope.currSearch.maxScore) {
+                $scope.currSearch.maxScore = doc.score();
+                console.log('new max score: ' + $scope.currSearch.maxScore);
+              }
+            });
+          });
+      };
+
+      $scope.selectDoc = function(doc) {
+        console.log('selected: ' + doc.id);
+        $scope.docSelection = doc;
+      };
+    }
+  ]);

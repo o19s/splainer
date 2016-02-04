@@ -5,7 +5,13 @@ angular.module('splain-app')
 
     $scope.docRow = {};
     $scope.docRow.snippets = function(doc) {
-      return doc.subSnippets('<em>', '</em>');
+      var snippets = doc.subSnippets('<em>', '</em>');
+      angular.forEach(snippets, function(value, key){
+        if ( angular.isArray(value) ) {
+          snippets[key] = value.join('');
+        }
+      });
+      return snippets;
     };
 
     $scope.doc.showDetailed = function() {
