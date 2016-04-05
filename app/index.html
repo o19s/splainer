@@ -60,7 +60,7 @@
       </div>
       <div class="pane_east">
           <h3>Search Controls</h3>
-          <form class="form-horizontal" role="form" ng-controller="SettingsCtrl" ng-submit="searchSettings.publishSearcher()">
+          <form class="form-horizontal" role="form" ng-controller="SettingsCtrl" ng-submit="publishSearcher()">
             <div class="dev-header" ng-click="devSettingsSearchEngine.toggle = !devSettingsSearchEngine.toggle">
               Search Engine <span ng-class="{true: 'glyphicon-plus-sign', false: 'glyphicon-minus-sign'}[!devSettingsSearchEngine.toggle]" class="glyphicon"></span>
             </div>
