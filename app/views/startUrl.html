@@ -11,7 +11,7 @@
         <div class="tab-content">
           <div class="tab-pane active" id="solr_">
             <div class="input-group">
-              <input type="text" class="form-control" ng-model="start.settings.startUrl" placeholder="To get started, paste in a Solr URL (i.e. http://localhost:8983/solr/collection1/select?q=*:*)">
+              <input type="text" class="form-control" ng-model="start.solrSettings.startUrl" placeholder="To get started, paste in a Solr URL (i.e. http://localhost:8983/solr/collection1/select?q=*:*)">
               <span class="input-group-btn">
                 <button class="btn btn-primary" type="submit" dispatch-on-click="openEast" ng-click="start.submitSolr()">Splain This!</button>
               </span>
@@ -20,7 +20,7 @@
 
           <div class="tab-pane" id="es_">
             <div class="input-group">
-              <input type="text" class="form-control" ng-model="start.settings.startUrl" placeholder="To get started, paste in an ES URL (i.e. http://localhost:8983/es/collection1/_select)">
+              <input type="text" class="form-control" ng-model="start.esSettings.startUrl" placeholder="To get started, paste in an ES URL (i.e. http://localhost:8983/es/collection1/_select)">
               <span class="input-group-btn">
                 <button class="btn btn-primary" type="submit" dispatch-on-click="openEast" ng-click="start.submitEs()">Splain This!</button>
               </span>
@@ -30,7 +30,7 @@
                 useWrapMode: false,
                 mode: 'json'
               }"
-              ng-model="start.settings.searchArgsStr">
+              ng-model="start.esSettings.searchArgsStr">
             </div>
           </div>
         </div>

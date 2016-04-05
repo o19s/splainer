@@ -32,18 +32,18 @@ angular.module('splain-app')
         var createSearcher = function(fieldSpec, parsedArgs, searchSettings) {
           if (searchSettings.whichEngine === engines.ELASTICSEARCH) {
             try {
-              parsedArgs = angular.fromJson(searchSettings.searchArgsStr);
+              parsedArgs = angular.fromJson(searchSettings.es.searchArgsStr);
             } catch (SyntaxError) {
               parsedArgs = '';
               console.error(SyntaxError);
             }
           } else {
-            parsedArgs = solrUrlSvc.parseSolrArgs(searchSettings.searchArgsStr);
+            parsedArgs = solrUrlSvc.parseSolrArgs(searchSettings.solr.searchArgsStr);
           }
 
           return searchSvc.createSearcher(
             fieldSpec.fieldList(),
-            searchSettings.searchUrl,
+            searchSettings.searchUrl(),
             parsedArgs,
             '',
             {},
@@ -68,7 +68,7 @@ angular.module('splain-app')
           self.grouped            = {};
           self.maxScore           = 0.0;
           self.linkUrl            = '#';
-          self.settings           = {searchArgsStr: ''};
+          self.settings           = {searchArgsStr: function() {return '';}};
           self.paging             = false;
           self.state              = states.NO_SEARCH;
           self.overridingExplains = {};
@@ -100,7 +100,7 @@ angular.module('splain-app')
 
         function search() {
           var promise     = Promise.create(self.search);
-          var fieldSpec   = fieldSpecSvc.createFieldSpec(searchSettings.fieldSpecStr);
+          var fieldSpec   = fieldSpecSvc.createFieldSpec(searchSettings.fieldSpecStr());
           var parsedArgs  = null;
 
           self.searcher = createSearcher(fieldSpec, parsedArgs, searchSettings);
@@ -147,7 +147,7 @@ angular.module('splain-app')
             return;
           }
 
-          var fieldSpec = fieldSpecSvc.createFieldSpec(searchSettings.fieldSpecStr);
+          var fieldSpec = fieldSpecSvc.createFieldSpec(searchSettings.fieldSpecStr());
           self.searcher = self.searcher.pager();
 
           if (self.searcher) {

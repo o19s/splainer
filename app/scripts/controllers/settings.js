@@ -8,12 +8,17 @@ angular.module('splain-app')
     'esSettingsSvc',
     function ($scope, settingsStoreSvc, solrSettingsSvc, esSettingsSvc) {
 
-      $scope.searchSettings = settingsStoreSvc.settings;
+      $scope.whichEngine = settingsStoreSvc.settings.whichEngine;
+      $scope.searchSettings = settingsStoreSvc.settings[$scope.whichEngine];
+
+      $scope.$watch('whichEngine', function() {
+        $scope.searchSettings = settingsStoreSvc.settings[$scope.whichEngine];
+      });
 
       $scope.searchSettings.publishSearcher = function() {
-        if ( $scope.searchSettings.whichEngine === 'solr' ) {
+        if ( $scope.whichEngine === 'solr' ) {
           solrSettingsSvc.fromTweakedSettings($scope.searchSettings);
-        } else if ( $scope.searchSettings.whichEngine === 'es' ) {
+        } else if ( $scope.whichEngine === 'es' ) {
           esSettingsSvc.fromTweakedSettings($scope.searchSettings);
         }
 

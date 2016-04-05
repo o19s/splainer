@@ -4,12 +4,12 @@
   </div>
 
   <div ng-show="currSearch.state === currSearch.IN_ERROR" class="alert alert-error">
-    Error with your solr query. Double check that the URL is correct. Try accessing <a href="{{currSearch.linkUrl}}">Solr directly</a> to troubleshoot the error.
+    Error with your query. Double check that the URL is correct. <div ng-show="currSearch.engine==='solr'">Try accessing <a href="{{currSearch.linkUrl}}">Solr</a> to troubleshoot the error.</div>
   </div>
 
   <div ng-show="currSearch.state === currSearch.DID_SEARCH">
-    <div ng-controller="SolrSettingsWarningCtrl" class="alert alert-warning" ng-show="warnings.shouldWarn(currSearch.settings.searchArgsStr)">
-      <ul ng-repeat="(warning, arguments) in warnings.messages(currSearch.settings.searchArgsStr)">
+    <div ng-controller="SolrSettingsWarningCtrl" class="alert alert-warning" ng-show="warnings.shouldWarn(currSearch.settings.searchArgsStr())">
+      <ul ng-repeat="(warning, arguments) in warnings.messages(currSearch.settings.searchArgsStr())">
         <li>Arguments Removed: <span ng-repeat="argument in arguments"> <em>{{argument}} </em></span> because: {{warning}}</li>
       </ul>
     </div>

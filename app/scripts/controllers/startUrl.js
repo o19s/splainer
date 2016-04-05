@@ -16,7 +16,10 @@ angular.module('splain-app')
     ) {
       // initialize the start URL
       $scope.start = {};
-      $scope.start.settings = settingsStoreSvc.settings;
+      $scope.start.solrSettings = settingsStoreSvc.settings.solr;
+      $scope.start.esSettings = settingsStoreSvc.settings.es;
+      $scope.start.whichEngine = settingsStoreSvc.settings.whichEngine;
+
 
 
       var search = function() {
@@ -26,15 +29,15 @@ angular.module('splain-app')
         });
       };
 
-      var onStartUrl = function(overridingFieldSpec) {
-        solrSettingsSvc.fromStartUrl($scope.start.settings.startUrl, $scope.start.settings, overridingFieldSpec);
+      var runSolrSearch = function(overridingFieldSpec) {
+        solrSettingsSvc.fromStartUrl($scope.start.solrSettings.startUrl, $scope.start.solrSettings, overridingFieldSpec);
         search();
       };
 
       var setEsSettings = function(settings) {
-        $scope.start.settings.startUrl      = settings.searchUrl;
-        $scope.start.settings.searchArgsStr = settings.searchArgsStr;
-        esSettingsSvc.fromStartUrl($scope.start.settings);
+        $scope.start.esSettings.startUrl      = settings.searchUrl;
+        $scope.start.esSettings.searchArgsStr = settings.searchArgsStr;
+        esSettingsSvc.fromStartUrl($scope.start.esSettings);
       };
 
       var runEsSearch = function(settings) {
@@ -42,13 +45,14 @@ angular.module('splain-app')
         search();
       };
 
+      // If we have something set in the URL, use that
       if ($location.search().hasOwnProperty('solr')) {
-        $scope.start.settings.startUrl = $location.search().solr;
+        $scope.start.solrSettings.startUrl = $location.search().solr;
         var overridingFieldSpec;
         if ($location.search().hasOwnProperty('fieldSpec')) {
           overridingFieldSpec = $location.search().fieldSpec;
         }
-        onStartUrl(overridingFieldSpec);
+        runSolrSearch(overridingFieldSpec);
       } else if ($location.search().hasOwnProperty('esUrl')) {
         var settings = {
           searchUrl:      $location.search().esUrl,
@@ -59,14 +63,15 @@ angular.module('splain-app')
       }
 
       $scope.start.submitSolr = function() {
-        $scope.start.settings.whichEngine = 'solr';
-        onStartUrl();
+        settingsStoreSvc.settings.whichEngine = 'solr';
+        runSolrSearch();
       };
 
       $scope.start.submitEs = function() {
+        settingsStoreSvc.settings.whichEngine = 'es';
         var settings = {
-          searchUrl:      $scope.start.settings.startUrl,
-          searchArgsStr:  $scope.start.settings.searchArgsStr,
+          searchUrl:      $scope.start.esSettings.startUrl,
+          searchArgsStr:  $scope.start.esSettings.searchArgsStr,
         };
 
         runEsSearch(settings);
