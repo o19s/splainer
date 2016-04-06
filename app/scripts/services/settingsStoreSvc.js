@@ -29,10 +29,13 @@ angular.module('splain-app')
                             },
 
                             };
-      var localStorageTryGet = function(key, engine) {
+      var localStorageTryGet = function(key, engine, def) {
         var val;
         var prefix = '';
         var settings = searchSettings;
+        if (!def) {
+          def = '';
+        }
         if (engine) {
           settings = searchSettings[engine];
           prefix = engine + '_';
@@ -46,7 +49,7 @@ angular.module('splain-app')
         if (val !== null) {
           settings[key] = val;
         } else {
-          settings[key] = '';
+          settings[key] = def;
         }
       };
       if (localStorageService.isSupported) {
@@ -57,7 +60,7 @@ angular.module('splain-app')
         localStorageTryGet('searchUrl', 'es');
         localStorageTryGet('startUrl', 'es');
         localStorageTryGet('fieldSpecStr', 'es');
-        localStorageTryGet('searchArgsStr', 'es');
+        localStorageTryGet('searchArgsStr', 'es', defaultEsArgs);
         localStorageTryGet('whichEngine');
         if (!searchSettings.whichEngine) {
           searchSettings.whichEngine = 'solr';

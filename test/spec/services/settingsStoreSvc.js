@@ -41,58 +41,69 @@ describe('Service: settingsStoreSvc', function () {
     expect(settings.solr.searchUrl).toEqual('');
     expect(settings.solr.fieldSpecStr).toEqual('');
     expect(settings.solr.searchArgsStr).toEqual('');
+    expect(settings.es.startUrl).toEqual('');
+    expect(settings.es.searchUrl).toEqual('');
+    expect(settings.es.fieldSpecStr).toEqual('');
+    expect(settings.es.searchArgsStr.indexOf('{')).toBeGreaterThan(-1);
     expect(settings.whichEngine).toEqual('solr');
   });
 
-  var testStartUrl = 'http://localhost:8983/solr?q=*:*';
-  var testSearchUrl = 'http://localhost:8983/solr';
-  var testFieldSpecStr = 'id:foo title:bar';
+  it('initializes es query params to valid JSON', function() {
+    setupSvc();
+    var settings = settingsStoreSvc.settings;
+    // if this throws, test fails which is what we expect
+    JSON.parse(settings.es.searchArgsStr);
+  });
+
+  var testSolrStartUrl = 'http://localhost:8983/solr?q=*:*';
+  var testSolrSearchUrl = 'http://localhost:8983/solr';
+  var testSolrFielgcldSpecStr = 'id:foo title:bar';
   var testWhichEngine = 'solr';
-  var testSearchArgsStr = 'q=*:*';
+  var testSolrSearchArgsStr = 'q=*:*';
 
   it('loads whats stored', function() {
-    localStorageSvc.set('solr_startUrl', testStartUrl);
-    localStorageSvc.set('solr_searchUrl', testSearchUrl);
-    localStorageSvc.set('solr_fieldSpecStr', testFieldSpecStr);
-    localStorageSvc.set('solr_searchArgsStr', '!' + testSearchArgsStr);
+    localStorageSvc.set('solr_startUrl', testSolrStartUrl);
+    localStorageSvc.set('solr_searchUrl', testSolrSearchUrl);
+    localStorageSvc.set('solr_fieldSpecStr', testSolrFielgcldSpecStr);
+    localStorageSvc.set('solr_searchArgsStr', '!' + testSolrSearchArgsStr);
     localStorageSvc.set('whichEngine', testWhichEngine);
     setupSvc();
     var settings = settingsStoreSvc.settings;
-    expect(settings.solr.startUrl).toEqual(testStartUrl);
-    expect(settings.solr.searchUrl).toEqual(testSearchUrl);
-    expect(settings.solr.fieldSpecStr).toEqual(testFieldSpecStr);
-    expect(settings.solr.searchArgsStr).toEqual(testSearchArgsStr);
+    expect(settings.solr.startUrl).toEqual(testSolrStartUrl);
+    expect(settings.solr.searchUrl).toEqual(testSolrSearchUrl);
+    expect(settings.solr.fieldSpecStr).toEqual(testSolrFielgcldSpecStr);
+    expect(settings.solr.searchArgsStr).toEqual(testSolrSearchArgsStr);
     expect(settings.whichEngine).toEqual(testWhichEngine);
   });
 
   it('saves updates', function() {
     setupSvc();
     var settings = settingsStoreSvc.settings;
-    settings.solr.startUrl = testStartUrl;
-    settings.solr.searchUrl = testSearchUrl;
-    settings.solr.fieldSpecStr = testFieldSpecStr;
+    settings.solr.startUrl = testSolrStartUrl;
+    settings.solr.searchUrl = testSolrSearchUrl;
+    settings.solr.fieldSpecStr = testSolrFielgcldSpecStr;
     settings.whichEngine = testWhichEngine;
-    settings.solr.searchArgsStr = testSearchArgsStr;
+    settings.solr.searchArgsStr = testSolrSearchArgsStr;
     settingsStoreSvc.save();
 
-    expect(localStorageSvc.get('solr_startUrl')).toEqual(testStartUrl);
-    expect(localStorageSvc.get('solr_searchUrl')).toEqual(testSearchUrl);
-    expect(localStorageSvc.get('solr_fieldSpecStr')).toEqual(testFieldSpecStr);
-    expect(localStorageSvc.get('solr_searchArgsStr')).toEqual('!' + testSearchArgsStr);
+    expect(localStorageSvc.get('solr_startUrl')).toEqual(testSolrStartUrl);
+    expect(localStorageSvc.get('solr_searchUrl')).toEqual(testSolrSearchUrl);
+    expect(localStorageSvc.get('solr_fieldSpecStr')).toEqual(testSolrFielgcldSpecStr);
+    expect(localStorageSvc.get('solr_searchArgsStr')).toEqual('!' + testSolrSearchArgsStr);
     expect(localStorageSvc.get('whichEngine')).toEqual(testWhichEngine);
-    expect(locationSvc.lastParams.solr).toEqual(testStartUrl);
+    expect(locationSvc.lastParams.solr).toEqual(testSolrStartUrl);
   });
 
   it('navigates on updates', function() {
     setupSvc();
     var settings = settingsStoreSvc.settings;
-    settings.solr.startUrl = testStartUrl;
-    settings.solr.searchUrl = testSearchUrl;
-    settings.solr.fieldSpecStr = testFieldSpecStr;
+    settings.solr.startUrl = testSolrStartUrl;
+    settings.solr.searchUrl = testSolrSearchUrl;
+    settings.solr.fieldSpecStr = testSolrFielgcldSpecStr;
     settings.whichEngine = testWhichEngine;
-    settings.solr.searchArgsStr = testSearchArgsStr;
+    settings.solr.searchArgsStr = testSolrSearchArgsStr;
     settingsStoreSvc.save();
-    expect(locationSvc.lastParams.solr).toEqual(testStartUrl);
-    expect(locationSvc.lastParams.fieldSpec).toEqual(testFieldSpecStr);
+    expect(locationSvc.lastParams.solr).toEqual(testSolrStartUrl);
+    expect(locationSvc.lastParams.fieldSpec).toEqual(testSolrFielgcldSpecStr);
   });
 });
