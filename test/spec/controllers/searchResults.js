@@ -9,8 +9,25 @@ describe('searchResultsCtrl', function() {
   var testUrl = 'http://localhost:8983/solr/collection1/select';
   var testArgsStr = 'q=*:*&fq=blah&qq=blarg';
   var testFieldSpecStr = 'id field1';
-  var mockSolrSettings = {searchUrl: testUrl, searchArgsStr: testArgsStr,
-                          fieldSpecStr: testFieldSpecStr};
+  var mockSearchSettings = {solr:  {searchUrl: testUrl, fieldSpecStr: testFieldSpecStr, searchArgsStr: testArgsStr, whichEngine: 'solr'},
+                        es: {searchUrl: '', fieldSpecStr: '', searchArgsStr: '{}', whichEngine: 'es'},
+                        whichEngine: 'solr', // which engine was the last used
+
+                        searchUrl: function() {
+                          return this[this.whichEngine].searchUrl;
+                        },
+
+                        fieldSpecStr: function() {
+                          return this[this.whichEngine].fieldSpecStr;
+                        },
+
+                        searchArgsStr: function() {
+                          return this[this.whichEngine].searchArgsStr;
+                        },
+
+                        };
+
+
   var httpBackend = null;
 
   beforeEach(function() {
@@ -19,13 +36,13 @@ describe('searchResultsCtrl', function() {
         SOLR: 0,
         ELASTICSEARCH: 1
       },
-      settings: mockSolrSettings
+      settings: mockSearchSettings
     };
-    
+
     module(function($provide) {
       $provide.value('settingsStoreSvc', mockSolrSettingsSvc);
     });
-    
+
     inject(function($rootScope, $controller, $httpBackend) {
       httpBackend = $httpBackend;
       createController = function() {
@@ -34,7 +51,7 @@ describe('searchResultsCtrl', function() {
       };
     });
   });
-  
+
   /* global urlContainsParams, mockExplain*/
   var mockSolrResp = {
     response: {
@@ -48,7 +65,7 @@ describe('searchResultsCtrl', function() {
       explain: {
         'doc1': mockExplain,
         'doc2': mockExplain
-      } 
+      }
     }
   };
 
@@ -60,7 +77,7 @@ describe('searchResultsCtrl', function() {
     });
     return Object.keys(aSet);
   };
-  
+
   it('currSearch has states', function() {
     createController();
     var states = set([scope.currSearch.NO_SEARCH, scope.currSearch.WAITING_FOR_SEARCH,
@@ -84,7 +101,7 @@ describe('searchResultsCtrl', function() {
     expect(scope.currSearch.state).toBe(scope.currSearch.DID_SEARCH);
     httpBackend.verifyNoOutstandingExpectation();
   });
-  
+
   it('goes to WAITING_FOR_SEARCH -> ERROR on seasrch fail', function() {
     httpBackend.expectJSONP(urlContainsParams(testUrl, {q: ['*:*']}))
                .respond(404);
@@ -95,7 +112,7 @@ describe('searchResultsCtrl', function() {
     expect(scope.currSearch.state).toBe(scope.currSearch.IN_ERROR);
     httpBackend.verifyNoOutstandingExpectation();
   });
-  
+
   it('gets a list of docs', function() {
     httpBackend.expectJSONP(urlContainsParams(testUrl, {q: ['*:*']}))
                .respond(200, mockSolrResp);
@@ -115,7 +132,7 @@ describe('searchResultsCtrl', function() {
     expect(scope.currSearch.maxScore).toBeGreaterThan(0);
     httpBackend.verifyNoOutstandingExpectation();
   });
-  
+
   it('resets list of docs on error', function() {
     httpBackend.expectJSONP(urlContainsParams(testUrl, {q: ['*:*']}))
                .respond(200, mockSolrResp);
@@ -123,7 +140,7 @@ describe('searchResultsCtrl', function() {
     scope.search.search();
     httpBackend.flush();
     expect(scope.currSearch.docs.length).toEqual(mockSolrResp.response.docs.length);
-    
+
     httpBackend.expectJSONP(urlContainsParams(testUrl, {q: ['*:*']}))
                .respond(404);
     scope.search.search();
@@ -131,7 +148,7 @@ describe('searchResultsCtrl', function() {
     expect(scope.currSearch.docs.length).toEqual(0);
     httpBackend.verifyNoOutstandingExpectation();
   });
-  
+
 
 
 });

@@ -37,11 +37,11 @@ describe('Service: settingsStoreSvc', function () {
   it('initializes from nothing', function() {
     setupSvc();
     var settings = settingsStoreSvc.settings;
-    expect(settings.startUrl).toEqual('');
-    expect(settings.searchUrl).toEqual('');
-    expect(settings.fieldSpecStr).toEqual('');
-    expect(settings.searchArgsStr).toEqual('');
-    expect(settings.whichEngine).toEqual('');
+    expect(settings.solr.startUrl).toEqual('');
+    expect(settings.solr.searchUrl).toEqual('');
+    expect(settings.solr.fieldSpecStr).toEqual('');
+    expect(settings.solr.searchArgsStr).toEqual('');
+    expect(settings.whichEngine).toEqual('solr');
   });
 
   var testStartUrl = 'http://localhost:8983/solr?q=*:*';
@@ -51,34 +51,34 @@ describe('Service: settingsStoreSvc', function () {
   var testSearchArgsStr = 'q=*:*';
 
   it('loads whats stored', function() {
-    localStorageSvc.set('startUrl', testStartUrl);
-    localStorageSvc.set('searchUrl', testSearchUrl);
-    localStorageSvc.set('fieldSpecStr', testFieldSpecStr);
-    localStorageSvc.set('searchArgsStr', '!' + testSearchArgsStr);
+    localStorageSvc.set('solr_startUrl', testStartUrl);
+    localStorageSvc.set('solr_searchUrl', testSearchUrl);
+    localStorageSvc.set('solr_fieldSpecStr', testFieldSpecStr);
+    localStorageSvc.set('solr_searchArgsStr', '!' + testSearchArgsStr);
     localStorageSvc.set('whichEngine', testWhichEngine);
     setupSvc();
     var settings = settingsStoreSvc.settings;
-    expect(settings.startUrl).toEqual(testStartUrl);
-    expect(settings.searchUrl).toEqual(testSearchUrl);
-    expect(settings.fieldSpecStr).toEqual(testFieldSpecStr);
-    expect(settings.searchArgsStr).toEqual(testSearchArgsStr);
+    expect(settings.solr.startUrl).toEqual(testStartUrl);
+    expect(settings.solr.searchUrl).toEqual(testSearchUrl);
+    expect(settings.solr.fieldSpecStr).toEqual(testFieldSpecStr);
+    expect(settings.solr.searchArgsStr).toEqual(testSearchArgsStr);
     expect(settings.whichEngine).toEqual(testWhichEngine);
   });
 
   it('saves updates', function() {
     setupSvc();
     var settings = settingsStoreSvc.settings;
-    settings.startUrl = testStartUrl;
-    settings.searchUrl = testSearchUrl;
-    settings.fieldSpecStr = testFieldSpecStr;
+    settings.solr.startUrl = testStartUrl;
+    settings.solr.searchUrl = testSearchUrl;
+    settings.solr.fieldSpecStr = testFieldSpecStr;
     settings.whichEngine = testWhichEngine;
-    settings.searchArgsStr = testSearchArgsStr;
+    settings.solr.searchArgsStr = testSearchArgsStr;
     settingsStoreSvc.save();
 
-    expect(localStorageSvc.get('startUrl')).toEqual(testStartUrl);
-    expect(localStorageSvc.get('searchUrl')).toEqual(testSearchUrl);
-    expect(localStorageSvc.get('fieldSpecStr')).toEqual(testFieldSpecStr);
-    expect(localStorageSvc.get('searchArgsStr')).toEqual('!' + testSearchArgsStr);
+    expect(localStorageSvc.get('solr_startUrl')).toEqual(testStartUrl);
+    expect(localStorageSvc.get('solr_searchUrl')).toEqual(testSearchUrl);
+    expect(localStorageSvc.get('solr_fieldSpecStr')).toEqual(testFieldSpecStr);
+    expect(localStorageSvc.get('solr_searchArgsStr')).toEqual('!' + testSearchArgsStr);
     expect(localStorageSvc.get('whichEngine')).toEqual(testWhichEngine);
     expect(locationSvc.lastParams.solr).toEqual(testStartUrl);
   });
@@ -86,11 +86,11 @@ describe('Service: settingsStoreSvc', function () {
   it('navigates on updates', function() {
     setupSvc();
     var settings = settingsStoreSvc.settings;
-    settings.startUrl = testStartUrl;
-    settings.searchUrl = testSearchUrl;
-    settings.fieldSpecStr = testFieldSpecStr;
+    settings.solr.startUrl = testStartUrl;
+    settings.solr.searchUrl = testSearchUrl;
+    settings.solr.fieldSpecStr = testFieldSpecStr;
     settings.whichEngine = testWhichEngine;
-    settings.searchArgsStr = testSearchArgsStr;
+    settings.solr.searchArgsStr = testSearchArgsStr;
     settingsStoreSvc.save();
     expect(locationSvc.lastParams.solr).toEqual(testStartUrl);
     expect(locationSvc.lastParams.fieldSpec).toEqual(testFieldSpecStr);

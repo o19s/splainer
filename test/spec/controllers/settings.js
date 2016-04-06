@@ -40,6 +40,7 @@ describe('SettingsCtrl', function() {
 
   it('initializes with default settings', function() {
     createController();
+    expect(scope.whichEngine).toEqual('solr');
     expect(scope.searchSettings.searchUrl).toEqual('');
     expect(scope.searchSettings.fieldSpecStr).toEqual('');
     expect(scope.searchSettings.searchArgsStr).toEqual('');
@@ -49,7 +50,7 @@ describe('SettingsCtrl', function() {
     it('loads partial', function() {
       localStorage.isSupported = true;
       var  testUrl = 'http://localhost:8983/solr/collection1/select';
-      localStorage.store.searchUrl = testUrl;
+      localStorage.store.solr_searchUrl = testUrl;
       createController();
       expect(scope.searchSettings.searchUrl).toEqual(testUrl);
       expect(scope.searchSettings.fieldSpecStr).toEqual('');
@@ -61,8 +62,20 @@ describe('SettingsCtrl', function() {
       var testUrl = 'http://localhost:8983/solr/collection1/select';
       var testArgsStr = 'q=*:*&fq=blah&qq=blarg';
       localStorage.store.whichEngine = 'solr';
-      localStorage.store.searchUrl = testUrl;
-      localStorage.store.searchArgsStr = '!' + testArgsStr;
+      localStorage.store.solr_searchUrl = testUrl;
+      localStorage.store.solr_searchArgsStr = '!' + testArgsStr;
+      createController();
+      expect(scope.searchSettings.searchUrl).toEqual(testUrl);
+      expect(scope.searchSettings.searchArgsStr).toEqual(testArgsStr);
+    });
+
+    it('loads es', function() {
+      localStorage.isSupported = true;
+      var testUrl = 'http://localhost:9200/tmdb/movies/_search';
+      var testArgsStr = '{}';
+      localStorage.store.whichEngine = 'es';
+      localStorage.store.es_searchUrl = testUrl;
+      localStorage.store.es_searchArgsStr = '!' + testArgsStr;
       createController();
       expect(scope.searchSettings.searchUrl).toEqual(testUrl);
       expect(scope.searchSettings.searchArgsStr).toEqual(testArgsStr);
@@ -71,6 +84,7 @@ describe('SettingsCtrl', function() {
     it('gets ""s if unsupported', function() {
       localStorage.isSupported = false;
       createController();
+      expect(scope.whichEngine).toEqual('solr');
       expect(scope.searchSettings.searchUrl).toEqual('');
       expect(scope.searchSettings.fieldSpecStr).toEqual('');
       expect(scope.searchSettings.searchArgsStr).toEqual('');
@@ -86,12 +100,12 @@ describe('SettingsCtrl', function() {
 
       beforeEach(function() {
         createController();
-        scope.searchSettings.whichEngine = 'solr';
+        scope.whichEngine = 'solr';
         scope.searchSettings.searchUrl = testUrl;
         scope.searchSettings.searchArgsStr = testArgsStr;
         scope.searchSettings.fieldSpecStr = testFieldSpec;
         spyOn(scope.search, 'search').andCallThrough();
-        scope.searchSettings.publishSearcher();
+        scope.publishSearcher();
       });
 
       it('searches on submit', function() {
@@ -99,9 +113,9 @@ describe('SettingsCtrl', function() {
       });
 
       it('saves settings in local storage', function() {
-        expect(localStorage.get('searchUrl')).toEqual(testUrl);
-        expect(localStorage.get('fieldSpecStr')).toEqual(testFieldSpec);
-        expect(localStorage.get('searchArgsStr').slice(1)).toEqual(testArgsStr);
+        expect(localStorage.get('solr_searchUrl')).toEqual(testUrl);
+        expect(localStorage.get('solr_fieldSpecStr')).toEqual(testFieldSpec);
+        expect(localStorage.get('solr_searchArgsStr').slice(1)).toEqual(testArgsStr);
       });
     });
 
@@ -118,7 +132,7 @@ describe('SettingsCtrl', function() {
         createController();
         scope.searchSettings.whichEngine = 'solr';
         scope.searchSettings.searchUrl = testUserUrl;
-        scope.searchSettings.publishSearcher();
+        scope.publishSearcher();
 
         expect(scope.searchSettings.fieldSpecStr).toEqual('field1');
         expect(scope.searchSettings.searchArgsStr).toEqual('q=*:*');
@@ -129,7 +143,7 @@ describe('SettingsCtrl', function() {
         createController();
         scope.searchSettings.whichEngine = 'solr';
         scope.searchSettings.searchUrl = testUrlEncodedUrl;
-        scope.searchSettings.publishSearcher();
+        scope.publishSearcher();
 
         expect(scope.searchSettings.fieldSpecStr).toEqual('catch_line text');
         expect(scope.searchSettings.searchArgsStr).toEqual('q=choice of law\n&defType=edismax\n&qf=catch_line text\n&pf=catch_line');
@@ -151,7 +165,7 @@ describe('SettingsCtrl', function() {
 
       it('sets params to new url', function() {
         scope.searchSettings.searchUrl = testNewUserUrl;
-        scope.searchSettings.publishSearcher();
+        scope.publishSearcher();
       });
     });
   });

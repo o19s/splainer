@@ -8,10 +8,12 @@ angular.module('splain-app')
     this.ENGINES.SOLR = 'solr';
     this.ENGINES.ELASTICSEARCH = 'es';
 
+    var defaultEsArgs = ' {"query": {"_all": ""}}    ';
+
     // Next is Local Storage
     var initSearchArgs = function() {
       var searchSettings = {solr:  {searchUrl: '', fieldSpecStr: '', searchArgsStr: '', whichEngine: 'solr'},
-                            es: {searchUrl: '', fieldSpecStr: '', searchArgsStr: '', whichEngine: 'es'},
+                            es: {searchUrl: '', fieldSpecStr: '', searchArgsStr: defaultEsArgs, whichEngine: 'es'},
                             whichEngine: 'solr', // which engine was the last used
 
                             searchUrl: function() {
@@ -57,6 +59,9 @@ angular.module('splain-app')
         localStorageTryGet('fieldSpecStr', 'es');
         localStorageTryGet('searchArgsStr', 'es');
         localStorageTryGet('whichEngine');
+        if (!searchSettings.whichEngine) {
+          searchSettings.whichEngine = 'solr';
+        }
       }
       searchSettings.solr.searchArgsStr = searchSettings.solr.searchArgsStr.slice(1);
       searchSettings.es.searchArgsStr = searchSettings.es.searchArgsStr.slice(1);
