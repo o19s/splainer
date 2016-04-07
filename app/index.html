@@ -68,13 +68,13 @@
               Change Search Engine:<br />
               <div>
                 <label>
-                   <input type="radio" value="solr" ng-model="whichEngine">
+                   <input type="radio" value="solr" ng-model="workingWhichEngine">
                    Solr
                 </label>
               </div>
               <div>
                 <label>
-                  <input type="radio" value="es" ng-model="whichEngine">
+                  <input type="radio" value="es" ng-model="workingWhichEngine">
                   ElasticSearch
                 </label>
               </div>
@@ -84,31 +84,31 @@
               Search URL <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsSolr.toggle]" class="glyphicon glyphicon-minus-sign"></span>
             </div>
             <div class="dev-section" ng-show="!devSettingsSolr.toggle">
-              <input type="text" ng-model="searchSettings.searchUrl" placeholder="Enter URL to your request handler" class="form-control"></input>
+              <input type="text" ng-model="workingSettings.searchUrl" placeholder="Enter URL to your request handler" class="form-control"></input>
             </div>
 
             <div class="dev-header" ng-click="devSettingsFields.toggle = !devSettingsFields.toggle">
               Displayed Fields <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsFields.toggle]" class="glyphicon glyphicon-minus-sign"></span>
             </div>
             <div class="dev-section" ng-show="!devSettingsFields.toggle">
-              <input id="inputFieldSpec" type="text" ng-model="searchSettings.fieldSpecStr" placeholder="Fields you'd like to display" class="form-control"></input>
+              <input id="inputFieldSpec" type="text" ng-model="workingSettings.fieldSpecStr" placeholder="Fields you'd like to display" class="form-control"></input>
             </div>
 
             <div class="dev-header" ng-click="devSettingsArgs.toggle = !devSettingsArgs.toggle">
               Search Args <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsArgs.toggle]" class="glyphicon glyphicon-minus-sign"></span>
             </div>
             <div class="dev-section" ng-show="!devSettingsArgs.toggle">
-              <div ng-show="searchSettings.whichEngine === 'solr'">
-                <textarea id="inputSolrArgsStr" ng-model="searchSettings.searchArgsStr" rows="10" class="form-control ng-pristine ng-valid"></textarea>
+              <div ng-show="workingWhichEngine === 'solr'">
+                <textarea id="inputSolrArgsStr" ng-model="workingSettings.searchArgsStr" rows="10" class="form-control ng-pristine ng-valid"></textarea>
               </div>
 
-              <div ng-show="searchSettings.whichEngine === 'es'">
+              <div ng-show="workingWhichEngine === 'es'">
                 <div style="height: 300px;" ui-ace="{
                     require: ['ace/ext/language_tools'],
                     useWrapMode: false,
                     mode: 'json'
                   }"
-                  ng-model="searchSettings.searchArgsStr">
+                  ng-model="workingSettings.searchArgsStr">
                 </div>
               </div>
             </div>
