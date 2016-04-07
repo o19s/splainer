@@ -149,6 +149,18 @@ describe('searchResultsCtrl', function() {
     httpBackend.verifyNoOutstandingExpectation();
   });
 
+  it('reports errors', function() {
+    httpBackend.expectJSONP(urlContainsParams(testUrl, {q: ['*:*']}))
+               .respond(-1);
+    createController();
+    scope.search.search();
+    httpBackend.flush();
+    expect(scope.currSearch.docs.length).toEqual(0);
+    expect(scope.currSearch.errorMsg.length).toBeGreaterThan(0);
+
+    httpBackend.verifyNoOutstandingExpectation();
+  });
+
 
 
 });

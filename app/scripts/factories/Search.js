@@ -72,6 +72,7 @@ angular.module('splain-app')
           self.paging             = false;
           self.state              = states.NO_SEARCH;
           self.overridingExplains = {};
+          self.errorMsg           = '';
 
           if (overridingExplains) {
             // we might not be explaining this search, but being used
@@ -106,6 +107,7 @@ angular.module('splain-app')
           self.searcher = createSearcher(fieldSpec, parsedArgs, searchSettings);
           self.reset();
           self.state    = states.WAITING_FOR_SEARCH;
+          self.errorMsg = '';
           self.settings = angular.copy(searchSettings);
 
           self.searcher.search()
@@ -131,9 +133,11 @@ angular.module('splain-app')
 
               self.state = states.DID_SEARCH;
               promise.complete();
-            }, function searchFailure() {
+            }, function searchFailure(msg) {
               self.state    = states.IN_ERROR;
               self.linkUrl  = self.searcher.linkUrl;
+              self.errorMsg = msg.searchError;
+              promise.complete();
               return;
             });
 
