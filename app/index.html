@@ -60,24 +60,20 @@
       </div>
       <div class="pane_east">
           <h3>Search Controls</h3>
-          <form class="form-horizontal" role="form" ng-controller="SettingsCtrl" ng-submit="publishSearcher()">
+          <form class="form-horizontal" style="height: 100%; min-height: 100%" id="queryParams" role="form" ng-controller="SettingsCtrl" ng-submit="publishSearcher()">
             <div class="dev-header" ng-click="devSettingsSearchEngine.toggle = !devSettingsSearchEngine.toggle">
               Search Engine <span ng-class="{true: 'glyphicon-plus-sign', false: 'glyphicon-minus-sign'}[!devSettingsSearchEngine.toggle]" class="glyphicon"></span>
             </div>
             <div class="dev-section" ng-show="devSettingsSearchEngine.toggle">
               Change Search Engine:<br />
-              <div>
                 <label>
                    <input type="radio" value="solr" ng-model="workingWhichEngine">
                    Solr
                 </label>
-              </div>
-              <div>
                 <label>
                   <input type="radio" value="es" ng-model="workingWhichEngine">
                   ElasticSearch
                 </label>
-              </div>
             </div>
 
             <div class="dev-header" ng-click="devSettingsSolr.toggle = !devSettingsSolr.toggle">
@@ -103,7 +99,7 @@
               </div>
 
               <div ng-show="workingWhichEngine === 'es'">
-                <div style="height: 300px;" ui-ace="{
+                <div class="es-query-params" ui-ace="{
                     require: ['ace/ext/language_tools'],
                     useWrapMode: false,
                     mode: 'json'
@@ -116,7 +112,6 @@
               <button type="submit" class="btn btn-default">Rerun Query</button>
             </div>
           </form>
-          <div ng-include="'views/helpBox.html'"></div>
       </div>
     </div>
 
@@ -182,6 +177,7 @@
     <script src="scripts/controllers/settings.js"></script>
     <script src="scripts/controllers/solrSettingsWarning.js"></script>
     <script src="scripts/controllers/startUrl.js"></script>
+    <script src="scripts/ace-config.js"></script>
     <!-- endbuild -->
 </body>
 </html>
