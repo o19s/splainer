@@ -65,7 +65,6 @@
               Search Engine <span ng-class="{true: 'glyphicon-plus-sign', false: 'glyphicon-minus-sign'}[!devSettingsSearchEngine.toggle]" class="glyphicon"></span>
             </div>
             <div class="dev-section" ng-show="devSettingsSearchEngine.toggle">
-              Change Search Engine:<br />
                 <label>
                    <input type="radio" value="solr" ng-model="workingWhichEngine">
                    Solr
@@ -103,7 +102,7 @@
                     require: ['ace/ext/language_tools'],
                     useWrapMode: false,
                     mode: 'json'
-                  }"
+                  }" id="es-query-params-editor"
                   ng-model="workingSettings.searchArgsStr">
                 </div>
               </div>
