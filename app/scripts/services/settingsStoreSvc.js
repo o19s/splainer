@@ -8,7 +8,13 @@ angular.module('splain-app')
     this.ENGINES.SOLR = 'solr';
     this.ENGINES.ELASTICSEARCH = 'es';
 
-    var defaultEsArgs = ' {"query": {"_all": ""}}    ';
+    var defaultEsArgs = '!{\n' +
+                        '  "query": {\n' +
+                        '    "match": {\n' +
+                        '      "_all": ""\n' +
+                        '    }\n' +
+                        '  }\n' +
+                        '}    ';
 
     // Next is Local Storage
     var initSearchArgs = function() {
