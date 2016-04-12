@@ -10,7 +10,7 @@
     "angular-bootstrap": "~0.11.0",
     "angular-ui-ace": "bower",
     "ng-json-explorer": "git://github.com/softwaredoug/ng-json-explorer",
-    "splainer-search": "1.6.1",
+    "splainer-search": "1.9.0",
     "angular-sanitize": "~1.4.0",
     "jquery": "~2.1.1",
     "inspector-gadget": "^0.2.0"
