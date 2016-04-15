@@ -3,6 +3,7 @@ node_modules
 .sass-cache
 bower_components
 dist/
+coverage/
 
 deploy.sh
 # vim swp
