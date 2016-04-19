@@ -45,50 +45,74 @@
                 </li>
               </ul>
           </header>
+
           <div class="container">
-            
             <div ng-include="'views/searchResults.html'"></div>
             <div ng-controller="StartUrlCtrl" ng-show="currSearch.state === currSearch.NO_SEARCH" ng-include="'views/startUrl.html'"></div>
           </div>
-          <div class="footer" style="margin-bottom:10px">
+
+          <div class="footer">
             <p style="margin: 0px">From the <a target="_blank" href="http://opensourceconnections.com"><img class="osc_logo" alt="OSC Logo" src="images/OSC-logomark-color-sm.png"></img></span> OpenSource Connections</a> team</p>
             <small>Expertise, Solutions, and Consulting for Apache Solr | <a target="_blank" href="http://www.opensourceconnections.com/blog">Blog</a> | <a target="_blank" href="http://www.opensourceconnections.com/what-we-do/">Services</a> | <a href="mailto:TalkToUs@opensourceconnections.com">Contact Us</a></small>
           </div>
       </div>
       <div class="east-slider">
-      </div>    
+      </div>
       <div class="pane_east">
           <h3>Search Controls</h3>
-          <form class="form-horizontal" role="form" ng-controller="SolrSettingsCtrl" ng-submit="searchSettings.publishSearcher()">
+          <form class="form-horizontal" style="height: 100%; min-height: 100%" id="queryParams" role="form" ng-controller="SettingsCtrl" ng-submit="publishSearcher()">
+            <div class="dev-header" ng-click="devSettingsSearchEngine.toggle = !devSettingsSearchEngine.toggle">
+              Search Engine <span ng-class="{true: 'glyphicon-plus-sign', false: 'glyphicon-minus-sign'}[!devSettingsSearchEngine.toggle]" class="glyphicon"></span>
+            </div>
+            <div class="dev-section" ng-show="devSettingsSearchEngine.toggle">
+                <label>
+                   <input type="radio" value="solr" ng-model="workingWhichEngine">
+                   Solr
+                </label>
+                <label>
+                  <input type="radio" value="es" ng-model="workingWhichEngine">
+                  ElasticSearch
+                </label>
+            </div>
+
             <div class="dev-header" ng-click="devSettingsSolr.toggle = !devSettingsSolr.toggle">
-              Solr URL <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsSolr.toggle]" class="glyphicon glyphicon-minus-sign"></span>
+              Search URL <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsSolr.toggle]" class="glyphicon glyphicon-minus-sign"></span>
             </div>
             <div class="dev-section" ng-show="!devSettingsSolr.toggle">
-              <input type="text" ng-model="searchSettings.searchUrl" placeholder="Enter URL to your request handler" class="form-control"></input>
+              <input type="text" ng-model="workingSettings.searchUrl" placeholder="Enter URL to your request handler" class="form-control"></input>
             </div>
 
             <div class="dev-header" ng-click="devSettingsFields.toggle = !devSettingsFields.toggle">
               Displayed Fields <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsFields.toggle]" class="glyphicon glyphicon-minus-sign"></span>
             </div>
             <div class="dev-section" ng-show="!devSettingsFields.toggle">
-              <input id="inputFieldSpec" type="text" ng-model="searchSettings.fieldSpecStr" placeholder="Fields you'd like to display" class="form-control"></input>
+              <input id="inputFieldSpec" type="text" ng-model="workingSettings.fieldSpecStr" placeholder="Fields you'd like to display" class="form-control"></input>
             </div>
 
             <div class="dev-header" ng-click="devSettingsArgs.toggle = !devSettingsArgs.toggle">
               Search Args <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsArgs.toggle]" class="glyphicon glyphicon-minus-sign"></span>
             </div>
             <div class="dev-section" ng-show="!devSettingsArgs.toggle">
-              <textarea id="inputSolrArgsStr" ng-model="searchSettings.searchArgsStr" rows="10" class="form-control ng-pristine ng-valid"></textarea> 
+              <div ng-show="workingWhichEngine === 'solr'">
+                <textarea id="inputSolrArgsStr" ng-model="workingSettings.searchArgsStr" rows="10" class="form-control ng-pristine ng-valid"></textarea>
+              </div>
+
+              <div ng-show="workingWhichEngine === 'es'">
+                <div class="es-query-params" ui-ace="{
+                    require: ['ace/ext/language_tools'],
+                    useWrapMode: false,
+                    mode: 'json'
+                  }" id="es-query-params-editor"
+                  ng-model="workingSettings.searchArgsStr">
+                </div>
+              </div>
             </div>
             <div class="dev-section">
               <button type="submit" class="btn btn-default">Rerun Query</button>
             </div>
           </form>
-          <div ng-include="'views/helpBox.html'"></div>
       </div>
-
     </div>
-
 
     <!-- Google Analytics:-->
     <script>
@@ -106,6 +130,8 @@
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="bower_components/ace-builds/src-min-noconflict/ace.js"></script>
+    <script src="bower_components/ace-builds/src-min-noconflict/ext-language_tools.js"></script>
 
     <!-- build:js(app) scripts/oldieshim.js -->
     <!--[if lt IE 9]>
@@ -119,6 +145,7 @@
     <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
     <script src="bower_components/angular-local-storage/angular-local-storage.js"></script>
     <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="bower_components/angular-ui-ace/ui-ace.js"></script>
     <script src="bower_components/ng-json-explorer/src/gd-ui-jsonexplorer.js"></script>
     <script src="bower_components/urijs/src/URI.js"></script>
     <script src="bower_components/splainer-search/splainer-search.js"></script>
@@ -126,27 +153,30 @@
     <!-- endbower -->
     <!-- endbuild -->
 
-      <!-- build:js({.tmp,app}) scripts/scripts.js -->
-      <script src="scripts/panes.js"></script>
-      <script src="scripts/promise.js"></script>
-      <script src="scripts/stringPatch.js"></script>
-      <script src="scripts/app.js"></script>
-      <script src="scripts/controllers/helpBox.js"></script>
-      <script src="scripts/controllers/docSelector.js"></script>
-      <script src="scripts/directives/dispatchOnClick.js"></script>
-      <script src="scripts/directives/docRow.js"></script>
-      <script src="scripts/directives/docSelector.js"></script>
-      <script src="scripts/directives/stackedChart.js"></script>
-      <script src="scripts/services/solrSettingsSvc.js"></script>
-      <script src="scripts/services/splSearchSvc.js"></script>
-      <script src="scripts/services/settingsStoreSvc.js"></script>
-      <script src="scripts/controllers/docRow.js"></script>
-      <script src="scripts/controllers/detailedExplain.js"></script>
-      <script src="scripts/controllers/detailedDoc.js"></script>
-      <script src="scripts/controllers/searchResults.js"></script>
-      <script src="scripts/controllers/solrSettings.js"></script>
-      <script src="scripts/controllers/solrSettingsWarning.js"></script>
-      <script src="scripts/controllers/startUrl.js"></script>
-      <!-- endbuild -->
+    <!-- build:js({.tmp,app}) scripts/scripts.js -->
+    <script src="scripts/panes.js"></script>
+    <script src="scripts/promise.js"></script>
+    <script src="scripts/stringPatch.js"></script>
+    <script src="scripts/app.js"></script>
+    <script src="scripts/factories/Search.js"></script>
+    <script src="scripts/controllers/helpBox.js"></script>
+    <script src="scripts/controllers/docSelector.js"></script>
+    <script src="scripts/directives/dispatchOnClick.js"></script>
+    <script src="scripts/directives/docRow.js"></script>
+    <script src="scripts/directives/docSelector.js"></script>
+    <script src="scripts/directives/stackedChart.js"></script>
+    <script src="scripts/services/solrSettingsSvc.js"></script>
+    <script src="scripts/services/esSettingsSvc.js"></script>
+    <script src="scripts/services/splSearchSvc.js"></script>
+    <script src="scripts/services/settingsStoreSvc.js"></script>
+    <script src="scripts/controllers/docRow.js"></script>
+    <script src="scripts/controllers/detailedExplain.js"></script>
+    <script src="scripts/controllers/detailedDoc.js"></script>
+    <script src="scripts/controllers/searchResults.js"></script>
+    <script src="scripts/controllers/settings.js"></script>
+    <script src="scripts/controllers/solrSettingsWarning.js"></script>
+    <script src="scripts/controllers/startUrl.js"></script>
+    <script src="scripts/ace-config.js"></script>
+    <!-- endbuild -->
 </body>
 </html>

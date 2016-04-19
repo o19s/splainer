@@ -10,14 +10,12 @@
 angular.module('splain-app')
   .controller('SearchResultsCtrl', function ($scope, splSearchSvc, settingsStoreSvc) {
 
-
     $scope.search = {};
 
     /* Initiate a new search with the latest settings
      * */
     $scope.search.search = function() {
       var promise = Promise.create($scope.search.search);
-      $scope.search.reset();
       $scope.currSearch.search()
       .then(function() {
         promise.complete();

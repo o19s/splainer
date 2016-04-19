@@ -4,46 +4,98 @@ angular.module('splain-app')
   .service('settingsStoreSvc', function settingsStoreSvc(localStorageService, $location) {
 
     this.ENGINES = {};
-    this.ENGINES.SOLR = 0;
-    this.ENGINES.ELASTICSEARCH = 1;
+    // these need to be angular values
+    this.ENGINES.SOLR = 'solr';
+    this.ENGINES.ELASTICSEARCH = 'es';
+
+    var defaultEsArgs = '!{\n' +
+                        '  "query": {\n' +
+                        '    "match": {\n' +
+                        '      "_all": ""\n' +
+                        '    }\n' +
+                        '  }\n' +
+                        '}    ';
 
     // Next is Local Storage
     var initSearchArgs = function() {
-      var searchSettings = {searchUrl: '', fieldSpecStr: '', searchArgsStr: ''};
-      var localStorageTryGet = function(key) {
+      var searchSettings = {solr:  {searchUrl: '', fieldSpecStr: '', searchArgsStr: '', whichEngine: 'solr'},
+                            es: {searchUrl: '', fieldSpecStr: '', searchArgsStr: defaultEsArgs, whichEngine: 'es'},
+                            whichEngine: 'solr', // which engine was the last used
+
+                            searchUrl: function() {
+                              return this[this.whichEngine].searchUrl;
+                            },
+
+                            fieldSpecStr: function() {
+                              return this[this.whichEngine].fieldSpecStr;
+                            },
+
+                            searchArgsStr: function() {
+                              return this[this.whichEngine].searchArgsStr;
+                            },
+
+                            };
+      var localStorageTryGet = function(key, engine, def) {
         var val;
+        var prefix = '';
+        var settings = searchSettings;
+        if (!def) {
+          def = '';
+        }
+        if (engine) {
+          settings = searchSettings[engine];
+          prefix = engine + '_';
+        }
         try {
-          val = localStorageService.get(key);
+          val = localStorageService.get(prefix + key);
         } catch (SyntaxError) {
           val = null;
         }
 
         if (val !== null) {
-          searchSettings[key] = val;
+          settings[key] = val;
         } else {
-          searchSettings[key] = '';
+          settings[key] = def;
         }
       };
       if (localStorageService.isSupported) {
-        localStorageTryGet('searchUrl');
-        localStorageTryGet('startUrl');
-        localStorageTryGet('fieldSpecStr');
-        localStorageTryGet('searchArgsStr');
+        localStorageTryGet('searchUrl', 'solr');
+        localStorageTryGet('startUrl', 'solr');
+        localStorageTryGet('fieldSpecStr', 'solr');
+        localStorageTryGet('searchArgsStr', 'solr');
+        localStorageTryGet('searchUrl', 'es');
+        localStorageTryGet('startUrl', 'es');
+        localStorageTryGet('fieldSpecStr', 'es');
+        localStorageTryGet('searchArgsStr', 'es', defaultEsArgs);
         localStorageTryGet('whichEngine');
+        if (!searchSettings.whichEngine) {
+          searchSettings.whichEngine = 'solr';
+        }
       }
-      searchSettings.searchArgsStr = searchSettings.searchArgsStr.slice(1);
+      searchSettings.solr.searchArgsStr = searchSettings.solr.searchArgsStr.slice(1);
+      searchSettings.es.searchArgsStr = searchSettings.es.searchArgsStr.slice(1);
       return searchSettings;
     };
 
     var trySaveSolrArgs= function(searchSettings) {
       if (localStorageService.isSupported) {
-        localStorageService.set('startUrl', searchSettings.startUrl);
-        localStorageService.set('searchUrl', searchSettings.searchUrl);
-        localStorageService.set('fieldSpecStr', searchSettings.fieldSpecStr);
-        localStorageService.set('searchArgsStr', '!' + searchSettings.searchArgsStr);
+        localStorageService.set('solr_startUrl', searchSettings.solr.startUrl);
+        localStorageService.set('solr_searchUrl', searchSettings.solr.searchUrl);
+        localStorageService.set('solr_fieldSpecStr', searchSettings.solr.fieldSpecStr);
+        localStorageService.set('solr_searchArgsStr', '!' + searchSettings.solr.searchArgsStr);
+        localStorageService.set('es_startUrl', searchSettings.es.startUrl);
+        localStorageService.set('es_searchUrl', searchSettings.es.searchUrl);
+        localStorageService.set('es_fieldSpecStr', searchSettings.es.fieldSpecStr);
+        localStorageService.set('es_searchArgsStr', '!' + searchSettings.es.searchArgsStr);
         localStorageService.set('whichEngine', searchSettings.whichEngine);
       }
-      $location.search({'solr':  searchSettings.startUrl, 'fieldSpec': searchSettings.fieldSpecStr});
+      if (searchSettings.whichEngine === 'solr') {
+        $location.search({'solr':  searchSettings.solr.startUrl, 'fieldSpec': searchSettings.solr.fieldSpecStr});
+      } else {
+        $location.search({'esUrl':  searchSettings.es.searchUrl,
+                          'esQuery': searchSettings.es.searchArgsStr});
+
+      }
     };
 
     // init from local storage if there
