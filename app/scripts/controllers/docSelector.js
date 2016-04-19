@@ -24,17 +24,17 @@ angular.module('splain-app')
         var args;
         if (settings.whichEngine === 'es') {
           try {
-            args = angular.fromJson(settings.searchArgsStr);
+            args = angular.fromJson(settings.searchArgsStr());
           } catch (SyntaxError) {
             args = '';
           }
         } else {
-          args = solrUrlSvc.parseSolrArgs(settings.searchArgsStr);
+          args = solrUrlSvc.parseSolrArgs(settings.searchArgsStr());
         }
 
         return searchSvc.createSearcher(
           fieldSpec.fieldList(),
-          settings.searchUrl,
+          settings.searchUrl(),
           args,
           '',
           {},
@@ -47,7 +47,7 @@ angular.module('splain-app')
 
       $scope.explainOther = function(altQuery) {
         var settings      = settingsStoreSvc.settings;
-        var fieldSpec     = fieldSpecSvc.createFieldSpec(settings.fieldSpecStr);
+        var fieldSpec     = fieldSpecSvc.createFieldSpec(settings.fieldSpecStr());
         var searcher      = createSearcher(fieldSpec, settings);
 
         $scope.currSearch.docs = []; // reset the array for a new search

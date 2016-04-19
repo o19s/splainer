@@ -7,7 +7,8 @@ angular.module('splain-app')
       priority: 1000,
       scope: {
           doc: '=',
-          maxScore: '='
+          maxScore: '=',
+          whichEngine: '='
       },
       templateUrl: 'views/docRow.html',
       controller: 'DocRowCtrl'

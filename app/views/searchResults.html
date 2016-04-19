@@ -2,7 +2,7 @@
   <div ng-show="currSearch.state === currSearch.WAITING_FOR_SEARCH" style="text-align: center">
     <img src="images/ajax-loader.gif"><img>
   </div>
-
+   ENGINE {{currSearch.engine}}
   <div ng-show="currSearch.state === currSearch.IN_ERROR" class="alert alert-error">
     Error with your query. Double check that the URL is correct. <div ng-show="currSearch.engine==='solr'">Try accessing <a href="{{currSearch.linkUrl}}">Solr</a> to troubleshoot the error.</div>
     <pre ng-show="currSearch.errorMsg.length > 0">{{currSearch.errorMsg}}</pre>
@@ -21,7 +21,7 @@
 
     <hr style="margin-top: 5px"/>
     <div ng-if="!currSearch.hasGrouped()" ng-repeat="doc in currSearch.docs">
-      <doc-row doc="doc" max-score="currSearch.maxScore"></doc-row>
+      <doc-row doc="doc" max-score="currSearch.maxScore" which-engine="currSearch.engine"></doc-row>
       <hr/>
     </div>
 
@@ -30,7 +30,7 @@
       <div ng-repeat="grouped in groupedBy">
         <h4 style="margin-left: 10px" title = "Group: {{group}}, {{grouped.value}}">Value: <em>{{grouped.value}}</em></h4>
         <div ng-repeat="doc in grouped.docs">
-          <doc-row doc="doc" max-score="currSearch.maxScore"></doc-row>
+          <doc-row doc="doc" max-score="currSearch.maxScore" which-engine="currSearch.engine"></doc-row>
         </div>
 
         <hr/>

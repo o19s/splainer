@@ -25,6 +25,11 @@ angular.module('splain-app')
         self.getOverridingExplain = getOverridingExplain;
         self.search               = search;
         self.page                 = page;
+        if (searchSettings.hasOwnProperty('whichEngine')) {
+          self.engine               = searchSettings.whichEngine;
+        } else {
+          self.engine = 'solr';
+        }
 
         // Bootstrap
         self.reset();

@@ -22,6 +22,9 @@ angular.module('splain-app')
         resolve: {
           doc: function() {
             return $scope.doc;
+          },
+          canExplainOther: function() {
+            return $scope.whichEngine === 'solr';
           }
         }
       });
