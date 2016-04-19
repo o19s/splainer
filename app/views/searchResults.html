@@ -2,7 +2,6 @@
   <div ng-show="currSearch.state === currSearch.WAITING_FOR_SEARCH" style="text-align: center">
     <img src="images/ajax-loader.gif"><img>
   </div>
-   ENGINE {{currSearch.engine}}
   <div ng-show="currSearch.state === currSearch.IN_ERROR" class="alert alert-error">
     Error with your query. Double check that the URL is correct. <div ng-show="currSearch.engine==='solr'">Try accessing <a href="{{currSearch.linkUrl}}">Solr</a> to troubleshoot the error.</div>
     <pre ng-show="currSearch.errorMsg.length > 0">{{currSearch.errorMsg}}</pre>
