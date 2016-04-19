@@ -328,6 +328,14 @@ module.exports = function (grunt) {
           cwd: 'app/bower_components/bootstrap/dist',
           src: 'fonts/*',
           dest: '<%= yeoman.dist %>'
+        }, {
+          expand: true,
+          cwd: '<%= yeoman.app %>/bower_components/ace-builds/src-min-noconflict/',
+          dest: '<%= yeoman.dist %>',
+          src: [
+            'worker-json.js',
+            'mode-json.js'
+          ]
         }]
       },
       styles: {
