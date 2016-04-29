@@ -67,6 +67,10 @@ angular.module('splain-app')
         runSolrSearch();
       };
 
+      $scope.start.autoIndent = function() {
+        $scope.start.esSettings.searchArgsStr = JSON.stringify(JSON.parse($scope.start.esSettings.searchArgsStr), null, 2);
+      };
+
       $scope.start.submitEs = function() {
         settingsStoreSvc.settings.whichEngine = 'es';
         var settings = {
