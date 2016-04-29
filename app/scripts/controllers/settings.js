@@ -20,6 +20,11 @@ angular.module('splain-app')
         $scope.workingSettings = settingsStoreSvc.settings[$scope.workingWhichEngine];
       });
 
+      $scope.autoindent = function() {
+        if ($scope.workingWhichEngine === 'es') {
+          $scope.workingWhichEngine = JSON.stringify(JSON.parse($scope.workingSettings.searchArgsStr), null, 2);
+        }
+      };
 
       $scope.publishSearcher = function() {
         if ( $scope.workingWhichEngine === 'solr' ) {
