@@ -71,7 +71,7 @@
                 </label>
                 <label>
                   <input type="radio" value="es" ng-model="workingWhichEngine">
-                  ElasticSearch
+                  Elasticsearch <span class="label label-warning">Beta</span>
                 </label>
             </div>
 
@@ -100,7 +100,7 @@
               <div ng-show="workingWhichEngine === 'es'">
                 <div class="es-query-params" ui-ace="{
                     require: ['ace/ext/language_tools'],
-                    useWrapMode: false,
+                    useWrapMode: true,
                     mode: 'json'
                   }" id="es-query-params-editor"
                   ng-model="workingSettings.searchArgsStr">
@@ -138,9 +138,9 @@
     <![endif]-->
     <!-- endbuild -->
     <!-- build:js(app) scripts/vendor.js -->
-    <!-- bower:js -->
     <script src="bower_components/ace-builds/src-min-noconflict/ace.js"></script>
     <script src="bower_components/ace-builds/src-min-noconflict/ext-language_tools.js"></script>
+    <!-- bower:js -->
     <script src="bower_components/json3/lib/json3.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
     <script src="bower_components/angular-local-storage/angular-local-storage.js"></script>
