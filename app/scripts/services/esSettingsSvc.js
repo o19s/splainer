@@ -47,6 +47,10 @@ angular.module('splain-app')
           settings.fieldSpecStr = '*';
         }
 
+        if (!angular.isDefined(parsedUrl.fields)) {
+          settings.startUrl = parsedUrl.url + '?fields=' + settings.fieldSpecStr;
+        }
+
         settings.searchUrl = parsedUrl.url;
       }
 
