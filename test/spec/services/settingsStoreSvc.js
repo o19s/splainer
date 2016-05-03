@@ -106,4 +106,23 @@ describe('Service: settingsStoreSvc', function () {
     expect(locationSvc.lastParams.solr).toEqual(testSolrStartUrl);
     expect(locationSvc.lastParams.fieldSpec).toEqual(testSolrFielgcldSpecStr);
   });
+
+  var testEsStartUrl = 'http://localhost:9200/tmdb/_search';
+  var testEsFieldSpecStr = testSolrFielgcldSpecStr;
+  var testSearchArgsStr = '{"_match": "_all"}';
+
+  it('navigates on es updates', function() {
+    setupSvc();
+    var settings = settingsStoreSvc.settings;
+    settings.es.startUrl = testEsStartUrl;
+    settings.es.searchUrl = testEsStartUrl;
+    settings.es.fieldSpecStr = testEsFieldSpecStr;
+    settings.whichEngine = 'elasticsearch';
+    settings.es.searchArgsStr = testSearchArgsStr;
+    settingsStoreSvc.save();
+    expect(locationSvc.lastParams.esUrl).toEqual(testEsStartUrl);
+    expect(locationSvc.lastParams.esQuery).toEqual(testSearchArgsStr);
+    expect(locationSvc.lastParams.fieldSpec).toEqual(testEsFieldSpecStr);
+
+  });
 });
