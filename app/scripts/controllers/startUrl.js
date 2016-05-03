@@ -30,6 +30,7 @@ angular.module('splain-app')
       };
 
       var runSolrSearch = function(overridingFieldSpec) {
+        settingsStoreSvc.settings.whichEngine = 'solr';
         solrSettingsSvc.fromStartUrl($scope.start.solrSettings.startUrl, $scope.start.solrSettings, overridingFieldSpec);
         search();
       };
@@ -37,33 +38,35 @@ angular.module('splain-app')
       var setEsSettings = function(settings) {
         $scope.start.esSettings.startUrl      = settings.searchUrl;
         $scope.start.esSettings.searchArgsStr = settings.searchArgsStr;
+        $scope.start.esSettings.fieldSpecStr = settings.fieldSpecStr;
         esSettingsSvc.fromStartUrl($scope.start.esSettings);
       };
 
       var runEsSearch = function(settings) {
+        settingsStoreSvc.settings.whichEngine = 'es';
         setEsSettings(settings);
         search();
       };
 
       // If we have something set in the URL, use that
+      var overridingFieldSpec;
+      if ($location.search().hasOwnProperty('fieldSpec')) {
+        overridingFieldSpec = $location.search().fieldSpec;
+      }
       if ($location.search().hasOwnProperty('solr')) {
         $scope.start.solrSettings.startUrl = $location.search().solr;
-        var overridingFieldSpec;
-        if ($location.search().hasOwnProperty('fieldSpec')) {
-          overridingFieldSpec = $location.search().fieldSpec;
-        }
         runSolrSearch(overridingFieldSpec);
       } else if ($location.search().hasOwnProperty('esUrl')) {
         var settings = {
           searchUrl:      $location.search().esUrl,
           searchArgsStr:  $location.search().esQuery,
+          fieldSpecStr: overridingFieldSpec
         };
 
         runEsSearch(settings);
       }
 
       $scope.start.submitSolr = function() {
-        settingsStoreSvc.settings.whichEngine = 'solr';
         runSolrSearch();
       };
 
@@ -72,7 +75,6 @@ angular.module('splain-app')
       };
 
       $scope.start.submitEs = function() {
-        settingsStoreSvc.settings.whichEngine = 'es';
         var settings = {
           searchUrl:      $scope.start.esSettings.startUrl,
           searchArgsStr:  $scope.start.esSettings.searchArgsStr,
