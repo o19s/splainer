@@ -93,7 +93,8 @@ angular.module('splain-app')
         $location.search({'solr':  searchSettings.solr.startUrl, 'fieldSpec': searchSettings.solr.fieldSpecStr});
       } else {
         $location.search({'esUrl':  searchSettings.es.searchUrl,
-                          'esQuery': searchSettings.es.searchArgsStr});
+                          'esQuery': searchSettings.es.searchArgsStr,
+                          'fieldSpec': searchSettings.es.fieldSpecStr});
 
       }
     };

@@ -38,10 +38,12 @@ angular.module('splain-app')
         if (settings.searchArgsStr.trim().length === 0) {
           settings.searchArgsStr = '{ "match_all": {} }';
         }
-
-        if ( angular.isDefined(parsedUrl.fl) ) {
-          settings.fieldSpecStr = parsedUrl.fl;
-        } else {
+        if (settings.fieldSpecStr && angular.isString(settings.fieldSpecStr)) {
+          settings.fieldSpecStr = settings.fieldSpecStr;
+        } else if ( angular.isDefined(parsedUrl.fields) ) {
+          settings.fieldSpecStr = parsedUrl.fields;
+        }
+        else {
           settings.fieldSpecStr = '*';
         }
 
@@ -52,7 +54,7 @@ angular.module('splain-app')
         settings.startUrl = settings.searchUrl;
 
         if ( angular.isDefined(settings.fieldSpecStr) && settings.fieldSpecStr.length > 0) {
-          settings.startUrl += '?fl=' + settings.fieldSpecStr;
+          settings.startUrl += '?fields=' + settings.fieldSpecStr;
         }
       }
     }
