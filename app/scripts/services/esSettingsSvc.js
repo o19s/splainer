@@ -13,7 +13,12 @@ angular.module('splain-app')
         var parser  = document.createElement('a');
         parser.href = url;
 
-        var uri = parser.protocol + '//' + parser.host + parser.pathname;
+        var uri = parser.protocol + '//';
+        if (parser.username && parser.password) {
+          uri += parser.username + ':' + parser.password + '@';
+        }
+
+        uri += parser.host + parser.pathname;
         var result = {
           url: uri
         };
