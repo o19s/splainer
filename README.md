@@ -22,7 +22,7 @@ Take the [tour](http://splainer.io/help.html) to see how you'd use Splainer.
 
 ### If you want to work locally, we have a Docker image
 
-`docker run o19s/splainer ``
+` docker run -d -p 9000:9000 o19s/splainer` and then go to http://localhost:9000
 
 ## Running the code
 

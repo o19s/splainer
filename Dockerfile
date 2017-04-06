@@ -1,4 +1,5 @@
 FROM node:6
+MAINTAINER  Eric Pugh "epugh@opensourceconnections.com"
 
 COPY . /home/splainer
 WORKDIR /home/splainer
