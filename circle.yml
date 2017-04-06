@@ -1,6 +1,8 @@
 machine:
   node:
     version: 0.12.7
+  services:
+    - docker
 
 dependencies:
   cache_directories:
@@ -31,3 +33,8 @@ deployment:
     commands:
       - gsutil rsync -R dist gs://splainer.io/
       - gsutil -m setmeta -r -h "Cache-Control:public, max-age=3600" "gs://splainer.io/*"
+  hub:
+    branch: /.*/
+    owner: o19s
+    commands:
+      - docker build -t splainer  .    
