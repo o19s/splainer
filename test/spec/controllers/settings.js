@@ -108,7 +108,7 @@ describe('SettingsCtrl', function() {
         scope.workingSettings.searchUrl = testUrl;
         scope.workingSettings.searchArgsStr = testArgsStr;
         scope.workingSettings.fieldSpecStr = testFieldSpec;
-        spyOn(scope.search, 'search').andCallThrough();
+        spyOn(scope.search, 'search').and.callThrough();
         scope.publishSearcher();
       });
 
