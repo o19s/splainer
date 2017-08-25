@@ -406,7 +406,8 @@ module.exports = function (grunt) {
   grunt.registerTask('build', [
     'clean:dist',
     'useminPrepare',
-    'concurrent:dist',
+    'copy:styles',
+    'svgmin',
     'autoprefixer',
     'concat',
     'ngmin',
