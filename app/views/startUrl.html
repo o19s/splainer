@@ -28,6 +28,8 @@
             <div style="height: 300px; margin-top: 20px;" ui-ace="{
                 require: ['ace/ext/language_tools'],
                 useWrapMode: false,
+                tabSize: 2,
+                useSoftTabs: true,
                 mode: 'json'
               }"
               ng-model="start.esSettings.searchArgsStr">
