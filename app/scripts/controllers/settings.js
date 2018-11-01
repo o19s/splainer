@@ -20,10 +20,14 @@ angular.module('splain-app')
         $scope.workingSettings = settingsStoreSvc.settings[$scope.workingWhichEngine];
       });
 
-      $scope.autoindent = function() {
+      $scope.autoIndent = function() {
         if ($scope.workingWhichEngine === 'es') {
-          $scope.workingWhichEngine = JSON.stringify(JSON.parse($scope.workingSettings.searchArgsStr), null, 2);
+          $scope.workingSettings.searchArgsStr = JSON.stringify(JSON.parse($scope.workingSettings.searchArgsStr), null, 2);
         }
+      };
+
+      $scope.aceSettings = function(_editor) {
+        _editor.session.setTabSize(2);
       };
 
       $scope.publishSearcher = function() {
