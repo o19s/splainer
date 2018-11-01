@@ -115,7 +115,8 @@ module.exports = function (grunt) {
     jshint: {
       options: {
         jshintrc: '.jshintrc',
-        reporter: require('jshint-stylish')
+        reporter: require('jshint-stylish'),
+        reporterOutput: ''
       },
       all: {
         src: [
@@ -407,7 +408,8 @@ module.exports = function (grunt) {
   grunt.registerTask('build', [
     'clean:dist',
     'useminPrepare',
-    'concurrent:dist',
+    'copy:styles',
+    'svgmin',
     'autoprefixer',
     'concat',
     'ngmin',
