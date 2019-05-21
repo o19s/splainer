@@ -1,4 +1,4 @@
-FROM node:6
+FROM node:4
 MAINTAINER  Eric Pugh "epugh@opensourceconnections.com"
 
 COPY . /home/splainer
