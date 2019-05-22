@@ -51,7 +51,14 @@ jobs:
 
       #- run: docker cp $id:/home/splainer/app .
 
-      - run: ls -alh
+      - run: ls -alh ./app
+
+      - run:
+          name: Deploy Master to s3
+          command: aws s3 sync ./app s3://splainer.io/ --delete
+#      - run:
+#          name: Invalidate Cloudfront Cache
+#          command: aws cloudfront create-invalidation --distribution-id E399IZ73XKNGHC --paths /*
 
 workflows:
   version: 2
