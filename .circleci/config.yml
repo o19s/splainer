@@ -61,7 +61,7 @@ jobs:
         enabled: true
     environment:
       <<: *image_config
-    branch: master
+    branch: circleci2.0
     steps:
 
       - run: docker push o19s/splainer:$IMAGE_TAG && sleep 10
@@ -99,4 +99,4 @@ workflows:
             - build
           filters:
             branches:
-              only: master
+              only: circleci2.0
