@@ -41,8 +41,6 @@ jobs:
     steps:
       - checkout
 
-##      - run: bash scripts/generate.sh > Dockerfile
-
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
 
       - run: docker build -t o19s/splainer:$IMAGE_TAG .
@@ -57,6 +55,17 @@ jobs:
 ##      - image: $DOCKER_USER/(name of image):(image tag)
 ##        environment:
 ##          <<: *image_config
+
+  deploy-prod:
+    machine:
+        enabled: true
+    environment:
+      <<: *image_config
+    branch: master
+    steps:      
+
+      - run: docker push o19s/splainer:$IMAGE_TAG && sleep 10
+
 
 ##    steps:
 ##      - checkout
@@ -80,14 +89,14 @@ jobs:
 ##      - store_artifacts:
 ##          path: test_results
 
-##workflows:
-##  version: 2
-##  dockerfile_wizard:
-##    jobs:
-##      - build:
-##          context: org-global
-
-##      - test_image:
-##          context: org-global
-##          requires:
-##            - build
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
+      - deploy-prod:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
