@@ -43,9 +43,9 @@ jobs:
 
 ##      - run: bash scripts/generate.sh > Dockerfile
 
-      - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
 
-      - run: docker build -t $DOCKER_USERNAME/$IMAGE_NAME:$IMAGE_TAG .
+      - run: docker build -t $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG .
 
       - run: docker push o19s/splainer:$IMAGE_TAG && sleep 10
 
@@ -54,7 +54,7 @@ jobs:
 
 ##  test_image:
 ##    docker:
-##      - image: $DOCKER_USERNAME/(name of image):(image tag)
+##      - image: $DOCKER_USER/(name of image):(image tag)
 ##        environment:
 ##          <<: *image_config
 
