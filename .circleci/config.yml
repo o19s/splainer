@@ -37,6 +37,22 @@ jobs:
 
       - run: docker push $IMAGE_NAME:latest && sleep 10
 
+  publish-splainerio:
+    #executor: docker-publisher
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - setup_remote_docker
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
+
+      - run: id=$(docker create o19s/splainer)
+
+      - run: docker cp $id:/home/splainer/app .
+
+      - run: ls -alh    
+
 workflows:
   version: 2
   build-master:
@@ -51,3 +67,9 @@ workflows:
           filters:
             branches:
               only: master
+      - publish-splainerio:
+          requires:
+            - build
+          filters:
+            branches:
+              only: circleci2.0
