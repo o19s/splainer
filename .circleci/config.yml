@@ -1,99 +1,50 @@
-image_config: &image_config
-
-  # make sure to set your Docker Hub username & password in CircleCI,
-  # either as project-specific environment variables
-  # or as resources in your organization's org-global Context
-
-  IMAGE_NAME: o19s/splainer
-
-  IMAGE_TAG: latest
-
-  # NOTE: if you're modifying this config.yml file manually
-  # rather than using the included setup script,
-  # make sure you also add the values of your IMAGE_NAME & IMAGE_TAG variables
-  # to the `test_image` job (line 55)
-
-  LINUX_VERSION: UBUNTU_TRUSTY # DEBIAN_JESSIE, DEBIAN_STRETCH, UBUNTU_TRUSTY, or UBUNTU_XENIAL
-
-  RUBY_VERSION_NUM: # pick a version from https://cache.ruby-lang.org/pub/ruby
-
-  NODE_VERSION_NUM: 4 # pick a version from https://nodejs.org/dist
-
-  PYTHON_VERSION_NUM: # pick a version from https://python.org/ftp/python
-
-  JAVA: false # Java options: true, false
-
-  MYSQL_CLIENT: false # MySQL options: true, false
-
-  POSTGRES_CLIENT: false # Postgres options: true, false
-
-  DOCKERIZE: true # Dockerize options: true, false
-
-  BROWSERS: true # browser tools (Xvfb, PhantomJS, Firefox, Chrome, Chromedriver): true, false
-
-version: 2
+version: 2.1
+executors:
+  docker-publisher:
+    environment:
+      IMAGE_NAME: o19s/splainer
+    docker:
+      - image: circleci/buildpack-deps:stretch
 jobs:
   build:
-    machine: true
-    environment:
-      <<: *image_config
-
+    executor: docker-publisher
     steps:
       - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Docker image
+          command: |
+            docker build -t $IMAGE_NAME:latest .
+      - run:
+          name: Archive Docker image
+          command: docker save -o image.tar $IMAGE_NAME
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./image.tar
+  publish-latest:
+    executor: docker-publisher
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - setup_remote_docker
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
 
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
 
-      - run: docker build -t o19s/splainer:latest .
-
-      #- run: docker push o19s/splainer:$IMAGE_TAG && sleep 10
-
-##      - store_artifacts:
-##          path: Dockerfile
-
-##  test_image:
-##    docker:
-##      - image: $DOCKER_USER/(name of image):(image tag)
-##        environment:
-##          <<: *image_config
-
-  deploy-prod:
-    machine: true
-    environment:
-      <<: *image_config
-    branch: circleci2.0
-    steps:
-
-      - run: docker push o19s/splainer:latest && sleep 10
-
-
-##    steps:
-##      - checkout
-
-##      - run:
-##          name: start Xvfb for phantomjs test
-##          command: Xvfb :99
-##          background: true
-
-##      - run:
-##          name: bats tests
-##          command: |
-##            mkdir -p test_results/bats
-##            bats scripts/tests.bats | \
-##            perl scripts/tap-to-junit.sh > \
-##            test_results/bats/results.xml
-
-##      - store_test_results:
-##          path: test_results
-
-##      - store_artifacts:
-##          path: test_results
+      - run: docker push $IMAGE_NAME:latest && sleep 10
 
 workflows:
   version: 2
-  build-deploy:
+  build-master:
     jobs:
-      - build
-      - deploy-prod:
+      - build:
+          filters:
+            branches:
+              only: circleci2.0
+      - publish-latest:
           requires:
             - build
           filters:
