@@ -1,3 +1,4 @@
+# Inspired heavily by https://circleci.com/blog/using-circleci-workflows-to-replicate-docker-hub-automated-builds/
 version: 2.1
 executors:
   docker-publisher:
@@ -41,12 +42,12 @@ workflows:
   build-master:
     jobs:
       - build:
-          filters:
-            branches:
-              only: circleci2.0
+          #filters:
+            #branches:
+              #only: circleci2.0
       - publish-latest:
           requires:
             - build
           filters:
             branches:
-              only: circleci2.0
+              only: master
