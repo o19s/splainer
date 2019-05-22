@@ -45,7 +45,7 @@ jobs:
 
       - run: docker build -t o19s/splainer:$IMAGE_TAG .
 
-      - run: docker push o19s/splainer:$IMAGE_TAG && sleep 10
+      #- run: docker push o19s/splainer:$IMAGE_TAG && sleep 10
 
 ##      - store_artifacts:
 ##          path: Dockerfile
@@ -62,7 +62,7 @@ jobs:
     environment:
       <<: *image_config
     branch: master
-    steps:      
+    steps:
 
       - run: docker push o19s/splainer:$IMAGE_TAG && sleep 10
 
