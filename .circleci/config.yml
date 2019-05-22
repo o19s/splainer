@@ -45,7 +45,7 @@ jobs:
 
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
 
-      - run: docker build -t $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG .
+      - run: docker build -t o19s/splainer:$IMAGE_TAG .
 
       - run: docker push o19s/splainer:$IMAGE_TAG && sleep 10
 
