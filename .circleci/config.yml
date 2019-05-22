@@ -38,7 +38,7 @@ jobs:
       - run: docker push $IMAGE_NAME:latest && sleep 10
 
   publish-splainerio:
-    #executor: docker-publisher
+    executor: docker-publisher
     steps:
       - attach_workspace:
           at: /tmp/workspace
@@ -51,7 +51,7 @@ jobs:
 
       - run: docker cp $id:/home/splainer/app .
 
-      - run: ls -alh    
+      - run: ls -alh
 
 workflows:
   version: 2
