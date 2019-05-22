@@ -43,7 +43,7 @@ jobs:
 
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
 
-      - run: docker build -t o19s/splainer:$IMAGE_TAG .
+      - run: docker build -t o19s/splainer:latest .
 
       #- run: docker push o19s/splainer:$IMAGE_TAG && sleep 10
 
@@ -57,14 +57,13 @@ jobs:
 ##          <<: *image_config
 
   deploy-prod:
-    machine:
-        enabled: true
+    machine: true
     environment:
       <<: *image_config
     branch: circleci2.0
     steps:
 
-      - run: docker push o19s/splainer:$IMAGE_TAG && sleep 10
+      - run: docker push o19s/splainer:latest && sleep 10
 
 
 ##    steps:
