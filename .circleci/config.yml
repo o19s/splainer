@@ -32,7 +32,7 @@ jobs:
           name: Load archived Docker image
           command: docker load -i /tmp/workspace/image.tar
 
-      - run: echo "$DOCKER_PASS" | docker login -u "$DOCKERHUB_USERN" --password-stdin
+      - run: echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 
       - run: docker push $IMAGE_NAME:latest && sleep 10
 
