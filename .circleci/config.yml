@@ -5,7 +5,7 @@ executors:
     environment:
       IMAGE_NAME: o19s/splainer
     docker:
-      - image: circleci/buildpack-deps:stretch
+      - image: circleci/python #:3.8.0a4-stretch
 jobs:
   build:
     executor: docker-publisher
@@ -53,7 +53,7 @@ jobs:
 
       - run:
           name: Install AWS cli
-          command: pip install awscli --upgrade --user
+          command: pip3 install awscli --upgrade --user
 
       - run:
           name: Deploy Master to s3
