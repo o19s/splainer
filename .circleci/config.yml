@@ -49,9 +49,11 @@ jobs:
 
       - run: id=$(docker create o19s/splainer) && echo "$id" && docker cp $id:/home/splainer/app .
 
-      #- run: docker cp $id:/home/splainer/app .
-
       - run: ls -alh ./app
+
+      - run:
+          name: Install AWS cli
+          command: pip3 install awscli --upgrade --user
 
       - run:
           name: Deploy Master to s3
