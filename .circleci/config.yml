@@ -53,11 +53,13 @@ jobs:
 
       - run:
           name: Install AWS cli
-          command: pip3 install awscli #--upgrade --user
+          command: pip3 install awscli --upgrade --user
+
+      - run: ls -alh /home/circleci/.local/bin
 
       - run:
           name: Deploy Master to s3
-          command: aws s3 sync ./app s3://splainer.io/ --delete
+          command: /home/circleci/.local/bin/aws s3 sync ./app s3://splainer.io/ --delete
 #      - run:
 #          name: Invalidate Cloudfront Cache
 #          command: aws cloudfront create-invalidation --distribution-id E399IZ73XKNGHC --paths /*
