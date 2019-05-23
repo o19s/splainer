@@ -53,7 +53,7 @@ jobs:
 
       - run:
           name: Install AWS cli
-          command: pip3 install awscli --upgrade --user
+          command: pip3 install awscli #--upgrade --user
 
       - run:
           name: Deploy Master to s3
