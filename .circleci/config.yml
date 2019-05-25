@@ -1,5 +1,7 @@
 # Inspired heavily by https://circleci.com/blog/using-circleci-workflows-to-replicate-docker-hub-automated-builds/
 version: 2.1
+orbs:
+  aws-cli: circleci/aws-cli@0.1.13
 executors:
   docker-publisher:
     environment:
@@ -51,15 +53,15 @@ jobs:
 
       - run: ls -alh ./app
 
-      - run:
-          name: Install AWS cli
-          command: pip3 install awscli --upgrade --user
+      #- run:
+      #    name: Install AWS cli
+      #    command: pip3 install awscli --upgrade --user
 
-      - run: ls -alh /home/circleci/.local/bin
+      #- run: ls -alh /home/circleci/.local/bin
 
       - run:
           name: Deploy Master to s3
-          command: /home/circleci/.local/bin/aws s3 sync ./app s3://splainer.io/ --delete
+          command: aws s3 sync ./app s3://splainer.io/ --delete
 #      - run:
 #          name: Invalidate Cloudfront Cache
 #          command: aws cloudfront create-invalidation --distribution-id E399IZ73XKNGHC --paths /*
