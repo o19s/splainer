@@ -1,0 +1,83 @@
+# Inspired heavily by https://circleci.com/blog/using-circleci-workflows-to-replicate-docker-hub-automated-builds/
+version: 2.1
+executors:
+  docker-publisher:
+    environment:
+      IMAGE_NAME: o19s/splainer
+    docker:
+      - image: circleci/python
+jobs:
+  build:
+    executor: docker-publisher
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Docker image now
+          command: |
+            docker build -t $IMAGE_NAME:latest .
+      - run:
+          name: Archive Docker image
+          command: docker save -o image.tar $IMAGE_NAME
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./image.tar
+  publish-latest:
+    executor: docker-publisher
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - setup_remote_docker
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
+
+      - run: echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+
+      - run: docker push $IMAGE_NAME:latest && sleep 10
+
+  publish-splainerio:
+    executor: docker-publisher
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - setup_remote_docker
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
+
+      - run: id=$(docker create o19s/splainer) && echo "$id" && docker cp $id:/home/splainer/app .
+
+      - run: ls -alh ./app
+
+      - run:
+          name: Install AWS cli
+          command: pip3 install awscli --upgrade --user
+
+      - run: ls -alh /home/circleci/.local/bin
+
+      - run:
+          name: Deploy Master to s3
+          command: /home/circleci/.local/bin/aws s3 sync ./app s3://splainer.io/ --delete
+
+workflows:
+  version: 2
+  build-master:
+    jobs:
+      - build
+          #filters:
+            #branches:
+              #only: circleci2.0
+      - publish-latest:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+      - publish-splainerio:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
