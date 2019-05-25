@@ -22,7 +22,7 @@ Take the [tour](http://splainer.io/help.html) to see how you'd use Splainer.
 
 ### If you want to work locally, we have a Docker image
 
-` docker run -d -p 9000:9000 o19s/splainer` and then go to http://localhost:9000
+`docker run -d -p 9000:9000 o19s/splainer` and then go to http://localhost:9000
 
 ## Running the code
 
@@ -34,7 +34,7 @@ Be sure you've installed npm, bower, and grunt on your machine.
 
 * On a Mac [follow these instructions](http://thechangelog.com/install-node-js-with-homebrew-on-os-x/)
 * On Ubuntu [follow these instructions](https://rtcamp.com/tutorials/nodejs/node-js-npm-install-ubuntu/)
-*
+
 Use npm to install Grunt and Bower globally on your system (may require sudo)
 
 ```
@@ -53,6 +53,10 @@ From the root of the project, you should be able to run the following:
 To build the project, simply run "grunt" static build artifacts will be placed in the dist/ folder
 
     grunt
+
+There are tests that can be run via
+
+    grunt test
 
 ### With Docker installed
 
