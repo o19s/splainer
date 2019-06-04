@@ -7,7 +7,7 @@
   <div class="col-md-8">
     <h4><a href="" ng-click="doc.showDoc()"> {{doc.title}}</a></h4>
     <div ng-if="doc.hasThumb()">
-      <img style="max-height: 200px" src="{{doc.thumb}}"></img>
+      <img style="max-height: 200px" ng-src="{{doc.thumb}}"></img>
     </div>
     <div ng-repeat="(fieldName, fieldSnippet) in docRow.snippets(doc)">
       <label class="fieldLabel">
