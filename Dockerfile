@@ -1,10 +1,11 @@
-FROM node:4
+FROM node:8
 MAINTAINER  Eric Pugh "epugh@opensourceconnections.com"
 
 COPY . /home/splainer
 WORKDIR /home/splainer
 
 # Must have packages
+RUN printf "deb http://archive.debian.org/debian/ jessie main\ndeb-src http://archive.debian.org/debian/ jessie main\ndeb http://security.debian.org jessie/updates main\ndeb-src http://security.debian.org jessie/updates main" > /etc/apt/sources.list
 RUN apt-get update -qq && apt-get install -y vim curl git tmux build-essential libpng-dev
 
 # Install PhantomJS

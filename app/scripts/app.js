@@ -12,7 +12,6 @@ angular
   .module('splain-app', ['ngSanitize',
                          'LocalStorageModule',
                          'ui.bootstrap',
-                         'gd.ui.jsonexplorer',
-                         'swd.inspector-gadget',
+                         'ngJsonExplorer',
                          'ui.ace',
                          'o19s.splainer-search']);

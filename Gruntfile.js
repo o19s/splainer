@@ -327,12 +327,12 @@ module.exports = function (grunt) {
           src: ['generated/*']
         }, {
           expand: true,
-          cwd: 'app/node_modules/bootstrap/dist',
+          cwd: 'node_modules/bootstrap/dist',
           src: 'fonts/*',
           dest: '<%= yeoman.dist %>'
         }, {
           expand: true,
-          cwd: '<%= yeoman.app %>/node_modules/ace-builds/src-min-noconflict/',
+          cwd: 'node_modules/ace-builds/src-min-noconflict/',
           dest: '<%= yeoman.dist %>',
           src: [
             'worker-json.js',
