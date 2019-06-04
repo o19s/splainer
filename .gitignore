@@ -3,6 +3,7 @@ node_modules
 .tmp
 .sass-cache
 bower_components
+node_modules
 dist/
 coverage/
 

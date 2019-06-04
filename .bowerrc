@@ -1,4 +1,3 @@
 {
-  "directory": "app/bower_components",
-  "registry": "https://registry.bower.io"
+  "directory": "node_modules"
 }

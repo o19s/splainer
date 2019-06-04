@@ -18,17 +18,17 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'app/bower_components/angular/angular.js',
-      'app/bower_components/angular-sanitize/angular-sanitize.js',
-      'app/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
-      'app/bower_components/ace-builds/src-min-noconflict/ace.js',
-      'app/bower_components/ace-builds/src-min-noconflict/ext-language_tools.js',
-      'app/bower_components/ng-json-explorer/src/gd-ui-jsonexplorer.js',
-      'app/bower_components/angular-local-storage/angular-local-storage.js',
-      'app/bower_components/splainer-search/splainer-search.js',
-      'app/bower_components/angular-mocks/angular-mocks.js',
-      'app/bower_components/inspector-gadget/inspector-gadget.js',
-      'app/bower_components/angular-ui-ace/ui-ace.js',
+      'app/node_modules/angular/angular.js',
+      'app/node_modules/angular-sanitize/angular-sanitize.js',
+      'app/node_modules/angular-bootstrap/ui-bootstrap-tpls.js',
+      'app/node_modules/ace-builds/src-min-noconflict/ace.js',
+      'app/node_modules/ace-builds/src-min-noconflict/ext-language_tools.js',
+      'app/node_modules/ng-json-explorer/src/gd-ui-jsonexplorer.js',
+      'app/node_modules/angular-local-storage/angular-local-storage.js',
+      'app/node_modules/splainer-search/splainer-search.js',
+      'app/node_modules/angular-mocks/angular-mocks.js',
+      'app/node_modules/inspector-gadget/inspector-gadget.js',
+      'app/node_modules/angular-ui-ace/ui-ace.js',
       'app/scripts/**/*.js',
       'test/mock/**/*.js',
       'test/spec/**/*.js'

@@ -79,8 +79,8 @@ module.exports = function (grunt) {
             return [
               connect.static('.tmp'),
               connect().use(
-                '/bower_components',
-                connect.static('./bower_components')
+                '/node_modules',
+                connect.static('./node_modules')
               ),
               connect.static(appConfig.app)
             ];
@@ -95,8 +95,8 @@ module.exports = function (grunt) {
               connect.static('.tmp'),
               connect.static('test'),
               connect().use(
-                '/bower_components',
-                connect.static('./bower_components')
+                '/node_modules',
+                connect.static('./node_modules')
               ),
               connect.static(appConfig.app)
             ];
@@ -327,12 +327,12 @@ module.exports = function (grunt) {
           src: ['generated/*']
         }, {
           expand: true,
-          cwd: 'app/bower_components/bootstrap/dist',
+          cwd: 'app/node_modules/bootstrap/dist',
           src: 'fonts/*',
           dest: '<%= yeoman.dist %>'
         }, {
           expand: true,
-          cwd: '<%= yeoman.app %>/bower_components/ace-builds/src-min-noconflict/',
+          cwd: '<%= yeoman.app %>/node_modules/ace-builds/src-min-noconflict/',
           dest: '<%= yeoman.dist %>',
           src: [
             'worker-json.js',
