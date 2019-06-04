@@ -3,35 +3,39 @@
 
     <div class="row">
       <div>
-        <tabset>
-          <tab heading="Summarized">
+        <uib-tabset>
+          <uib-tab heading="Summarized">
           <div class="explain-view" ng-class="{true: 'col-md-6', false: 'col-md-12'}[altDoc !== null]">
             <pre>{{doc.explain().toStr()}}</pre>
           </div>
           <div  class="explain-view" ng-if="altDoc" ng-class="{true: 'col-md-6', false: 'col-md-0'}[altDoc !== null]">
             <pre>{{altDoc.explain().toStr()}}</pre>
-          </div> 
-          </tab>
-          <tab heading="Hot Matches">
+          </div>
+          </uib-tab>
+          <uib-tab heading="Hot Matches">
           <div  class="explain-view" ng-class="{true: 'col-md-6', false: 'col-md-12'}[altDoc !== null]">
             <pre>{{doc.hotMatches().toStr()}}</pre>
           </div>
           <div  class="explain-view" ng-if="altDoc" ng-class="{true: 'col-md-6', false: 'col-md-0'}[altDoc !== null]">
             <pre>{{altDoc.hotMatches().toStr()}}</pre>
-          </div> 
-          </tab>
-          <tab heading="Full Explain">
+          </div>
+          </uib-tab>
+          <uib-tab heading="Full Explain">
             <div ng-class="{true: 'col-md-6', false: 'col-md-12'}[altDoc !== null]">
-              <json-explorer json-data="{{doc.explain().rawStr()}}"></json-explorer>
+              <json-explorer
+                json-data="doc.explain().rawStr()"
+              ></json-explorer>
             </div>
             <div ng-if="altDoc" ng-class="{true: 'col-md-6', false: 'col-md-0'}[altDoc !== null]">
-              <json-explorer json-data="{{altDoc.explain().rawStr()}}"></json-explorer>
+              <json-explorer
+                json-data="altDoc.explain().rawStr()"
+              ></json-explorer>
             </div>
-          </tab>
-        </tabset>
+          </uib-tab>
+        </uib-tabset>
       </div>
     </div>
-    
+
 </div>
 <div ng-show="canExplainOther" class="container">
     <hr/>
