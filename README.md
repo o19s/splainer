@@ -22,7 +22,7 @@ Take the [tour](http://splainer.io/help.html) to see how you'd use Splainer.
 
 ### If you want to work locally, we have a Docker image
 
-`docker run -d -p 9000:9000 o19s/splainer` and then go to http://localhost:9000
+`docker run -d -p 9000:9000 -p 35729:35729 o19s/splainer` and then go to http://localhost:9000
 
 ## Running the code
 
@@ -62,6 +62,12 @@ grunt
 ### With Docker installed
 
 From the root of the project, you should run:
+
+```
+docker build -t splainer  .
+```
+
+or use the following shortcuts if you have `ruby` installed:
 
 ```
 bin/docker b

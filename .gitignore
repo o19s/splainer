@@ -6,6 +6,7 @@ bower_components
 node_modules
 dist/
 coverage/
+yarn-error.log
 
 deploy.sh
 # vim swp
