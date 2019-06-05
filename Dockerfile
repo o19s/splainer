@@ -7,6 +7,7 @@ WORKDIR /home/splainer
 # Must have packages
 RUN printf "deb http://archive.debian.org/debian/ jessie main\ndeb-src http://archive.debian.org/debian/ jessie main\ndeb http://security.debian.org jessie/updates main\ndeb-src http://security.debian.org jessie/updates main" > /etc/apt/sources.list
 RUN apt-get update -qq && apt-get install -y vim curl git tmux build-essential libpng-dev
+RUN curl --compressed -o- -L https://yarnpkg.com/install.sh | bash
 
 # Install PhantomJS
 RUN apt-get update                              \

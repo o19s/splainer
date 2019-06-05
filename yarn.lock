@@ -7462,9 +7462,9 @@ spdx-license-ids@^3.0.0:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-3.0.2.tgz#a59efc09784c2a5bada13cfeaf5c75dd214044d2"
 
-splainer-search@2.4.2:
-  version "2.4.2"
-  resolved "https://registry.yarnpkg.com/splainer-search/-/splainer-search-2.4.2.tgz#7cce8e91d39b130a3b7fe9a1f61d119a817878a8"
+splainer-search@2.4.3:
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/splainer-search/-/splainer-search-2.4.3.tgz#599f89b0dce2681ad96f72ae8b3df377599d46b8"
   dependencies:
     angular "~1.7.7"
     jasmine-core "^3.1.0"
