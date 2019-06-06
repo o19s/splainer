@@ -18,6 +18,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      'node_modules/angular/angular.js',
       'node_modules/ace-builds/src-min-noconflict/ace.js',
       'node_modules/ace-builds/src-min-noconflict/ext-language_tools.js',
       'node_modules/angular-local-storage/dist/angular-local-storage.js',
@@ -25,7 +26,6 @@ module.exports = function(config) {
       'node_modules/angular-sanitize/angular-sanitize.js',
       'node_modules/angular-ui-ace/src/ui-ace.js',
       'node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js',
-      'node_modules/angular/angular.js',
       'node_modules/ng-json-explorer/dist/angular-json-explorer.js',
       'node_modules/splainer-search/splainer-search.js',
       'scripts/**/*.js',
@@ -53,7 +53,6 @@ module.exports = function(config) {
 
     // Which plugins to enable
     plugins: [
-      'karma-phantomjs-launcher',
       'karma-chrome-launcher',
       'karma-jasmine'
     ],

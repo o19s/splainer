@@ -2,6 +2,7 @@
 // http://karma-runner.github.io/0.12/config/configuration-file.html
 // Generated on 2014-07-17 using
 // generator-karma 0.8.3
+process.env.CHROME_BIN = require('puppeteer').executablePath();
 
 module.exports = function(config) {
   'use strict';
@@ -18,6 +19,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      'node_modules/angular/angular.js',
       'node_modules/ace-builds/src-min-noconflict/ace.js',
       'node_modules/ace-builds/src-min-noconflict/ext-language_tools.js',
       'node_modules/angular-local-storage/dist/angular-local-storage.js',
@@ -25,7 +27,6 @@ module.exports = function(config) {
       'node_modules/angular-sanitize/angular-sanitize.js',
       'node_modules/angular-ui-ace/src/ui-ace.js',
       'node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js',
-      'node_modules/angular/angular.js',
       'node_modules/jquery/dist/jquery.js',
       'node_modules/ng-json-explorer/dist/angular-json-explorer.js',
       'node_modules/splainer-search/splainer-search.js',
@@ -49,12 +50,24 @@ module.exports = function(config) {
     // - PhantomJS
     // - IE (only Windows)
     browsers: [
-      'PhantomJS'
+      'Chrome_no_sandbox'
     ],
+
+    customLaunchers: {
+      Chrome_no_sandbox: {
+        base: 'Chrome',
+        flags: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--headless',
+          '--disable-gpu',
+          '--remote-debugging-port=9222',
+        ],
+      },
+    },
 
     // Which plugins to enable
     plugins: [
-      'karma-phantomjs-launcher',
       'karma-chrome-launcher',
       'karma-jasmine',
       'karma-coverage'

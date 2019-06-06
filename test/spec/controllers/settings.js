@@ -18,7 +18,6 @@ describe('SettingsCtrl', function() {
 
 
     inject(function($rootScope, $controller) {
-
       createController = function() {
         scope = $rootScope.$new();
         scope.search = {};
