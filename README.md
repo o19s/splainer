@@ -65,6 +65,7 @@ From the root of the project, you should run:
 
 ```
 docker build -t splainer  .
+docker run -p 9000:9000 splainer
 ```
 
 or use the following shortcuts if you have `ruby` installed:
