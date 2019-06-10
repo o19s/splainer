@@ -61,7 +61,7 @@ workflows:
   version: 2
   build-master:
     jobs:
-      - build
+      - build:
           filters:
             branches:
               only: circleci2.0
