@@ -62,9 +62,9 @@ workflows:
   build-master:
     jobs:
       - build
-          #filters:
-            #branches:
-              #only: circleci2.0
+          filters:
+            branches:
+              only: circleci2.0
       - publish-latest:
           requires:
             - build
