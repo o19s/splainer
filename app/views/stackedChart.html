@@ -3,8 +3,8 @@
   <div ng-if="hots.length <= 3">
     <div class="graph-explain" ng-repeat="match in hots">
       <div class="graph-label">{{match.description}}</div>
-      <progressbar value="match.percentage"></progressbar>
-    </div> 
+      <uib-progressbar value="match.percentage"></uib-progressbar>
+    </div>
     <a ng-if="detailed" style="font-size: 10px" ng-click="detailed()" >Detailed</a>
   </div>
 
@@ -12,13 +12,13 @@
   <div ng-if="hots.length > 3">
     <div class="graph-explain" ng-repeat="match in hots.slice(0,3)">
       <div class="graph-label">{{match.description}}</div>
-      <progressbar value="match.percentage"></progressbar>
-    </div> 
+      <uib-progressbar value="match.percentage"></uib-progressbar>
+    </div>
     <div collapse="!showAll">
       <div class="graph-explain" ng-repeat="match in hots.slice(3)">
         <div class="graph-label">{{match.description}}</div>
-        <progressbar value="match.percentage"></progressbar>
-      </div> 
+        <uib-progressbar value="match.percentage"></uib-progressbar>
+      </div>
     </div>
     <a style="font-size: 10px" href="" ng-click="detailed()">Detailed</a>
     &nbsp;&nbsp;&nbsp;

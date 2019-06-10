@@ -1,0 +1,43 @@
+<h1>File for testing Splainer.io</h1>
+
+<hr/>
+Links to Splainer, both local and deployed, with the Solr we use in demoing Quepid and the <a href="http://github.com/o19s/solr-tmdb">solr-tmdb</a> project.
+<p/>
+
+<a target="_blank"   href="http://splainer.io/#?solr=http:%2F%2Flocalhost:8983%2Fsolr%2Ftmdb%2Fselect%3FdebugQuery%3Don%26defType%3Dedismax%26qf%3Dtext_all%26indent%3Don%26q%3Dstar%20wars%26titleQuery%3D%7B!edismax%20mm%3D100%2525%20qf%3Dtitle%20bq%3D''%20bf%3D''%20v%3D$q%7D%26bf%3Dif($titleQuery,product(100,vote_average),0)%26bf%3D$totalDateBoost%26peopleQuery%3D%7B!field%20bf%3D''%20bq%3D''%20f%3Dtext_people%20mm%3D100%2525%20v%3D$q%7D%26dateBoost%3Drecip(ms(NOW,release_date),3.16e-11,10,1)%26prodDateBoost%3Dproduct(10000,$dateBoost)%26totalDateBoost%3Dproduct(query($peopleQuery),$prodDateBoost)%26tie%3D1.0%26fl%3Dtitle%20tagline%20text_people%20overview%20release_date%20vote_average%20vote_count&fieldSpec=title:title%20tagline%20text_people%20overview%20release_date%20vote_average%20vote_count%20f:$dateBoost%20f:$prodDateBoost%20f:$totalDateBoost
+">Test 1 - Splainer.io w/ local Solr</a>
+<p/>
+<a target="_blank"   href="http://localhost:9000/#?solr=http:%2F%2Flocalhost:8983%2Fsolr%2Ftmdb%2Fselect%3FdebugQuery%3Don%26defType%3Dedismax%26qf%3Dtext_all%26indent%3Don%26q%3Dstar%20wars%26titleQuery%3D%7B!edismax%20mm%3D100%2525%20qf%3Dtitle%20bq%3D''%20bf%3D''%20v%3D$q%7D%26bf%3Dif($titleQuery,product(100,vote_average),0)%26bf%3D$totalDateBoost%26peopleQuery%3D%7B!field%20bf%3D''%20bq%3D''%20f%3Dtext_people%20mm%3D100%2525%20v%3D$q%7D%26dateBoost%3Drecip(ms(NOW,release_date),3.16e-11,10,1)%26prodDateBoost%3Dproduct(10000,$dateBoost)%26totalDateBoost%3Dproduct(query($peopleQuery),$prodDateBoost)%26tie%3D1.0%26fl%3Dtitle%20tagline%20text_people%20overview%20release_date%20vote_average%20vote_count&fieldSpec=title:title%20tagline%20text_people%20overview%20release_date%20vote_average%20vote_count%20f:$dateBoost%20f:$prodDateBoost%20f:$totalDateBoost
+">Test 1 - Localhost w/ local Solr</a>
+<p/>
+<a target="_blank"   href="http://localhost:9000/#?solr=http:%2F%2Fquepid-solr.dev.o19s.com:8983%2Fsolr%2Ftmdb%2Fselect%3FdebugQuery%3Don%26defType%3Dedismax%26qf%3Dtext_all%26indent%3Don%26q%3Dstar%20wars%26titleQuery%3D%7B!edismax%20mm%3D100%2525%20qf%3Dtitle%20bq%3D''%20bf%3D''%20v%3D$q%7D%26bf%3Dif($titleQuery,product(100,vote_average),0)%26bf%3D$totalDateBoost%26peopleQuery%3D%7B!field%20bf%3D''%20bq%3D''%20f%3Dtext_people%20mm%3D100%2525%20v%3D$q%7D%26dateBoost%3Drecip(ms(NOW,release_date),3.16e-11,10,1)%26prodDateBoost%3Dproduct(10000,$dateBoost)%26totalDateBoost%3Dproduct(query($peopleQuery),$prodDateBoost)%26tie%3D1.0%26fl%3Dtitle%20tagline%20text_people%20overview%20release_date%20vote_average%20vote_count&fieldSpec=title:title%20tagline%20text_people%20overview%20release_date%20vote_average%20vote_count%20f:$dateBoost%20f:$prodDateBoost%20f:$totalDateBoost
+">Test 1 - Localhost w/ Quepid Demo Solr</a>
+
+<p/>
+
+<a target="_blank"   href="http://splainer.io/#?solr=http:%2F%2Flocalhost:8983%2Fsolr%2Ftmdb%2Fselect%3FdebugQuery%3Don%26defType%3Dedismax%26qf%3Dtext_all%26indent%3Don%26q%3Dbasketball%20cartoon%20aliens%26tie%3D1.0&fieldSpec=*
+">Test 2 - Splainer.io w/ local Solr</a>
+<p/>
+<a target="_blank"   href="http://localhost:9000/#!?solr=http:%2F%2Flocalhost:8983%2Fsolr%2Ftmdb%2Fselect%3FdebugQuery%3Don%26defType%3Dedismax%26qf%3Dtext_all%26indent%3Don%26q%3Dbasketball%20cartoon%20aliens%26tie%3D1.0&fieldSpec=*
+">Test 2 - Localhost w/ local Solr</a>
+<p/>
+<a target="_blank"   href="http://localhost:9000/#!?solr=http:%2F%2Fquepid-solr.dev.o19s.com:8983%2Fsolr%2Ftmdb%2Fselect%3FdebugQuery%3Don%26defType%3Dedismax%26qf%3Dtext_all%26indent%3Don%26q%3Dbasketball%20cartoon%20aliens%26tie%3D1.0&fieldSpec=*
+">Test 2 - Localhost w/ Quepid Demo Solr</a>
+<p/>
+<hr/>
+
+Links to Splainer, both local and deployed, with the Elasticsearch we use in demoing Quepid and the <a href="http://github.com/o19s/es-tmdb">es-tmdb</a> project.
+<p/>
+
+<a target="_blank"   href="http://splainer.io/#/es_?esUrl=http:%2F%2Flocalhost:9200%2Ftmdb%2F_search&esQuery=%7B%0A%20%20%22query%22:%20%7B%0A%20%20%20%20%22match%22:%20%7B%0A%20%20%20%20%20%20%22text_people%22:%20%22will%20smith%22%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D%20%20%20%20&fieldSpec=title%20tagline%20overview%20cast
+">Test 3 - Splainer.io w/ local Elasticsearch</a>
+<p/>
+
+<a target="_blank"   href="http://localhost:9000/#/es_?esUrl=http:%2F%2Flocalhost:9200%2Ftmdb%2F_search&esQuery=%7B%0A%20%20%22query%22:%20%7B%0A%20%20%20%20%22match%22:%20%7B%0A%20%20%20%20%20%20%22text_people%22:%20%22will%20smith%22%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D%20%20%20%20&fieldSpec=title%20tagline%20overview%20cast
+">Test 3 - Localhost w/ local Elasticsearch</a>
+<p/>
+
+<a target="_blank"   href="http://localhost:9000/#/es_?esUrl=http:%2F%2Fquepid-elasticsearch.dev.o19s.com:9200%2Ftmdb%2F_search&esQuery=%7B%0A%20%20%22query%22:%20%7B%0A%20%20%20%20%22match%22:%20%7B%0A%20%20%20%20%20%20%22title%22:%20%22will%20smith%22%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D%20%20%20%20&fieldSpec=title%20tagline%20overview%20cast
+">Test 3 - Localhost w/ Quepid Demo Elasticsearch</a>
+<small>We query on <code>title</code> instead of <code>text_people</code> for this Elasticsearch</small>
+<p/>

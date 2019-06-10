@@ -2,6 +2,7 @@
 // http://karma-runner.github.io/0.12/config/configuration-file.html
 // Generated on 2014-07-17 using
 // generator-karma 0.8.3
+process.env.CHROME_BIN = require('puppeteer').executablePath();
 
 module.exports = function(config) {
   'use strict';
@@ -18,18 +19,17 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'app/bower_components/jquery/dist/jquery.js',
-      'app/bower_components/angular/angular.js',
-      'app/bower_components/angular-sanitize/angular-sanitize.js',
-      'app/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
-      'app/bower_components/ace-builds/src-min-noconflict/ace.js',
-      'app/bower_components/ace-builds/src-min-noconflict/ext-language_tools.js',
-      'app/bower_components/ng-json-explorer/src/gd-ui-jsonexplorer.js',
-      'app/bower_components/angular-local-storage/angular-local-storage.js',
-      'app/bower_components/splainer-search/splainer-search.js',
-      'app/bower_components/angular-mocks/angular-mocks.js',
-      'app/bower_components/inspector-gadget/inspector-gadget.js',
-      'app/bower_components/angular-ui-ace/ui-ace.js',
+      'node_modules/angular/angular.js',
+      'node_modules/ace-builds/src-min-noconflict/ace.js',
+      'node_modules/ace-builds/src-min-noconflict/ext-language_tools.js',
+      'node_modules/angular-local-storage/dist/angular-local-storage.js',
+      'node_modules/angular-mocks/angular-mocks.js',
+      'node_modules/angular-sanitize/angular-sanitize.js',
+      'node_modules/angular-ui-ace/src/ui-ace.js',
+      'node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js',
+      'node_modules/jquery/dist/jquery.js',
+      'node_modules/ng-json-explorer/dist/angular-json-explorer.js',
+      'node_modules/splainer-search/splainer-search.js',
       'app/scripts/**/*.js',
       'test/mock/**/*.js',
       'test/spec/**/*.js'
@@ -50,12 +50,24 @@ module.exports = function(config) {
     // - PhantomJS
     // - IE (only Windows)
     browsers: [
-      'PhantomJS'
+      'Chrome_no_sandbox'
     ],
+
+    customLaunchers: {
+      Chrome_no_sandbox: {
+        base: 'Chrome',
+        flags: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--headless',
+          '--disable-gpu',
+          '--remote-debugging-port=9222',
+        ],
+      },
+    },
 
     // Which plugins to enable
     plugins: [
-      'karma-phantomjs-launcher',
       'karma-chrome-launcher',
       'karma-jasmine',
       'karma-coverage'

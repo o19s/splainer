@@ -22,43 +22,63 @@ Take the [tour](http://splainer.io/help.html) to see how you'd use Splainer.
 
 ### If you want to work locally, we have a Docker image
 
-` docker run -d -p 9000:9000 o19s/splainer` and then go to http://localhost:9000
+`docker run -d -p 9000:9000 -p 35729:35729 o19s/splainer` and then go to http://localhost:9000
 
 ## Running the code
 
-### Npm/Bower Dev Environment
+### Npm/Bower/Yarn Dev Environment
 
-Splainer is written using AngularJS project. It requires npm, grunt, and bower.
+Splainer is written using AngularJS project. It requires npm, grunt, and yarn (w. bower).
 
 Be sure you've installed npm, bower, and grunt on your machine.
 
 * On a Mac [follow these instructions](http://thechangelog.com/install-node-js-with-homebrew-on-os-x/)
 * On Ubuntu [follow these instructions](https://rtcamp.com/tutorials/nodejs/node-js-npm-install-ubuntu/)
-*
-Use npm to install Grunt and Bower globally on your system (may require sudo)
+* Use npm to install Grunt and Bower globally on your system (may require sudo)
 
 ```
 npm install -g grunt-cli
 npm install -g bower
 ```
 
-### With Npm/Bower installed
+* Install yarn [follow these instructions](https://yarnpkg.com/en/docs/install)
+
+### With Npm/Yarn installed
 
 From the root of the project, you should be able to run the following:
 
-    npm install
-    bower install
-    grunt serve
+```
+bower install --allow-root
+yarn
+grunt serve
+```
 
 To build the project, simply run "grunt" static build artifacts will be placed in the dist/ folder
 
-    grunt
+```
+grunt
+```
 
 ### With Docker installed
 
 From the root of the project, you should run:
 
-    docker build -t splainer  .
+```
+docker build -t splainer  .
+docker run -p 9000:9000 splainer
+```
+
+or use the following shortcuts if you have `ruby` installed:
+
+```
+bin/docker b
+```
+
+then to run the server run
+
+```
+bin/docker s
+```
 
 ## Who?
 
