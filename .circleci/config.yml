@@ -47,7 +47,7 @@ jobs:
           name: Load archived Docker image
           command: docker load -i /tmp/workspace/image.tar
 
-      - run: id=$(docker create o19s/splainer) && echo "$id" && docker cp $id:/home/splainer/app . && docker cp $id:/home/splainer/node_modules ./node_modules
+      - run: id=$(docker create o19s/splainer) && echo "$id" && docker cp $id:/home/splainer/app . && docker cp $id:/home/splainer/node_modules ./app/node_modules
 
       - run: ls -alh ./app
 
