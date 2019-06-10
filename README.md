@@ -2,7 +2,7 @@
 
 [![Build Status](https://circleci.com/gh/o19s/splainer.svg?style=svg)](https://circleci.com/gh/o19s/splainer)
 
-The sandbox that explains your search results for you so you don't have to go digging through explain debug! Paste in your Solr URL and go. Try it out [here](http://splainer.io).
+The sandbox that explains your search results for you so you don't have to go digging through explain debug! Paste in your Solr or Elasticsearch query URL and go. Try it out [here](http://splainer.io).
 
 ## Why?
 
