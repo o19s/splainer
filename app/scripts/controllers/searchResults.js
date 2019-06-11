@@ -8,16 +8,14 @@
  * Controller of the frontendApp
  */
 angular.module('splain-app')
-  .controller('SearchResultsCtrl', function ($scope, searchSvc, settingsStoreSvc) {
-  
+  .controller('SearchResultsCtrl', function ($scope, splSearchSvc, settingsStoreSvc) {
 
     $scope.search = {};
 
     /* Initiate a new search with the latest settings
-     * */ 
+     * */
     $scope.search.search = function() {
       var promise = Promise.create($scope.search.search);
-      $scope.search.reset();
       $scope.currSearch.search()
       .then(function() {
         promise.complete();
@@ -27,9 +25,9 @@ angular.module('splain-app')
 
     $scope.search.reset = function() {
       var searchSettings = settingsStoreSvc.settings;
-      $scope.currSearch = searchSvc.createSearch(searchSettings);
+      $scope.currSearch = splSearchSvc.createSearch(searchSettings);
     };
-    
+
     $scope.search.reset();
 
   });

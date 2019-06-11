@@ -8,8 +8,8 @@
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(app) styles/vendor.css -->
     <!-- bower:css -->
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="bower_components/ng-json-explorer/src/gd-ui-jsonexplorer.css" />
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="node_modules/ng-json-explorer/dist/angular-json-explorer.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
@@ -24,71 +24,98 @@
     <![endif]-->
     <!-- Add your site or application content here -->
     <div class="pane_container" ng-controller="SearchResultsCtrl">
-        <div class="pane_main">
-          <header class="navbar-inverse navbar-secondary clearfix ng-scope">
-    <a  ng-show="currSearch.state === currSearch.NO_SEARCH" style="z-index:10000" href="https://github.com/o19s/splainer"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
-              <div class="navbar-header">
-                <h3 class="navbar-brand" style="cursor: pointer" dispatch-on-click="closeEast" ng-click="search.reset()"><a style="color: inherit; text-decoration: inherit" href="#">Splainer</a></h3>
-                <small class="tiny_sub">By <a href="http://opensourceconnections.com">OpenSource Connections</a></small>
-              </div>
-              <ul class="nav navbar-nav navbar-right">
-                <li>
-                  <a ng-show="currSearch.state !==currSearch.NO_SEARCH" data-toggle="tooltip" title="Take a Tour" href="help.html" target="_blank">
-                    <span class="glyphicon glyphicon-question-sign"></span> Take a Tour
-                  </a>
-                </li>
-                <li>
-                  <a ng-show="currSearch.state !== currSearch.NO_SEARCH" dispatch-on-click="toggleEast" href="" type="button" ng-click="devSettingsSolr.sidebar = !devSettingsSolr.sidebar">
-                    <span ng-class="{true: 'glyphicon glyphicon-chevron-left', false: ''}[devSettingsSolr.sidebar]"></span>
-                    Tweak <span ng-class="{true: 'glyphicon-chevron-right', false: ''}[!devSettingsSolr.sidebar]" class="glyphicon glyphicon-chevron-right"></span>
-                  </a>
-                </li>
-              </ul>
-          </header>
-          <div class="container">
+      <div class="pane_main">
+        <header class="navbar-inverse navbar-secondary clearfix ng-scope">
+          <a  ng-show="currSearch.state === currSearch.NO_SEARCH" style="z-index:10000" href="https://github.com/o19s/splainer"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+          <div class="navbar-header">
+            <h3 class="navbar-brand" style="cursor: pointer" dispatch-on-click="closeEast" ng-click="search.reset()"><a style="color: inherit; text-decoration: inherit" href="#">Splainer</a></h3>
+            <small class="tiny_sub">By <a href="http://opensourceconnections.com">OpenSource Connections</a></small>
+          </div>
+          <ul class="nav navbar-nav navbar-right">
+            <li>
+              <a ng-show="currSearch.state !==currSearch.NO_SEARCH" data-toggle="tooltip" title="Take a Tour" href="help.html" target="_blank">
+                <span class="glyphicon glyphicon-question-sign"></span> Take a Tour
+              </a>
+            </li>
+            <li>
+              <a ng-show="currSearch.state !== currSearch.NO_SEARCH" dispatch-on-click="toggleEast" href="" type="button" ng-click="devSettingsSolr.sidebar = !devSettingsSolr.sidebar">
+                <span ng-class="{true: 'glyphicon glyphicon-chevron-left', false: ''}[devSettingsSolr.sidebar]"></span>
+                Tweak <span ng-class="{true: 'glyphicon-chevron-right', false: ''}[!devSettingsSolr.sidebar]" class="glyphicon glyphicon-chevron-right"></span>
+              </a>
+            </li>
+          </ul>
+        </header>
 
-            <div ng-include="'views/searchResults.html'"></div>
-            <div ng-controller="StartUrlCtrl" ng-show="currSearch.state === currSearch.NO_SEARCH" ng-include="'views/startUrl.html'"></div>
-          </div>
-          <div class="footer" style="margin-bottom:10px">
-            <p style="margin: 0px">From the <a target="_blank" href="http://opensourceconnections.com"><img class="osc_logo" alt="OSC Logo" src="images/OSC-logomark-color-sm.png"></img></span> OpenSource Connections</a> team</p>
-            <small>Expertise, Solutions, and Consulting for Apache Solr | <a target="_blank" href="http://www.opensourceconnections.com/blog">Blog</a> | <a target="_blank" href="http://www.opensourceconnections.com/what-we-do/">Services</a> | <a href="mailto:TalkToUs@opensourceconnections.com">Contact Us</a></small>
-          </div>
+        <div class="container">
+          <div ng-include="'views/searchResults.html'"></div>
+          <div ng-controller="StartUrlCtrl" ng-show="currSearch.state === currSearch.NO_SEARCH" ng-include="'views/startUrl.html'"></div>
+        </div>
+
+        <div class="footer">
+          <p style="margin: 0px">From the <a target="_blank" href="http://opensourceconnections.com"><img class="osc_logo" alt="OSC Logo" src="images/OSC-logomark-color-sm.png"></img></span> OpenSource Connections</a> team</p>
+          <small>Our mission is to empower great search teams | <a target="_blank" href="http://www.opensourceconnections.com/blog">Blog</a> | <a target="_blank" href="http://www.opensourceconnections.com/what-we-do/">Services</a> | <a href="mailto:hello@opensourceconnections.com">Contact Us</a></small>
+        </div>
       </div>
       <div class="east-slider">
       </div>
       <div class="pane_east">
-          <h3>Search Controls</h3>
-          <form class="form-horizontal" role="form" ng-controller="SolrSettingsCtrl" ng-submit="searchSettings.publishSearcher()">
+        <h3>Search Controls</h3>
+        <form class="form-horizontal" style="height: 100%; min-height: 100%" id="queryParams" role="form" ng-controller="SettingsCtrl" ng-submit="publishSearcher()">
+            <div class="dev-header" ng-click="devSettingsSearchEngine.toggle = !devSettingsSearchEngine.toggle">
+              Search Engine <span ng-class="{true: 'glyphicon-plus-sign', false: 'glyphicon-minus-sign'}[!devSettingsSearchEngine.toggle]" class="glyphicon"></span>
+            </div>
+            <div class="dev-section" ng-show="devSettingsSearchEngine.toggle">
+                <label>
+                   <input type="radio" value="solr" ng-model="workingWhichEngine">
+                   Solr
+                </label>
+                <label>
+                  <input type="radio" value="es" ng-model="workingWhichEngine">
+                  Elasticsearch <span class="label label-warning">Beta</span>
+                </label>
+            </div>
+
             <div class="dev-header" ng-click="devSettingsSolr.toggle = !devSettingsSolr.toggle">
-              Solr URL <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsSolr.toggle]" class="glyphicon glyphicon-minus-sign"></span>
+              Search URL <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsSolr.toggle]" class="glyphicon glyphicon-minus-sign"></span>
             </div>
             <div class="dev-section" ng-show="!devSettingsSolr.toggle">
-              <input type="text" ng-model="searchSettings.searchUrl" placeholder="Enter URL to your request handler" class="form-control"></input>
+              <input type="text" ng-model="workingSettings.searchUrl" placeholder="Enter URL to your request handler" class="form-control"></input>
             </div>
 
             <div class="dev-header" ng-click="devSettingsFields.toggle = !devSettingsFields.toggle">
               Displayed Fields <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsFields.toggle]" class="glyphicon glyphicon-minus-sign"></span>
             </div>
             <div class="dev-section" ng-show="!devSettingsFields.toggle">
-              <input id="inputFieldSpec" type="text" ng-model="searchSettings.fieldSpecStr" placeholder="Fields you'd like to display" class="form-control"></input>
+              <input id="inputFieldSpec" type="text" ng-model="workingSettings.fieldSpecStr" placeholder="Fields you'd like to display" class="form-control"></input>
             </div>
 
             <div class="dev-header" ng-click="devSettingsArgs.toggle = !devSettingsArgs.toggle">
               Search Args <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsArgs.toggle]" class="glyphicon glyphicon-minus-sign"></span>
             </div>
             <div class="dev-section" ng-show="!devSettingsArgs.toggle">
-              <textarea id="inputSolrArgsStr" ng-model="searchSettings.searchArgsStrShow" rows="10" class="form-control ng-pristine ng-valid"></textarea> 
+              <div ng-show="workingWhichEngine === 'solr'">
+                <textarea id="inputSolrArgsStr" ng-model="workingSettings.searchArgsStr" rows="10" class="form-control ng-pristine ng-valid"></textarea>
+              </div>
+
+              <div ng-show="workingWhichEngine === 'es'">
+                <div class="es-query-params" ui-ace="{
+                    require: ['ace/ext/language_tools'],
+                    useWrapMode: true,
+                    useSoftTabs: true,
+                    onLoad: aceSettings,
+                    mode: 'json'
+                  }" id="es-query-params-editor"
+                  ng-model="workingSettings.searchArgsStr">
+                </div>
+              <a href="" class="pull-right label" ng-click="autoIndent()">Indent JSON</a>
+              </div>
             </div>
             <div class="dev-section">
               <button type="submit" class="btn btn-default">Rerun Query</button>
             </div>
           </form>
-          <div ng-include="'views/helpBox.html'"></div>
       </div>
-
     </div>
-
 
     <!-- Google Analytics:-->
     <script>
@@ -103,49 +130,55 @@
     </script>
 
     <!-- excluded from vendor.js below to be replaced with cdn links -->
-    <script src="bower_components/jquery/dist/jquery.js"></script>
-    <script src="bower_components/angular/angular.js"></script>
-    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="node_modules/jquery/dist/jquery.js"></script>
+    <script src="node_modules/angular/angular.js"></script>
+    <script src="node_modules/angular-sanitize/angular-sanitize.js"></script>
 
     <!-- build:js(app) scripts/oldieshim.js -->
     <!--[if lt IE 9]>
-    <script src="bower_components/es5-shim/es5-shim.js"></script>
-    <script src="bower_components/json3/lib/json3.min.js"></script>
+    <script src="node_modules/es5-shim/es5-shim.js"></script>
+    <script src="node_modules/json3/lib/json3.min.js"></script>
     <![endif]-->
     <!-- endbuild -->
     <!-- build:js(app) scripts/vendor.js -->
+    <script src="node_modules/ace-builds/src-min-noconflict/ace.js"></script>
+    <script src="node_modules/ace-builds/src-min-noconflict/ext-language_tools.js"></script>
     <!-- bower:js -->
-    <script src="bower_components/json3/lib/json3.js"></script>
-    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
-    <script src="bower_components/angular-local-storage/angular-local-storage.js"></script>
-    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-    <script src="bower_components/ng-json-explorer/src/gd-ui-jsonexplorer.js"></script>
-    <script src="bower_components/splainer-search/splainer-search.js"></script>
-    <script src="bower_components/inspector-gadget/inspector-gadget.js"></script>
+    <script src="node_modules/angular-local-storage/dist/angular-local-storage.js"></script>
+    <script src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
+    <script src="node_modules/angular-ui-ace/src/ui-ace.js"></script>
+    <script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="node_modules/json3/lib/json3.js"></script>
+    <script src="node_modules/ng-json-explorer/dist/angular-json-explorer.js"></script>
+    <script src="node_modules/splainer-search/splainer-search.js"></script>
+    <script src="node_modules/urijs/src/URI.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
-      <!-- build:js({.tmp,app}) scripts/scripts.js -->
-      <script src="scripts/panes.js"></script>
-      <script src="scripts/promise.js"></script>
-      <script src="scripts/stringPatch.js"></script>
-      <script src="scripts/app.js"></script>
-      <script src="scripts/controllers/helpBox.js"></script>
-      <script src="scripts/controllers/docSelector.js"></script>
-      <script src="scripts/directives/dispatchOnClick.js"></script>
-      <script src="scripts/directives/docRow.js"></script>
-      <script src="scripts/directives/docSelector.js"></script>
-      <script src="scripts/directives/stackedChart.js"></script>
-      <script src="scripts/services/solrSettingsSvc.js"></script>
-      <script src="scripts/services/searchSvc.js"></script>
-      <script src="scripts/services/settingsStoreSvc.js"></script>
-      <script src="scripts/controllers/docRow.js"></script>
-      <script src="scripts/controllers/detailedExplain.js"></script>
-      <script src="scripts/controllers/detailedDoc.js"></script>
-      <script src="scripts/controllers/searchResults.js"></script>
-      <script src="scripts/controllers/solrSettings.js"></script>
-      <script src="scripts/controllers/solrSettingsWarning.js"></script>
-      <script src="scripts/controllers/startUrl.js"></script>
-      <!-- endbuild -->
+    <!-- build:js({.tmp,app}) scripts/scripts.js -->
+    <script src="scripts/panes.js"></script>
+    <script src="scripts/promise.js"></script>
+    <script src="scripts/stringPatch.js"></script>
+    <script src="scripts/app.js"></script>
+    <script src="scripts/factories/Search.js"></script>
+    <script src="scripts/controllers/helpBox.js"></script>
+    <script src="scripts/controllers/docSelector.js"></script>
+    <script src="scripts/directives/dispatchOnClick.js"></script>
+    <script src="scripts/directives/docRow.js"></script>
+    <script src="scripts/directives/docSelector.js"></script>
+    <script src="scripts/directives/stackedChart.js"></script>
+    <script src="scripts/services/solrSettingsSvc.js"></script>
+    <script src="scripts/services/esSettingsSvc.js"></script>
+    <script src="scripts/services/splSearchSvc.js"></script>
+    <script src="scripts/services/settingsStoreSvc.js"></script>
+    <script src="scripts/controllers/docRow.js"></script>
+    <script src="scripts/controllers/detailedExplain.js"></script>
+    <script src="scripts/controllers/detailedDoc.js"></script>
+    <script src="scripts/controllers/searchResults.js"></script>
+    <script src="scripts/controllers/settings.js"></script>
+    <script src="scripts/controllers/solrSettingsWarning.js"></script>
+    <script src="scripts/controllers/startUrl.js"></script>
+    <script src="scripts/ace-config.js"></script>
+    <!-- endbuild -->
 </body>
 </html>

@@ -3,7 +3,7 @@
     <form ng-submit="explainOther(altQuery)">
       <div class="col-md-1"></div>
       <div class="col-md-7">
-        <input class="form-control" id="altQuery" ng-model="altQuery" placeholder="Search For Other Docs To Explain (use Solr Query syntax)" type="text"></input>
+        <input class="form-control" id="altQuery" ng-model="altQuery" placeholder="Search For Other Docs To Compare (use Simple Lucene Query syntax)" type="text"></input>
       </div>
       <div class="col-md-3">
         <input class="btn btn-primary form-control" type="submit" value="Find Others"></input>
@@ -12,17 +12,9 @@
     </form>
   </div>
   </hr>
-  <div class="container" ng-if="!currSearch.hasGrouped()" ng-repeat="doc in currSearch.docs">
+  <div class="container" ng-repeat="doc in currSearch.docs">
     <doc-row detailed-explain-link="false" max-score="currSearch.maxScore" doc="doc" ng-click="selectDoc(doc)"></doc-row>
     <hr/>
-  </div>
-  <div class="grouped " ng-if="currSearch.hasGrouped()" ng-repeat="(group, groupedBy) in currSearch.grouped">
-    <h4>Grouped by: {{group}}</h4>
-    <div class="container" ng-repeat="grouped in groupedBy">
-      <doc-row detailed-explain-link="false" max-score="currSearch.maxScore" doc="doc" ng-click="selectDoc(doc)"></doc-row>
-      <hr/>
-
-    </div>
   </div>
   <!--div>
     <div ng-show="!currSearch.paging && currSearch.moreResults()" id="pager" class="col-sm-3 col-sm-offset-5"><a href="" ng-click="currSearch.page()">Select From More Results</a></div>

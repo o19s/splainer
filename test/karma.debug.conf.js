@@ -8,7 +8,7 @@ module.exports = function(config) {
 
   config.set({
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: false,
+    autoWatch: true,
 
     // base path, that will be used to resolve files and exclude
     basePath: '../',
@@ -18,15 +18,17 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'app/bower_components/angular/angular.js',
-      'app/bower_components/angular-sanitize/angular-sanitize.js',
-      'app/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
-      'app/bower_components/ng-json-explorer/src/gd-ui-jsonexplorer.js',
-      'app/bower_components/angular-local-storage/angular-local-storage.js',
-      'app/bower_components/splainer-search/splainer-search.js',
-      'app/bower_components/angular-mocks/angular-mocks.js',
-      'app/bower_components/inspector-gadget/inspector-gadget.js',
-      'app/scripts/**/*.js',
+      'node_modules/angular/angular.js',
+      'node_modules/ace-builds/src-min-noconflict/ace.js',
+      'node_modules/ace-builds/src-min-noconflict/ext-language_tools.js',
+      'node_modules/angular-local-storage/dist/angular-local-storage.js',
+      'node_modules/angular-mocks/angular-mocks.js',
+      'node_modules/angular-sanitize/angular-sanitize.js',
+      'node_modules/angular-ui-ace/src/ui-ace.js',
+      'node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js',
+      'node_modules/ng-json-explorer/dist/angular-json-explorer.js',
+      'node_modules/splainer-search/splainer-search.js',
+      'scripts/**/*.js',
       'test/mock/**/*.js',
       'test/spec/**/*.js'
     ],
@@ -51,7 +53,6 @@ module.exports = function(config) {
 
     // Which plugins to enable
     plugins: [
-      'karma-phantomjs-launcher',
       'karma-chrome-launcher',
       'karma-jasmine'
     ],
