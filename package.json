@@ -20,7 +20,7 @@
     "grunt-contrib-nodeunit": "~0.4.1",
     "grunt-contrib-uglify": "~0.5.0",
     "grunt-google-cdn": "^0.4.1",
-    "jquery": "~2.1.1",
+    "jquery": "~3.4.0",
     "json3": "~3.3.1",
     "ng-json-explorer": "https://github.com/odra/ng-json-explorer",
     "splainer-search": "2.4.3",
