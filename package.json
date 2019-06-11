@@ -10,7 +10,7 @@
     "angular-sanitize": "~1.7.7",
     "angular-ui-ace": "https://github.com/angular-ui/ui-ace",
     "angular-ui-bootstrap": "~2.5.0",
-    "bootstrap": "~3.3.6",
+    "bootstrap": "~3.4.1",
     "es5-shim": "~4.1.11",
     "gifsicle": "^4.0.1",
     "google-cdn-data": "^0.1.6",
