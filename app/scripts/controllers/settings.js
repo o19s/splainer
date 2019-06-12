@@ -33,6 +33,7 @@ angular.module('splain-app')
       $scope.publishSearcher = function() {
         if ( $scope.workingWhichEngine === 'solr' ) {
           settingsStoreSvc.settings.whichEngine = 'solr';
+
           solrSettingsSvc.fromTweakedSettings($scope.workingSettings);
         } else if ( $scope.workingWhichEngine === 'es' ) {
           settingsStoreSvc.settings.whichEngine = 'es';
@@ -43,6 +44,11 @@ angular.module('splain-app')
         .then(function() {
           settingsStoreSvc.save();
         });
+      };
+
+      $scope.solrParams = '';
+      $scope.updateSearchArgs = function() {
+        $scope.workingSettings.searchArgsStr = solrSettingsSvc.normalizeArgs($scope.solrParams);
       };
     }
   ]);

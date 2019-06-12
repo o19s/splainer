@@ -94,7 +94,7 @@
             </div>
             <div class="dev-section" ng-show="!devSettingsArgs.toggle">
               <div ng-show="workingWhichEngine === 'solr'">
-                <textarea id="inputSolrArgsStr" ng-model="workingSettings.searchArgsStr" rows="10" class="form-control ng-pristine ng-valid"></textarea>
+                <textarea id="inputSolrArgsStr" ng-value="workingSettings.searchArgsStr | solrparams" ng-model="solrParams" ng-change="updateSearchArgs()" rows="10" class="form-control ng-pristine ng-valid"></textarea>
               </div>
 
               <div ng-show="workingWhichEngine === 'es'">
@@ -161,6 +161,7 @@
     <script src="scripts/stringPatch.js"></script>
     <script src="scripts/app.js"></script>
     <script src="scripts/factories/Search.js"></script>
+    <script src="scripts/filters/solrParams.js"></script>
     <script src="scripts/controllers/helpBox.js"></script>
     <script src="scripts/controllers/docSelector.js"></script>
     <script src="scripts/directives/dispatchOnClick.js"></script>

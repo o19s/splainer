@@ -59,44 +59,15 @@ describe("Service: solrSettingsSvc", function() {
     expect(settings.startUrl).toEqual("http://localhost:8983/solr/example");
   });
 
-  it("updates start URL from args updates", function() {
-    var settings = stubSettings();
-    var startUrl =
-      "http://localhost:8983/solr/example?q=*:*&fl=title catch_line";
-    solrSettingsSvc.fromStartUrl(startUrl, settings);
-
-    settings.searchArgsStrShow = "q=*:*\nfq=blah";
-    solrSettingsSvc.fromTweakedSettings(settings);
-
-    expect(settings.startUrl.indexOf("blah")).not.toEqual(-1);
+  it("normalize the search arguments", function() {
+    var args = solrSettingsSvc.normalizeArgs("q=name:apple\nfq=inStock:true");
+    expect(args).toEqual("q=name:apple&fq=inStock:true");
   });
 
-  it("updates start URL from args updates, empty fl", function() {
-    var settings = stubSettings();
-    var startUrl = "http://localhost:8983/solr/example?q=*:*";
-    solrSettingsSvc.fromStartUrl(startUrl, settings);
-
-    settings.searchArgsStrShow = "q=*:*\nfq=blah";
-    solrSettingsSvc.fromTweakedSettings(settings);
-
-    expect(settings.startUrl.indexOf("blah")).not.toEqual(-1);
-    expect(settings.startUrl.indexOf("fl")).toEqual(-1);
-    console.log(settings.startUrl);
+  it("denormalize the search arguments for visualization", function() {
+    var args = solrSettingsSvc.denormalizeArgs("q=name:apple&fq=inStock:true");
+    expect(args).toEqual("q=name:apple\nfq=inStock:true");
   });
-
-  // it("adds newlines to ampersands from startUrl", function() {
-  //   var settings = stubSettings();
-  //   var startUrl =
-  //     "http://localhost:8983/solr/example?q=*:*&fq=cat:meow&fl=title catch_line";
-  //   solrSettingsSvc.fromStartUrl(startUrl, settings);
-  //   expect(settings.searchUrl).toEqual("http://localhost:8983/solr/example");
-  //   expect(settings.fieldSpecStr).toEqual("title catch_line");
-  //   expect(settings.searchArgsStr).toEqual("q=*:*\n&fq=cat:meow");
-  //   expect(settings.whichEngine).toEqual("solr");
-  //   expect(settings.startUrl).toEqual(
-  //     "http://localhost:8983/solr/example?q=*:*&fq=cat:meow&fl=title catch_line"
-  //   );
-  // });
 
   it("updates start URL with only title & sub field", function() {
     var settings = stubSettings();

@@ -51,12 +51,6 @@ angular
      * (ie user updates solr URL or search args, fields, etc)
      * */
     this.fromTweakedSettings = function(searchSettings) {
-      if (searchSettings.searchArgsStrShow) {
-        searchSettings.searchArgsStr = searchSettings.searchArgsStrShow
-          .split("\n")
-          .join("&");
-      }
-
       var parsedUrl = solrUrlSvc.parseSolrUrl(searchSettings.searchUrl);
       if (
         parsedUrl !== null &&
@@ -86,10 +80,17 @@ angular
         fromParsedUrl(searchSettings, parsedUrl, overrideFieldSpec);
       }
 
-      searchSettings.searchArgsStrShow = searchSettings.searchArgsStr
-        .split("&")
-        .join("\n");
-
       return searchSettings;
+    };
+
+    /** Normalizes the search string args from the visualization
+     *  friendly format into the URL compatible format
+     */
+    this.normalizeArgs = function(strArgs) {
+      return strArgs.split("\n").join("&");
+    };
+
+    this.denormalizeArgs = function(strArgs) {
+      return strArgs.split("&").join("\n");
     };
   });
