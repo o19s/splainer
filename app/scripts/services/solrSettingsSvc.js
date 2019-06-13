@@ -24,7 +24,7 @@ angular
     };
 
     var newlineSolrArgs = function(searchArgsStr) {
-      return searchArgsStr; //.split('&').join('\n&'); // remove &
+      return searchArgsStr;
     };
 
     var fromParsedUrl = function(userSettings, parsedUrl, overrideFieldSpec) {
