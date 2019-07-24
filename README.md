@@ -26,35 +26,26 @@ Take the [tour](http://splainer.io/help.html) to see how you'd use Splainer.
 
 ## Running the code
 
-### Npm/Bower/Yarn Dev Environment
+### Npm/Grunt Dev Environment
 
-Splainer is written using AngularJS project. It requires npm, grunt, and yarn (w. bower).
+Splainer is written using AngularJS project. It requires npm, and grunt.  Grunt is managed under npm.
 
-Be sure you've installed npm, bower, and grunt on your machine.
+Be sure you've installed npm on your machine.
 
 * On a Mac [follow these instructions](http://thechangelog.com/install-node-js-with-homebrew-on-os-x/)
 * On Ubuntu [follow these instructions](https://rtcamp.com/tutorials/nodejs/node-js-npm-install-ubuntu/)
-* Use npm to install Grunt globally on your system (may require sudo)
 
-```
-npm install -g grunt-cli
-```
-
-* Install yarn [follow these instructions](https://yarnpkg.com/en/docs/install)
-
-### With Npm/Yarn installed
-
-From the root of the project, you should be able to run the following:
+From the root of the project, you should be able to run the following to run locally:
 
 ```
 npm install
-grunt serve
+npm run serve
 ```
 
-To build the project, simply run "grunt" static build artifacts will be placed in the dist/ folder
+To build the project as static build artifacts in `dist/`:
 
 ```
-grunt build
+npm run build
 ```
 
 ### With Docker installed
