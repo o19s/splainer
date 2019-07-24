@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "app": "app",
   "dist": "dist",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/o19s/splainer.git"
+  },
   "dependencies": {
     "ace-builds": "^1.4.1",
     "angular": "~1.7.7",
