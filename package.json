@@ -13,13 +13,8 @@
     "bootstrap": "~3.4.1",
     "es5-shim": "~4.1.11",
     "gifsicle": "^4.0.1",
-    "google-cdn-data": "^0.1.6",
     "grunt": "^0.4.1",
-    "grunt-contrib-cssmin": "*",
-    "grunt-contrib-jshint": "~0.10.0",
     "grunt-contrib-nodeunit": "~0.4.1",
-    "grunt-contrib-uglify": "~0.5.0",
-    "grunt-google-cdn": "^0.4.1",
     "jquery": "~3.4.0",
     "json3": "~3.3.1",
     "ng-json-explorer": "https://github.com/odra/ng-json-explorer",
@@ -59,10 +54,9 @@
     "puppeteer": "^0.13.0",
     "time-grunt": "^0.3.1"
   },
-  "engines": {
-    "node": ">=0.10.0"
-  },
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "serve": "grunt serve",
+    "dist": "grunt dist"
   }
 }

@@ -1,4 +1,4 @@
-// Generated on 2014-07-17 using generator-angular 0.9.5
+    // Generated on 2014-07-17 using generator-angular 0.9.5
 'use strict';
 
 // # Globbing
@@ -10,10 +10,10 @@
 module.exports = function (grunt) {
   // Load grunt tasks automatically
   require('load-grunt-tasks')(grunt);
-  grunt.loadNpmTasks('grunt-google-cdn');
+    //grunt.loadNpmTasks('grunt-google-cdn');
 
   // Time how long tasks take. Can help when optimizing build times
-  require('time-grunt')(grunt);
+  //require('time-grunt')(grunt);
 
   var appConfig = grunt.file.readJSON('package.json');
 
@@ -273,16 +273,6 @@ module.exports = function (grunt) {
       }
     },
 
-    // Replace Google CDN references
-    cdnify: {
-      options: {
-        cdn: require('google-cdn-data')
-      },
-      dist: {
-        html: ['<%= yeoman.dist %>/*.html'],
-      }
-    },
-
     // Copies remaining files to places other tasks can use
     copy: {
       dist: {
@@ -392,7 +382,6 @@ module.exports = function (grunt) {
     'concat',
     'ngmin',
     'copy:dist',
-    'cdnify',
     'cssmin',
     'uglify',
     'filerev',

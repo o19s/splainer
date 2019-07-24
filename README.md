@@ -34,11 +34,10 @@ Be sure you've installed npm, bower, and grunt on your machine.
 
 * On a Mac [follow these instructions](http://thechangelog.com/install-node-js-with-homebrew-on-os-x/)
 * On Ubuntu [follow these instructions](https://rtcamp.com/tutorials/nodejs/node-js-npm-install-ubuntu/)
-* Use npm to install Grunt and Bower globally on your system (may require sudo)
+* Use npm to install Grunt globally on your system (may require sudo)
 
 ```
 npm install -g grunt-cli
-npm install -g bower
 ```
 
 * Install yarn [follow these instructions](https://yarnpkg.com/en/docs/install)
@@ -48,15 +47,14 @@ npm install -g bower
 From the root of the project, you should be able to run the following:
 
 ```
-bower install --allow-root
-yarn
+npm install
 grunt serve
 ```
 
 To build the project, simply run "grunt" static build artifacts will be placed in the dist/ folder
 
 ```
-grunt
+grunt build
 ```
 
 ### With Docker installed
