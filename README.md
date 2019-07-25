@@ -45,7 +45,7 @@ npm run serve
 To build the project as static build artifacts in `dist/`:
 
 ```
-npm run build
+npm run dist
 ```
 
 ### With Docker installed
