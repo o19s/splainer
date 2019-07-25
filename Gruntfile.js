@@ -308,7 +308,12 @@ module.exports = function (grunt) {
             'worker-json.js',
             'mode-json.js'
           ]
-        }]
+        }, {
+          expand: true,
+          cwd: 'node_modules/',
+          src: '**/*',
+          dest: '<%= yeoman.dist %>/node_modules'
+        },]
       },
       styles: {
         expand: true,
@@ -366,6 +371,7 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('test', [
+    'newer:jshint',
     'clean:server',
     'concurrent:test',
     'autoprefixer',
@@ -373,7 +379,7 @@ module.exports = function (grunt) {
     'karma:unit'
   ]);
 
-  grunt.registerTask('build', [
+  grunt.registerTask('dist', [
     'clean:dist',
     'useminPrepare',
     'copy:styles',
@@ -390,8 +396,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('default', [
-    'newer:jshint',
     'test',
-    'build'
+    'dist'
   ]);
 };
