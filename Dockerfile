@@ -43,7 +43,8 @@ RUN apt-get update                              \
 
 RUN npm install -g grunt-cli          && \
   yarn global add phantomjs-prebuilt  && \
-  npm install                         && \
-  yarn
+  npm install
+RUN yarn install
+RUN grunt test
 
 CMD [ "grunt", "serve" ]
