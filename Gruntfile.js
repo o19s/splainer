@@ -10,7 +10,7 @@
 module.exports = function (grunt) {
   // Load grunt tasks automatically
   require('load-grunt-tasks')(grunt);
-  grunt.loadNpmTasks('grunt-google-cdn');
+  //grunt.loadNpmTasks('grunt-google-cdn');
 
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
@@ -273,15 +273,6 @@ module.exports = function (grunt) {
       }
     },
 
-    // Replace Google CDN references
-    cdnify: {
-      options: {
-        cdn: require('google-cdn-data')
-      },
-      dist: {
-        html: ['<%= yeoman.dist %>/*.html'],
-      }
-    },
 
     // Copies remaining files to places other tasks can use
     copy: {
@@ -392,7 +383,6 @@ module.exports = function (grunt) {
     'concat',
     'ngmin',
     'copy:dist',
-    'cdnify',
     'cssmin',
     'uglify',
     'filerev',
