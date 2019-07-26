@@ -43,8 +43,7 @@ RUN apt-get update                              \
 
 RUN npm install -g grunt-cli          && \
   yarn global add phantomjs-prebuilt  && \
-  npm install -g bower                && \
-  bower install --allow-root          && \
+  npm install                         && \
   yarn
 
 CMD [ "grunt", "serve" ]
