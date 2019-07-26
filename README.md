@@ -53,11 +53,13 @@ yarn
 grunt serve
 ```
 
-To build the project, simply run "grunt" static build artifacts will be placed in the dist/ folder
+To build the project, simply run `grunt dist` to build the static artifacts in the dist/ folder.
 
 ```
-grunt
+grunt dist
 ```
+
+You can test out the static artifacts via running `ruby -run -e httpd -- -p 5000 ./dist` and going to http://localhost:5000.
 
 ### With Docker installed
 

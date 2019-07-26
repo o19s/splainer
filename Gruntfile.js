@@ -325,7 +325,19 @@ module.exports = function (grunt) {
         cwd: '<%= yeoman.app %>/styles',
         dest: '.tmp/styles/',
         src: '{,*/}*.css'
-      }
+      },
+      app: {
+        expand: true,
+        cwd: '<%= yeoman.app %>/',
+        dest: '<%= yeoman.dist %>',
+        src: '**/*'
+      },
+      node_modules: {
+        expand: true,
+        cwd: 'node_modules/',
+        src: '**/*',
+        dest: '<%= yeoman.dist %>/node_modules'
+      },
     },
 
     // Run some tasks in parallel to speed up the build process
@@ -404,5 +416,12 @@ module.exports = function (grunt) {
     'newer:jshint',
     'test',
     'build'
+  ]);
+
+  grunt.registerTask('dist', [
+    'test',
+    'clean:dist',
+    'copy:app',
+    'copy:node_modules'
   ]);
 };
