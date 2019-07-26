@@ -4,7 +4,7 @@
   "app": "app",
   "dist": "dist",
   "dependencies": {
-    "ace-builds": "^1.4.1",
+    "ace-builds": "^1.4.5",
     "angular": "~1.7.7",
     "angular-local-storage": "~0.7.1",
     "angular-sanitize": "~1.7.7",
@@ -18,8 +18,8 @@
     "grunt-contrib-cssmin": "*",
     "grunt-contrib-nodeunit": "~0.4.1",
     "grunt-google-cdn": "^0.4.1",
-    "jquery": "~3.4.0",
-    "json3": "~3.3.1",
+    "jquery": "~3.4.1",
+    "json3": "~3.3.3",
     "ng-json-explorer": "https://github.com/odra/ng-json-explorer",
     "splainer-search": "2.4.3",
     "wiredep-away": "^0.1.3"
