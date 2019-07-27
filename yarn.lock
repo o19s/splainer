@@ -78,10 +78,6 @@ angular-sanitize@~1.7.7:
   version "1.7.8"
   resolved "https://registry.yarnpkg.com/angular-sanitize/-/angular-sanitize-1.7.8.tgz#87d59f754bb18d286dfd9d6ce867299c094c6719"
 
-angular-scenario@~1.4.0:
-  version "1.4.14"
-  resolved "http://registry.npmjs.org/angular-scenario/-/angular-scenario-1.4.14.tgz#3b3e00cf4d543f9b2438f5eb595e826de5919172"
-
 "angular-ui-ace@https://github.com/angular-ui/ui-ace":
   version "0.2.3"
   resolved "https://github.com/angular-ui/ui-ace#4c62a97e0adc60b7cde2be4caf902ac95c5c8c34"
