@@ -27,7 +27,7 @@
     "grunt-concurrent": "^3.0.0",
     "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-concat": "^1.0.1",
-    "grunt-contrib-connect": "^0.7.1",
+    "grunt-contrib-connect": "^2.0.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-cssmin": "^3.0.0",
     "grunt-contrib-htmlmin": "^3.1.0",
@@ -51,6 +51,7 @@
     "karma-jasmine": "^2.0.1",
     "load-grunt-tasks": "^5.0.0",
     "puppeteer": "^1.19.0",
+    "serve-static": "^1.14.1",
     "time-grunt": "^2.0.0"
   },
   "engines": {
