@@ -1,4 +1,4 @@
-FROM node:8
+FROM node:10
 MAINTAINER  Eric Pugh "epugh@opensourceconnections.com"
 
 COPY . /home/splainer
@@ -42,8 +42,7 @@ RUN apt-get update                              \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* google-chrome-unstable_current_amd64.deb
 
 RUN npm install -g grunt-cli          && \
-  yarn global add phantomjs-prebuilt  && \
-  npm install
+  yarn global add phantomjs-prebuilt
 RUN yarn install
 RUN grunt test
 
