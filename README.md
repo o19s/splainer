@@ -48,6 +48,7 @@ From the root of the project, you should be able to run the following:
 
 ```
 yarn
+grunt test
 grunt serve
 ```
 
@@ -57,7 +58,7 @@ To build the project, simply run `grunt dist` to build the static artifacts in t
 grunt dist
 ```
 
-You can test out the static artifacts via running `ruby -run -e httpd -- -p 5000 ./dist` and going to http://localhost:5000.
+You can test out the static artifacts via `ruby -run -e httpd -- -p 5000 ./dist` and going to http://localhost:5000.
 
 ### With Docker installed
 
