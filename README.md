@@ -6,15 +6,15 @@ The sandbox that explains your search results for you so you don't have to go di
 
 ## Why?
 
-You're a search developer trying to tune search results with Solr. You're engaged in [search relevancy](http://opensourceconnections.com/blog/2014/06/10/what-is-search-relevancy/) work.
+You're a search developer trying to tune search results with Solr or Elasticsearch. You're engaged in [search relevancy](http://opensourceconnections.com/blog/2014/06/10/what-is-search-relevancy/) work.
 
-You're probably stuck with the question of *why*? Why do search results come back in the order that they do? Solr/Lucene exposes an explain syntax for you to try to explain search scoring. Unfortunately outside the simplest tasks, its a nightmare to read through. There are parsers like [explain.solr.pl](http://explain.solr.pl) but they require a lot of manual copy/pasting of explain information to the tool.
+You're probably stuck with the question of *why*? Why do search results come back in the order that they do? Solr and Elasticsearch exposes an explain syntax for you to try to explain search scoring. Unfortunately outside the simplest tasks, its a nightmare to read through. There are parsers like [explain.solr.pl](http://explain.solr.pl) but they require a lot of manual copy/pasting of explain information to the tool.
 
-Splainer is different by being a *sandbox*. Paste in your Solr URL, query parameters and all. As you work with your query, changing parameters, Splainer shows you parsed and summarized explain information alongside your documents. Continue working and see how the search results change.
+Splainer is different by being a *sandbox*. Paste in your Solr or Elasticsearch URL, query parameters and all. As you work with your query, changing parameters, Splainer shows you parsed and summarized explain information alongside your documents. Continue working and see how the search results change.
 
 Read the blog post introducing Splainer [here](http://opensourceconnections.com/blog/2014/08/18/introducing-splainer-the-open-source-search-sandbox-that-tells-you-why/)
 
-Splainer forms the core of our product [Quepid](http://quepid.com) that allows you to do this over multiple queries against expert-graded search results to track search changes over a longer period of time.
+Splainer forms the core of the open source tool [Quepid](http://quepid.com) that allows you to do this over multiple queries against expert-graded search results to track search changes over a longer period of time.
 
 ## Using Splainer
 
