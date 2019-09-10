@@ -45,15 +45,15 @@ angular.module('splain-app')
         }
         if (settings.fieldSpecStr && angular.isString(settings.fieldSpecStr)) {
           settings.fieldSpecStr = settings.fieldSpecStr;
-        } else if ( angular.isDefined(parsedUrl.fields) ) {
-          settings.fieldSpecStr = parsedUrl.fields;
+        } else if ( angular.isDefined(parsedUrl.stored_fields) ) {
+          settings.fieldSpecStr = parsedUrl.stored_fields;
         }
         else {
           settings.fieldSpecStr = '*';
         }
 
-        if (!angular.isDefined(parsedUrl.fields)) {
-          settings.startUrl = parsedUrl.url + '?fields=' + settings.fieldSpecStr;
+        if (!angular.isDefined(parsedUrl.stored_fields)) {
+          settings.startUrl = parsedUrl.url + '?stored_fields=' + settings.fieldSpecStr;
         }
 
         settings.searchUrl = parsedUrl.url;
@@ -63,7 +63,7 @@ angular.module('splain-app')
         settings.startUrl = settings.searchUrl;
 
         if ( angular.isDefined(settings.fieldSpecStr) && settings.fieldSpecStr.length > 0) {
-          settings.startUrl += '?fields=' + settings.fieldSpecStr;
+          settings.startUrl += '?stored_fields=' + settings.fieldSpecStr;
         }
       }
     }
