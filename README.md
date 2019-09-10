@@ -52,6 +52,8 @@ grunt test
 grunt serve
 ```
 
+Now browse to http://localhost:9000.
+
 To build the project, simply run `grunt dist` to build the static artifacts in the dist/ folder.
 
 ```
