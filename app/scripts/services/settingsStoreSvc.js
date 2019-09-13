@@ -10,9 +10,7 @@ angular.module('splain-app')
 
     var defaultEsArgs = '!{\n' +
                         '  "query": {\n' +
-                        '    "match": {\n' +
-                        '      "_all": ""\n' +
-                        '    }\n' +
+                        '    "match_all": {}\n' +
                         '  }\n' +
                         '}    ';
 
