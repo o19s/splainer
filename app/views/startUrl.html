@@ -5,13 +5,13 @@
       <div class="tabbable tabs-below">
         <ul class="nav nav-tabs">
           <li class="active"><a href="#solr_"data-toggle="tab">Solr</a></li>
-          <li><a href="#es_" data-toggle="tab">Elasticsearch <span class="label label-warning">Beta</span></a></li>
+          <li><a href="#es_" data-toggle="tab">Elasticsearch</a></li>
         </ul>
 
         <div class="tab-content">
           <div class="tab-pane active" id="solr_">
             <div class="input-group">
-              <input type="text" class="form-control" ng-model="start.solrSettings.startUrl" placeholder="To get started, paste in a Solr URL (i.e. http://localhost:8983/solr/collection1/select?q=*:*)">
+              <input type="text" class="form-control" ng-model="start.solrSettings.startUrl" placeholder="To get started, paste in a Solr URL (i.e. http://quepid-solr.dev.o19s.com:8983/solr/tmdb/select?q=*:*)">
               <span class="input-group-btn">
                 <button class="btn btn-primary" type="submit" dispatch-on-click="openEast" ng-click="start.submitSolr()">Splain This!</button>
               </span>
@@ -20,7 +20,7 @@
 
           <div class="tab-pane" id="es_">
             <div class="input-group">
-              <input type="text" class="form-control" ng-model="start.esSettings.startUrl" placeholder="To get started, paste in an ES URL (i.e. http://localhost:9200/tmdb/movies/_search)">
+              <input type="text" class="form-control" ng-model="start.esSettings.startUrl" placeholder="To get started, paste in an ES URL (i.e. http://quepid-elasticsearch.dev.o19s.com:9200/tmdb/_search)">
               <span class="input-group-btn">
                 <button class="btn btn-primary" type="submit" dispatch-on-click="openEast" ng-click="start.submitEs()">Splain This!</button>
               </span>
@@ -46,11 +46,11 @@
     <div class="row">
       <div class="col-md-4">
         <h4>Understand</h4>
-        <p class="text-muted">Copy your Solr URL out of your browser window and paste it here. We'll highlight the matches driving your results and explain to you "why" in human-understandable terms.</p>
+        <p class="text-muted">Copy your Solr or Elasticseaarch URL out of your browser window and paste it here. We'll highlight the matches driving your results and explain to you "why" in human-understandable terms.</p>
       </div>
       <div class="col-md-4">
         <h4>Act</h4>
-        <p class="text-muted">Once you know why search isn't meeting up to your expectations, Act! Use Splainer as a sandbox to begin tweaking Solr parameters to get your query to match up to expectations.</p>
+        <p class="text-muted">Once you know why search isn't meeting up to your expectations, Act! Use Splainer as a sandbox to begin tweaking query parameters to get your query to match up to expectations.</p>
       </div>
       <div class="col-md-4">
         <h4>Evolve</h4>
@@ -59,4 +59,3 @@
     </div>
   </fieldset>
 </form>
-
