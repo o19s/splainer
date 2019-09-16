@@ -23,7 +23,7 @@ describe('Service: esSettingsSvc', function () {
 
   it('parses start URL -> URL + args', function() {
     var settings = stubSettings();
-    settings.startUrl = 'http://localhost:9200/statedecoded/_search?fields=title catch_line';
+    settings.startUrl = 'http://localhost:9200/statedecoded/_search?stored_fields=title catch_line';
     esSettingsSvc.fromStartUrl(settings);
 
     expect(settings.searchUrl).toEqual('http://localhost:9200/statedecoded/_search');
@@ -57,7 +57,7 @@ describe('Service: esSettingsSvc', function () {
 
   it('updates start URL from args updates', function() {
     var settings = stubSettings();
-    settings.startUrl = 'http://localhost:9200/statedecoded/_search?fields=title catch_line';
+    settings.startUrl = 'http://localhost:9200/statedecoded/_search?stored_fields=title catch_line';
     esSettingsSvc.fromStartUrl(settings);
 
     settings.fieldSpecStr = 'catch_line';
