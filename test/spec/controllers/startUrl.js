@@ -58,8 +58,8 @@ describe('startUrlCtrl', function() {
     locationSvc.lastParams = {esUrl: 'http://localhost:9200/tmdb/_search', esQuery: '{"match": "foo"}', fieldSpec: 'id banana'};
     createController();
     expect(localStorageSvc.get('whichEngine')).toEqual('es');
-    expect(scope.start.esSettings.startUrl).toBe('http://localhost:9200/tmdb/_search?fields=id banana');
-    expect(localStorageSvc.get('es_startUrl')).toEqual('http://localhost:9200/tmdb/_search?fields=id banana');
+    expect(scope.start.esSettings.startUrl).toBe('http://localhost:9200/tmdb/_search?stored_fields=id banana');
+    expect(localStorageSvc.get('es_startUrl')).toEqual('http://localhost:9200/tmdb/_search?stored_fields=id banana');
     expect(scope.start.esSettings.searchArgsStr).toContain('match');
     expect(localStorageSvc.get('es_searchArgsStr')).toEqual('!' + locationSvc.lastParams.esQuery);
     expect(scope.start.esSettings.searchUrl).toBe('http://localhost:9200/tmdb/_search');
