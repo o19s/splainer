@@ -10,3 +10,5 @@ services:
     ports:
       - 9000:9000
       - 35729:35729
+    command: serve
+    entrypoint: /usr/local/bin/grunt
