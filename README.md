@@ -24,6 +24,11 @@ Take the [tour](http://splainer.io/help.html) to see how you'd use Splainer.
 
 `docker run -d -p 9000:9000 -p 35729:35729 o19s/splainer` and then go to http://localhost:9000
 
+Alternatively, `docker-compose` is available
+
+    docker-compose build
+    docker-compose run --rm --service-ports app
+
 ## Running the code
 
 ### Npm/Yarn Dev Environment
@@ -82,6 +87,16 @@ then to run the server run
 ```
 bin/docker s
 ```
+
+### Using `docker-compose`
+
+From the root of the project,
+
+    docker-compose build
+    docker-compose run --rm --service-ports app
+
+### Docker Extras
+* `docker-compose.override.yml.example` can be copied to `docker-compose.override.yml` and use it to override environment variables or work with [`splainer-search`](https://github.com/o19s/splainer-search) JS library.  Example is included.
 
 ## Who?
 
