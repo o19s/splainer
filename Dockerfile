@@ -46,4 +46,4 @@ RUN npm install -g grunt-cli          && \
 RUN yarn install
 RUN grunt test
 
-# CMD [ "grunt", "serve" ]  # comment out for docker compose
+CMD [ "grunt", "serve" ]
