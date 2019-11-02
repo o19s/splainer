@@ -20,14 +20,10 @@ Splainer forms the core of the open source tool [Quepid](http://quepid.com) that
 
 Take the [tour](http://splainer.io/help.html) to see how you'd use Splainer.
 
-### If you want to work locally, we have a Docker image
+### If you want to work with a local copy of Splainer, we have a Docker image
 
-`docker run -d -p 9000:9000 -p 35729:35729 o19s/splainer` and then go to http://localhost:9000
+`docker run -d -p 9000:9000 o19s/splainer` and then go to http://localhost:9000
 
-Alternatively, `docker-compose` is available
-
-    docker-compose build
-    docker-compose run --rm --service-ports app
 
 ## Running the code
 
@@ -72,8 +68,8 @@ You can test out the static artifacts via `ruby -run -e httpd -- -p 5000 ./dist`
 From the root of the project, you should run:
 
 ```
-docker build -t splainer  .
-docker run -p 9000:9000 splainer
+docker build -t splainer .
+docker run -p 9000:9000 splainer:latest
 ```
 
 or use the following shortcuts if you have `ruby` installed:
@@ -88,15 +84,21 @@ then to run the server run
 bin/docker s
 ```
 
-### Using `docker-compose`
+destroy the server via
 
-From the root of the project,
-
-    docker-compose build
-    docker-compose run --rm --service-ports app
+```
+bin/docker d
+```
 
 ### Docker Extras
-* `docker-compose.override.yml.example` can be copied to `docker-compose.override.yml` and use it to override environment variables or work with [`splainer-search`](https://github.com/o19s/splainer-search) JS library.  Example is included.
+
+* If you are working with a local copy of [`splainer-search`](https://github.com/o19s/splainer-search) JS library, and want to mount it into the running Docker container, then you need to override the default volume with the path to your `splainer-search`:
+
+```
+docker run -p 9000:9000 --volume /Users/someperson/projects/splainer-search/:/home/splainer/node_modules/splainer-search splainer:latest
+```
+
+This will make integrating `splainer-search` a lot easier.
 
 ## Who?
 
