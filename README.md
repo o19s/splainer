@@ -20,16 +20,13 @@ Splainer forms the core of the open source tool [Quepid](http://quepid.com) that
 
 Take the [tour](http://splainer.io/help.html) to see how you'd use Splainer.
 
-### If you want to work locally, we have a Docker image
+### Using Splainer locally
 
-`docker run -d -p 9000:9000 -p 35729:35729 o19s/splainer` and then go to http://localhost:9000
+We have a Docker image published at https://hub.docker.com/r/o19s/splainer that you can use:
 
-Alternatively, `docker-compose` is available
+`docker run -d -p 9000:9000 o19s/splainer` and then go to http://localhost:9000
 
-    docker-compose build
-    docker-compose run --rm --service-ports app
-
-## Running the code
+## Developing Splainer
 
 ### Npm/Yarn Dev Environment
 
@@ -73,7 +70,7 @@ From the root of the project, you should run:
 
 ```
 docker build -t splainer  .
-docker run -p 9000:9000 splainer
+docker run -p 9000:9000 splainer:latest
 ```
 
 or use the following shortcuts if you have `ruby` installed:
