@@ -100,6 +100,12 @@ docker run -p 9000:9000 --volume /Users/someperson/projects/splainer-search/:/ho
 
 This will make integrating `splainer-search` a lot easier.
 
+### Testing Notes
+
+* Unit tests are written using Karma.
+
+* The `./tests/splainer_test_links.html` file is a list of links that invoke Splainer, both the local version and the deployed version against Solr and Elasticsearch, and is a great test to make sure the behavior hasn't reverted.  Use this to make sure existing links still work!
+
 ## Who?
 
 Created by [OpenSource Connections](http://opensourceconnections.com)
