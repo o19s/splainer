@@ -1,0 +1,14 @@
+version: '3'
+services:
+  app:
+    container_name: splainer
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/home/splainer
+    ports:
+      - 9000:9000
+      - 35729:35729
+    command: serve
+    entrypoint: /usr/local/bin/grunt
