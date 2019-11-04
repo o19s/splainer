@@ -98,6 +98,12 @@ From the root of the project,
 ### Docker Extras
 * `docker-compose.override.yml.example` can be copied to `docker-compose.override.yml` and use it to override environment variables or work with [`splainer-search`](https://github.com/o19s/splainer-search) JS library.  Example is included.
 
+### Testing Notes
+
+* Unit tests are written using Karma.
+
+* The `./tests/splainer_test_links.html` file is a list of links that invoke Splainer, both the local version and the deployed version against Solr and Elasticsearch, and is a great test to make sure the behavior hasn't reverted.  Use this to make sure existing links still work!
+
 ## Who?
 
 Created by [OpenSource Connections](http://opensourceconnections.com)
