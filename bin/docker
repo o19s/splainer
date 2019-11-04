@@ -9,14 +9,21 @@ command, *rest = ARGV
 Dir.chdir APP_ROOT do
   case command
   when 'build', 'b'
-    system 'docker build -t splainer .'
+    system 'docker-compose build'
   when 'bash', 'c'
-    system 'docker exec -it -name splainer bash'
+    system 'docker-compose run --rm app bash'
   when 'destroy', 'd'
-    system 'docker kill splainer'
+    system 'docker-compose down'
+  when 'run', 'r'
+    system "docker-compose run --rm app #{rest.join(' ')}"
+  when 'stop', 'p'
+    system 'docker-compose stop'
   when 'server', 's'
-    system 'docker run -d -p 9000:9000 --name splainer splainer:latest'
+    # system 'docker-compose run --service-ports app bin/server'
+    system 'docker-compose up'
+  when 'start', 't'
+    system 'docker-compose start'
   else
-    puts 'Unknown option (build|b, bash|c, destroy|d, server|s)'
+    puts 'Unknown option (build|b, bash|c, destroy|d, run|r, stop|p, server|s, start|t)'
   end
 end
