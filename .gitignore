@@ -11,3 +11,5 @@ yarn-error.log
 deploy.sh
 # vim swp
 *.swp
+
+docker-compose.override.yml

@@ -11,14 +11,11 @@ angular
     this.ENGINES.SOLR = "solr";
     this.ENGINES.ELASTICSEARCH = "es";
 
-    var defaultEsArgs =
-      "!{\n" +
-      '  "query": {\n' +
-      '    "match": {\n' +
-      '      "_all": ""\n' +
-      "    }\n" +
-      "  }\n" +
-      "}    ";
+    var defaultEsArgs = '!{\n' +
+                        '  "query": {\n' +
+                        '    "match_all": {}\n' +
+                        '  }\n' +
+                        '}    ';
 
     // Next is Local Storage
     var initSearchArgs = function() {

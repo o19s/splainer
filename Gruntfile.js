@@ -10,12 +10,15 @@
 module.exports = function (grunt) {
   // Load grunt tasks automatically
   require('load-grunt-tasks')(grunt);
-  grunt.loadNpmTasks('grunt-google-cdn');
 
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
 
+  grunt.loadNpmTasks('grunt-contrib-watch');
+
   var appConfig = grunt.file.readJSON('package.json');
+
+  var serveStatic = require('serve-static');
 
   // Define the configuration for all the tasks
   grunt.initConfig({
@@ -37,14 +40,14 @@ module.exports = function (grunt) {
       },
       styles: {
         files: ['<%= yeoman.app %>/styles/{,*/}*.css'],
-        tasks: ['newer:copy:styles', 'autoprefixer']
+        tasks: ['newer:copy:styles', 'postcss']
       },
       gruntfile: {
         files: ['Gruntfile.js']
       },
       livereload: {
         options: {
-          livereload: '<%= connect.options.livereload %>'
+          //livereload: '<%= connect.options.livereload %>'
         },
         files: [
           '<%= yeoman.app %>/{,*/}*.html',
@@ -65,15 +68,15 @@ module.exports = function (grunt) {
       },
       livereload: {
         options: {
-          open: true,
+          open: false,
           middleware: function(connect) {
             return [
-              connect.static('.tmp'),
+              serveStatic('.tmp'),
               connect().use(
                 '/node_modules',
-                connect.static('./node_modules')
+                serveStatic('./node_modules')
               ),
-              connect.static(appConfig.app)
+              serveStatic(appConfig.app)
             ];
           }
         }
@@ -83,13 +86,13 @@ module.exports = function (grunt) {
           port: 9001,
           middleware: function(connect) {
             return [
-              connect.static('.tmp'),
-              connect.static('test'),
+              serveStatic('.tmp'),
+              serveStatic('test'),
               connect().use(
                 '/node_modules',
-                connect.static('./node_modules')
+                serveStatic('./node_modules')
               ),
-              connect.static(appConfig.app)
+              serveStatic(appConfig.app)
             ];
           }
         }
@@ -139,9 +142,12 @@ module.exports = function (grunt) {
     },
 
     // Add vendor prefixed styles
-    autoprefixer: {
+    postcss: {
       options: {
-        browsers: ['last 1 version']
+        map: true,
+        processors: [
+          require('autoprefixer')
+        ]
       },
       dist: {
         files: [{
@@ -152,6 +158,7 @@ module.exports = function (grunt) {
         }]
       }
     },
+
 
     // Renames files for browser caching purposes
     filerev: {
@@ -273,15 +280,6 @@ module.exports = function (grunt) {
       }
     },
 
-    // Replace Google CDN references
-    cdnify: {
-      options: {
-        cdn: require('google-cdn-data')
-      },
-      dist: {
-        html: ['<%= yeoman.dist %>/*.html'],
-      }
-    },
 
     // Copies remaining files to places other tasks can use
     copy: {
@@ -325,7 +323,19 @@ module.exports = function (grunt) {
         cwd: '<%= yeoman.app %>/styles',
         dest: '.tmp/styles/',
         src: '{,*/}*.css'
-      }
+      },
+      app: {
+        expand: true,
+        cwd: '<%= yeoman.app %>/',
+        dest: '<%= yeoman.dist %>',
+        src: '**/*'
+      },
+      node_modules: {
+        expand: true,
+        cwd: 'node_modules/',
+        src: '**/*',
+        dest: '<%= yeoman.dist %>/node_modules'
+      },
     },
 
     // Run some tasks in parallel to speed up the build process
@@ -364,7 +374,7 @@ module.exports = function (grunt) {
     grunt.task.run([
       'clean:server',
       'concurrent:server',
-      'autoprefixer',
+      'postcss',
       'connect:livereload',
       'watch'
     ]);
@@ -378,7 +388,7 @@ module.exports = function (grunt) {
   grunt.registerTask('test', [
     'clean:server',
     'concurrent:test',
-    'autoprefixer',
+    'postcss',
     'connect:test',
     'karma:unit'
   ]);
@@ -388,11 +398,10 @@ module.exports = function (grunt) {
     'useminPrepare',
     'copy:styles',
     'svgmin',
-    'autoprefixer',
+    'postcss',
     'concat',
     'ngmin',
     'copy:dist',
-    'cdnify',
     'cssmin',
     'uglify',
     'filerev',
@@ -404,5 +413,12 @@ module.exports = function (grunt) {
     'newer:jshint',
     'test',
     'build'
+  ]);
+
+  grunt.registerTask('dist', [
+    'test',
+    'clean:dist',
+    'copy:app',
+    'copy:node_modules'
   ]);
 };

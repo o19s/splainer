@@ -1,0 +1,5 @@
+version: '3'
+services:
+  app:
+    volumes:
+      - /Users/someperson/projects/splainer-search/:/home/splainer/node_modules/splainer-search
