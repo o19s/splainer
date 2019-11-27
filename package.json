@@ -12,7 +12,6 @@
     "angular-ui-bootstrap": "~2.5.0",
     "bootstrap": "~3.4.1",
     "es5-shim": "~4.5.13",
-    "gifsicle": "^4.0.1",
     "grunt": "^1.0.4",
     "jquery": "~3.4.1",
     "json3": "~3.3.3",
