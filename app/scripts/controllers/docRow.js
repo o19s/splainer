@@ -27,7 +27,8 @@ angular.module('splain-app')
               return $scope.doc;
             },
             canExplainOther: function() {
-              return $scope.whichEngine === 'solr';
+              var allowedEngines = ['es', 'solr'];
+              return allowedEngines.includes($scope.whichEngine);
             }
           }
         });
