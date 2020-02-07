@@ -4,7 +4,8 @@ angular.module('splain-app')
   .controller('DocRowCtrl', [
     '$scope',
     '$uibModal',
-    function DocRowCtrl($scope, $uibModal) {
+    'settingsStoreSvc',
+    function DocRowCtrl($scope, $uibModal, settingsStoreSvc) {
 
       $scope.docRow = {};
       $scope.docRow.snippets = function(doc) {
@@ -27,7 +28,8 @@ angular.module('splain-app')
               return $scope.doc;
             },
             canExplainOther: function() {
-              return $scope.whichEngine === 'solr';
+              var allowedEngines = ['es', 'solr'];
+              return allowedEngines.includes(settingsStoreSvc.settings.whichEngine);
             }
           }
         });
