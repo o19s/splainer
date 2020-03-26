@@ -11,7 +11,7 @@
         <div class="tab-content">
           <div class="tab-pane active" id="solr_">
             <div class="input-group">
-              <input type="text" class="form-control" ng-model="start.solrSettings.startUrl" ng-init="start.solrSettings.startUrl='http://quepid-solr.dev.o19s.com:8983/solr/tmdb/select?q=*:*'">
+              <input type="text" class="form-control" ng-model="start.solrSettings.startUrl" ng-init="start.solrSettings.startUrl='http://quepid-solr.dev.o19s.com:8985/solr/tmdb/select?q=*:*'">
               <span class="input-group-btn">
                 <button class="btn btn-primary" type="submit" dispatch-on-click="openEast" ng-click="start.submitSolr()">Splain This!</button>
               </span>
@@ -20,7 +20,7 @@
 
           <div class="tab-pane" id="es_">
             <div class="input-group">
-              <input type="text" class="form-control" ng-model="start.esSettings.startUrl" ng-init="start.esSettings.startUrl='http://quepid-elasticsearch.dev.o19s.com:9200/tmdb/_search'">
+              <input type="text" class="form-control" ng-model="start.esSettings.startUrl" ng-init="start.esSettings.startUrl='http://quepid-elasticsearch.dev.o19s.com:9206/tmdb/_search'">
               <span class="input-group-btn">
                 <button class="btn btn-primary" type="submit" dispatch-on-click="openEast" ng-click="start.submitEs()">Splain This!</button>
               </span>
