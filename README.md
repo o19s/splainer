@@ -93,7 +93,9 @@ From the root of the project,
     docker-compose run --rm --service-ports app
 
 ### Docker Extras
-* `docker-compose.override.yml.example` can be copied to `docker-compose.override.yml` and use it to override environment variables or work with [`splainer-search`](https://github.com/o19s/splainer-search) JS library.  Example is included.
+* `docker-compose.override.yml.example` can be copied to `docker-compose.override.yml` and use it to override environment variables or work with a local copy of the [`splainer-search`](https://github.com/o19s/splainer-search) JS library during development defined in `docker-compose.yml`.  Example is included.
+
+https://docs.docker.com/compose/extends/
 
 ### Testing Notes
 
@@ -103,7 +105,9 @@ From the root of the project,
 
 ## Who?
 
-Created by [OpenSource Connections](http://opensourceconnections.com)
+Created by [OpenSource Connections](http://opensourceconnections.com).
+
+Thanks to all the [community contributors](https://github.com/o19s/splainer/graphs/contributors) for finding bugs and sharing fixes!.
 
 ## License
 
