@@ -3,7 +3,6 @@ backup/
 node_modules
 .tmp
 .sass-cache
-node_modules
 dist/
 coverage/
 yarn-error.log

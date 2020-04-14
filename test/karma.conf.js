@@ -50,20 +50,14 @@ module.exports = function(config) {
     // - PhantomJS
     // - IE (only Windows)
     browsers: [
-      'Chrome_no_sandbox'
+      'ChromeHeadlessNoSandbox'
     ],
 
     customLaunchers: {
-      Chrome_no_sandbox: {
-        base: 'Chrome',
-        flags: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--headless',
-          '--disable-gpu',
-          '--remote-debugging-port=9222',
-        ],
-      },
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox', '--headless']
+      }
     },
 
     // Which plugins to enable
