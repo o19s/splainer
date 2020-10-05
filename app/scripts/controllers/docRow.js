@@ -8,15 +8,23 @@ angular.module('splain-app')
     function DocRowCtrl($scope, $uibModal, settingsStoreSvc) {
 
       $scope.docRow = {};
+      // TODO: In a future refactor just compute the snippets and store them out, don't use a function call in the template
+      $scope.docRow.snippetCache = null;
       $scope.docRow.snippets = function(doc) {
-        var snippets = doc.subSnippets('<em>', '</em>');
-        angular.forEach(snippets, function(value, key){
-          if ( angular.isArray(value) ) {
-            snippets[key] = value.join('');
-          }
-        });
-        return snippets;
+        if (!$scope.docRow.snippetCache) {
+          var snippets = doc.subSnippets('<em>', '</em>');
+          angular.forEach(snippets, function(value, key){
+            if ( angular.isArray(value) ) {
+              snippets[key] = value.join(', ');
+            }
+          });
+          $scope.docRow.snippetCache = snippets;
+        }
+        return $scope.docRow.snippetCache;
       };
+
+      // Apply highlighting, no highlighting applied if you access doc.title directly
+      $scope.docRow.title = $scope.doc.getHighlightedTitle('<em>', '</em>');
 
       $scope.doc.showDetailed = function() {
         $uibModal.open({
