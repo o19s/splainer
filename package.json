@@ -14,8 +14,8 @@
     "es5-shim": "~4.5.13",
     "jquery": "~3.4.1",
     "json3": "~3.3.3",
-    "ng-json-explorer": "http://github.com/o19s/ng-json-explorer",
-    "splainer-search": "2.6.0"
+    "ng-json-explorer": "https://github.com/o19s/ng-json-explorer",
+    "splainer-search": "2.6.2"
   },
   "devDependencies": {
     "angular-mocks": "~1.7.8",

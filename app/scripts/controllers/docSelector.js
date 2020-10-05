@@ -33,7 +33,7 @@ angular.module('splain-app')
         }
 
         return searchSvc.createSearcher(
-          fieldSpec.fieldList(),
+          fieldSpec,
           settings.searchUrl(),
           args,
           '',

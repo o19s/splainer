@@ -5,7 +5,7 @@
   </div>
 
   <div class="col-md-8">
-    <h4><a href="" ng-click="doc.showDoc()"> {{doc.title}}</a></h4>
+    <h4><a href="" ng-click="doc.showDoc()" ng-bind-html="docRow.title"></a></h4>
     <div ng-if="doc.hasThumb()">
       <img style="max-height: 200px" ng-src="{{doc.thumb}}"></img>
     </div>
