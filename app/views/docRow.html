@@ -9,6 +9,9 @@
     <div ng-if="doc.hasThumb()">
       <img style="max-height: 200px" ng-src="{{doc.thumb}}"></img>
     </div>
+    <div ng-if="doc.hasImage()">
+      <img style="max-height: 450px" ng-src="{{doc.image}}"></img>
+    </div>
     <div ng-repeat="(fieldName, fieldSnippet) in docRow.snippets(doc)">
       <label class="fieldLabel">
         {{fieldName}}:

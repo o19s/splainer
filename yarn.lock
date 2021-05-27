@@ -93,9 +93,9 @@ angular-ui-bootstrap@~2.5.0:
   resolved "https://registry.yarnpkg.com/angular-ui-bootstrap/-/angular-ui-bootstrap-2.5.6.tgz#23937322ec641a6fbee16498cc32452aa199e7c5"
 
 angular@^1.7.9:
-  version "1.7.9"
-  resolved "https://registry.yarnpkg.com/angular/-/angular-1.7.9.tgz#e52616e8701c17724c3c238cfe4f9446fd570bc4"
-  integrity sha512-5se7ZpcOtu0MBFlzGv5dsM1quQDoDeUTwZrWjGtTNA7O88cD8TEk5IEKCTDa3uECV9XnvKREVUr7du1ACiWGFQ==
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.2.tgz#5983bbb5a9fa63e213cb7749199e0d352de3a2f1"
+  integrity sha512-IauMOej2xEe7/7Ennahkbb5qd/HFADiNuLSESz9Q27inmi32zB0lnAsFeLEWcox3Gd1F6YhNd1CP7/9IukJ0Gw==
 
 angular@~1.7.7:
   version "1.7.8"
@@ -3267,9 +3267,9 @@ neo-async@^2.6.0:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.1.tgz#ac27ada66167fa8849a6addd837f6b189ad2081c"
   integrity sha512-iyam8fBuCUpWeKPGpaNMetEocMt364qkCsfL9JuhjXX6dRnguRVOfk2GZaDpPjcOKiiXCPINZC1GczQ7iTq3Zw==
 
-"ng-json-explorer@http://github.com/o19s/ng-json-explorer":
+"ng-json-explorer@https://github.com/o19s/ng-json-explorer":
   version "1.3.6"
-  resolved "http://github.com/o19s/ng-json-explorer#23debd0589680696d6e253c813a01827c5d88b3e"
+  resolved "https://github.com/o19s/ng-json-explorer#23debd0589680696d6e253c813a01827c5d88b3e"
 
 ngmin@~0.4.0:
   version "0.4.1"
@@ -4394,10 +4394,10 @@ spdx-license-ids@^3.0.0:
   resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-3.0.5.tgz#3694b5804567a458d3c8045842a6358632f62654"
   integrity sha512-J+FWzZoynJEXGphVIS+XEh3kFSjZX/1i9gFBaWQcB+/tmpe2qUsSBABpcxqxnAxFdiUFEgAX1bjYGQvIZmoz9Q==
 
-splainer-search@2.6.0:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/splainer-search/-/splainer-search-2.6.0.tgz#56d7610e4f63c8a50e04d5ae772b7afad273892e"
-  integrity sha512-H77YRKZWhj5LS5jWR9zzbG/lULIDAwSMt9Fxs4a5i8vft7vG4At5GfRc/RW4eQnr+4oPRbC6n3y28MYzhUM+og==
+splainer-search@2.6.10:
+  version "2.6.10"
+  resolved "https://registry.yarnpkg.com/splainer-search/-/splainer-search-2.6.10.tgz#24577c0024d3089bda21c3f2af94e9dacd434f15"
+  integrity sha512-Fp1rzlW3zDjg0GWDIDRYnWnmBs81c8b8+mevsDu4TLr44/HNS5HsjgDmbT6GhqQUyIbI7u3M4pnmyUX0pqzmOA==
   dependencies:
     angular "^1.7.9"
     urijs "~1.16.1"
