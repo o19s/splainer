@@ -330,7 +330,7 @@ module.exports = function (grunt) {
         dest: '<%= yeoman.dist %>',
         src: '**/*'
       },
-      node_modules: {
+      node_modules: { // jshint ignore:line
         expand: true,
         cwd: 'node_modules/',
         src: '**/*',

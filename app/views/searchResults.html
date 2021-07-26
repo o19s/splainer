@@ -17,6 +17,16 @@
     <small>
       <a href="{{currSearch.linkUrl}}" target="_blank">{{currSearch.numFound}} Total Results</a>
     </small>
+    |
+    <small>
+      <a href="" ng-click="showQueryParsingDict=!showQueryParsingDict">Query Parsing Details</a>
+      <div uib-collapse="!showQueryParsingDict">
+        <json-explorer
+          json-data="currSearch.searcher.queryParsingDict"
+        ></json-explorer>
+      </div>
+    </small>
+
 
     <hr style="margin-top: 5px"/>
     <div ng-if="!currSearch.hasGrouped()" ng-repeat="doc in currSearch.docs">
