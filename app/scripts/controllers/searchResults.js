@@ -12,7 +12,7 @@ angular.module('splain-app')
 
     $scope.search = {};
 
-    $scope.showQueryParsingDict = false;
+    $scope.showParsedQueryDetails = false;
 
     /* Initiate a new search with the latest settings
      * */
@@ -28,7 +28,7 @@ angular.module('splain-app')
     $scope.search.reset = function() {
       var searchSettings = settingsStoreSvc.settings;
       $scope.currSearch = splSearchSvc.createSearch(searchSettings);
-      $scope.showQueryParsingDict = false;
+      $scope.showParsedQueryDetails = false;
     };
 
     $scope.search.reset();
