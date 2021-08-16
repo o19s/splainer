@@ -4394,10 +4394,10 @@ spdx-license-ids@^3.0.0:
   resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-3.0.5.tgz#3694b5804567a458d3c8045842a6358632f62654"
   integrity sha512-J+FWzZoynJEXGphVIS+XEh3kFSjZX/1i9gFBaWQcB+/tmpe2qUsSBABpcxqxnAxFdiUFEgAX1bjYGQvIZmoz9Q==
 
-splainer-search@2.7.0:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/splainer-search/-/splainer-search-2.7.0.tgz#572bcc540473480b378cc039418ff993dd242e82"
-  integrity sha512-4ZfLMN+UnR+mC+HYl7TK3nxTcqmuMBH5pWXMB7D8WIcLzSd8JQ3/b5DQXCrdU0tUtqpjRXYRjhRnTt1QPC/niA==
+splainer-search@2.8.0:
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/splainer-search/-/splainer-search-2.8.0.tgz#bc4238f0ff2452428e47cca23db6c234d335c7c2"
+  integrity sha512-dWRhRVOJpVhAvLN5wS7ullNdeF6CoznLXMGibVxe3qSC9BKPJK1DO/rjP4AgH9auKtir1dSGwLBPWLdx8k9C4w==
   dependencies:
     angular "^1.7.9"
     urijs "~1.16.1"
