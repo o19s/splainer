@@ -13,13 +13,17 @@ angular.module('splain-app')
     $scope.search = {};
 
     $scope.showParsedQueryDetails = false;
+    $scope.showQueryDetails = false;
 
     /* Initiate a new search with the latest settings
      * */
     $scope.search.search = function() {
+      $scope.showParsedQueryDetails = false;
+      $scope.showQueryDetails = false;
       var promise = Promise.create($scope.search.search);
       $scope.currSearch.search()
       .then(function() {
+        $scope.currSearch.engine = settingsStoreSvc.settings.whichEngine
         promise.complete();
       });
       return promise;
@@ -29,6 +33,7 @@ angular.module('splain-app')
       var searchSettings = settingsStoreSvc.settings;
       $scope.currSearch = splSearchSvc.createSearch(searchSettings);
       $scope.showParsedQueryDetails = false;
+      $scope.showQueryDetails = false;
     };
 
     $scope.search.reset();

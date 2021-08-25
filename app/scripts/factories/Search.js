@@ -25,6 +25,9 @@ angular.module('splain-app')
         self.getOverridingExplain = getOverridingExplain;
         self.search               = search;
         self.page                 = page;
+
+        // This logic I think is an old artifact, and doesn't matter,
+        // but tests need updating.
         if (searchSettings.hasOwnProperty('whichEngine')) {
           self.engine               = searchSettings.whichEngine;
         } else {
@@ -45,7 +48,6 @@ angular.module('splain-app')
           } else {
             parsedArgs = solrUrlSvc.parseSolrArgs(searchSettings.solr.searchArgsStr);
           }
-
           return searchSvc.createSearcher(
             fieldSpec,
             searchSettings.searchUrl(),

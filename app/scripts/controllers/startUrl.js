@@ -23,6 +23,8 @@ angular.module('splain-app')
 
 
       var search = function() {
+        // We should broadcast we are doing a search to tell SearchResultsCtrl
+        // to set the showQueryDetails to false.
         $scope.search.search()
         .then(function() {
           settingsStoreSvc.save();
@@ -30,6 +32,7 @@ angular.module('splain-app')
       };
 
       var runSolrSearch = function(overridingFieldSpec) {
+        // Should be setSolrSettings()
         settingsStoreSvc.settings.whichEngine = 'solr';
         solrSettingsSvc.fromStartUrl($scope.start.solrSettings.startUrl, $scope.start.solrSettings, overridingFieldSpec);
         search();
