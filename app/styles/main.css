@@ -170,7 +170,7 @@
 }
 
 .fieldLabel {
-    text-decoration: bold
+  font-weight:  bold;
 }
 
 .osc_logo {
