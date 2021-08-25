@@ -4394,13 +4394,13 @@ spdx-license-ids@^3.0.0:
   resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-3.0.5.tgz#3694b5804567a458d3c8045842a6358632f62654"
   integrity sha512-J+FWzZoynJEXGphVIS+XEh3kFSjZX/1i9gFBaWQcB+/tmpe2qUsSBABpcxqxnAxFdiUFEgAX1bjYGQvIZmoz9Q==
 
-splainer-search@2.9.0:
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/splainer-search/-/splainer-search-2.9.0.tgz#ed1d026e80589946480870dd3cd156d213e5743f"
-  integrity sha512-qq5CpsON4Mn+sMfbPBnAANgtz9TDrvcSSSsGdp0gYR3fZH/CaZ7HVJ77wldaXnRw4gXEQ+hdzMNTZS92yS183w==
+splainer-search@2.10.0:
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/splainer-search/-/splainer-search-2.10.0.tgz#f0eea8378a7f2f48ec678759cd1e0bce6931754c"
+  integrity sha512-iIAmRcqAipdA7oDgPGWlNSXyTbeUFNpe3vPxGIOjTdGp/n42SCVtcaY68yvIXSW5Sa6E8wTZSVYodUgNLOXaAA==
   dependencies:
     angular "^1.7.9"
-    urijs "~1.16.1"
+    urijs "^1.19.7"
 
 split-string@^3.0.1, split-string@^3.0.2:
   version "3.1.0"
@@ -4852,10 +4852,10 @@ uri-path@^1.0.0:
   resolved "https://registry.yarnpkg.com/uri-path/-/uri-path-1.0.0.tgz#9747f018358933c31de0fccfd82d138e67262e32"
   integrity sha1-l0fwGDWJM8Md4PzP2C0TjmcmLjI=
 
-urijs@~1.16.1:
-  version "1.16.1"
-  resolved "https://registry.yarnpkg.com/urijs/-/urijs-1.16.1.tgz#859ad31890f5f9528727be89f1932c94fb4731e2"
-  integrity sha1-hZrTGJD1+VKHJ76J8ZMslPtHMeI=
+urijs@^1.19.7:
+  version "1.19.7"
+  resolved "https://registry.yarnpkg.com/urijs/-/urijs-1.19.7.tgz#4f594e59113928fea63c00ce688fb395b1168ab9"
+  integrity sha512-Id+IKjdU0Hx+7Zx717jwLPsPeUqz7rAtuVBRLLs+qn+J2nf9NGITWVCxcijgYxBqe83C7sqsQPs6H1pyz3x9gA==
 
 urix@^0.1.0:
   version "0.1.0"
