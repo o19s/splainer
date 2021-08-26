@@ -84,7 +84,10 @@
               Displayed Fields <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsFields.toggle]" class="glyphicon glyphicon-minus-sign"></span>
             </div>
             <div class="dev-section" ng-show="!devSettingsFields.toggle">
-              <input id="inputFieldSpec" type="text" ng-model="workingSettings.fieldSpecStr" placeholder="Fields you'd like to display" class="form-control"></input>
+              <input id="inputFieldSpec" type="text" ng-show="!currSearch.searcher.isTemplateCall()" ng-model="workingSettings.fieldSpecStr" placeholder="Fields you'd like to display" class="form-control"></input>
+              <span ng-show="currSearch.searcher.isTemplateCall()">
+              When using ES Templates, specify fields to view via <code>_source</code> defined in the search template.
+              </span>
             </div>
 
             <div class="dev-header" ng-click="devSettingsArgs.toggle = !devSettingsArgs.toggle">
