@@ -20,24 +20,37 @@
         {{currSearch.numFound}} Total Results
       </span>
     </small>
+
+    <span ng-show="currSearch.engine == 'solr'">
+    |
+    <small>
+      <a href="" ng-click="showQueryDetails = !showQueryDetails">Query Details</a>
+    </small>
+    </span>
     |
     <small>
       <a href="" ng-click="showParsedQueryDetails = !showParsedQueryDetails">Parsed Query Details</a>
-      <div uib-collapse="!showParsedQueryDetails">
-        <json-explorer
-          json-data="currSearch.searcher.parsedQueryDetails"
-        ></json-explorer>
-      </div>
     </small>
+
+    <div uib-collapse="!showQueryDetails">
+      <json-explorer
+        json-data="currSearch.searcher.queryDetails"
+      ></json-explorer>
+    </div>
+    <div uib-collapse="!showParsedQueryDetails">
+      <json-explorer
+        json-data="currSearch.searcher.parsedQueryDetails"
+      ></json-explorer>
+    </div>
 
 
     <hr style="margin-top: 5px"/>
-    <div ng-if="!currSearch.hasGrouped()" ng-repeat="doc in currSearch.docs">
+    <div ng-if="!currSearch.hasGroup()" ng-repeat="doc in currSearch.docs">
       <doc-row doc="doc" max-score="currSearch.maxScore" which-engine="currSearch.engine"></doc-row>
       <hr/>
     </div>
 
-    <div class="grouped" ng-if="currSearch.hasGrouped()" ng-repeat="(group, groupedBy) in currSearch.grouped">
+    <div class="grouped" ng-if="currSearch.hasGroup()" ng-repeat="(group, groupedBy) in currSearch.grouped">
       <h4>Grouped by: {{group}}</h4>
       <div ng-repeat="grouped in groupedBy">
         <h4 style="margin-left: 10px" title = "Group: {{group}}, {{grouped.value}}">Value: <em>{{grouped.value}}</em></h4>
