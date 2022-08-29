@@ -58,12 +58,12 @@ jobs:
       - run: ls -alh /home/circleci/.local/bin
 
       - run:
-          name: Deploy Master to s3
+          name: Deploy Main to s3
           command: /home/circleci/.local/bin/aws s3 sync ./app s3://splainer.io/ --delete
 
 workflows:
   version: 2
-  build-master:
+  build-main:
     jobs:
       - build
           #filters:
@@ -74,10 +74,10 @@ workflows:
             - build
           filters:
             branches:
-              only: master
+              only: main
       - publish-splainerio:
           requires:
             - build
           filters:
             branches:
-              only: master
+              only: main
