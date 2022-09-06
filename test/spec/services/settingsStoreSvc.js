@@ -117,12 +117,31 @@ describe('Service: settingsStoreSvc', function () {
     settings.es.startUrl = testEsStartUrl;
     settings.es.searchUrl = testEsStartUrl;
     settings.es.fieldSpecStr = testEsFieldSpecStr;
-    settings.whichEngine = 'elasticsearch';
+    settings.whichEngine = 'es';
     settings.es.searchArgsStr = testSearchArgsStr;
     settingsStoreSvc.save();
     expect(locationSvc.lastParams.esUrl).toEqual(testEsStartUrl);
     expect(locationSvc.lastParams.esQuery).toEqual(testSearchArgsStr);
     expect(locationSvc.lastParams.fieldSpec).toEqual(testEsFieldSpecStr);
+
+  });
+
+  var testOsStartUrl = 'http://localhost:9200/tmdb/_search';
+  var testOsFieldSpecStr = '*';
+  var testOsSearchArgsStr = '{"_match": "_all"}';
+
+  it('navigates on opensearch updates', function() {
+    setupSvc();
+    var settings = settingsStoreSvc.settings;
+    settings.os.startUrl = testOsStartUrl;
+    settings.os.searchUrl = testOsStartUrl;
+    settings.os.fieldSpecStr = testOsFieldSpecStr;
+    settings.whichEngine = 'os';
+    settings.os.searchArgsStr = testOsSearchArgsStr;
+    settingsStoreSvc.save();
+    expect(locationSvc.lastParams.osUrl).toEqual(testOsStartUrl);
+    expect(locationSvc.lastParams.osQuery).toEqual(testOsSearchArgsStr);
+    expect(locationSvc.lastParams.fieldSpec).toEqual(testOsFieldSpecStr);
 
   });
 });
