@@ -22,7 +22,7 @@ angular.module('splain-app')
     ) {
       var createSearcher = function(fieldSpec, settings) {
         var args;
-        if (settings.whichEngine === 'es') {
+        if (settings.whichEngine === 'es' || settings.whichEngine === 'os') {
           try {
             args = angular.fromJson(settings.searchArgsStr());
           } catch (SyntaxError) {
@@ -60,6 +60,9 @@ angular.module('splain-app')
             if ( searcher.type === 'solr' ) {
               normalizedDocs = solrExplainExtractorSvc.docsWithExplainOther(searcher.docs, fieldSpec, searcher.othersExplained);
             } else if ( searcher.type === 'es' ) {
+              normalizedDocs = esExplainExtractorSvc.docsWithExplainOther(searcher.docs, fieldSpec);
+            } else if (searcher.type === 'os') {
+              // use ES for now
               normalizedDocs = esExplainExtractorSvc.docsWithExplainOther(searcher.docs, fieldSpec);
             }
 

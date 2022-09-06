@@ -36,7 +36,7 @@ angular.module('splain-app')
               return $scope.doc;
             },
             canExplainOther: function() {
-              var allowedEngines = ['es', 'solr'];
+              var allowedEngines = ['es', 'os', 'solr'];
               return allowedEngines.includes(settingsStoreSvc.settings.whichEngine);
             }
           }

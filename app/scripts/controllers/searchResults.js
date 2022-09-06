@@ -23,7 +23,7 @@ angular.module('splain-app')
       var promise = Promise.create($scope.search.search);
       $scope.currSearch.search()
       .then(function() {
-        $scope.currSearch.engine = settingsStoreSvc.settings.whichEngine
+        $scope.currSearch.engine = settingsStoreSvc.settings.whichEngine;
         promise.complete();
       });
       return promise;

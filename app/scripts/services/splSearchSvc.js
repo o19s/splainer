@@ -15,7 +15,8 @@ angular.module('splain-app')
 
       thisSvc.engines = {
         SOLR:           'solr',
-        ELASTICSEARCH:  'es'
+        ELASTICSEARCH:  'es',
+        OPENSEARCH:     'os'
       };
 
       this.createSearch = function(searchSettings, overridingExplains) {

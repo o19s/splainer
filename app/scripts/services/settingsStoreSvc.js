@@ -7,6 +7,7 @@ angular.module('splain-app')
     // these need to be angular values
     this.ENGINES.SOLR = 'solr';
     this.ENGINES.ELASTICSEARCH = 'es';
+    this.ENGINES.OPENSEARCH = 'os';
 
     var defaultEsArgs = '!{\n' +
                         '  "query": {\n' +
@@ -16,8 +17,10 @@ angular.module('splain-app')
 
     // Next is Local Storage
     var initSearchArgs = function() {
-      var searchSettings = {solr:  {searchUrl: '', fieldSpecStr: '', searchArgsStr: '', whichEngine: 'solr'},
+      var searchSettings = {solr: {searchUrl: '', fieldSpecStr: '', searchArgsStr: '', whichEngine: 'solr'},
                             es: {searchUrl: '', fieldSpecStr: '', searchArgsStr: defaultEsArgs, whichEngine: 'es'},
+                            os: {searchUrl: '', fieldSpecStr: '', searchArgsStr: defaultEsArgs, whichEngine: 'os'},
+
                             whichEngine: 'solr', // which engine was the last used
 
                             searchUrl: function() {
@@ -61,17 +64,26 @@ angular.module('splain-app')
         localStorageTryGet('startUrl', 'solr');
         localStorageTryGet('fieldSpecStr', 'solr');
         localStorageTryGet('searchArgsStr', 'solr');
+
         localStorageTryGet('searchUrl', 'es');
         localStorageTryGet('startUrl', 'es');
         localStorageTryGet('fieldSpecStr', 'es');
         localStorageTryGet('searchArgsStr', 'es', defaultEsArgs);
+
+        localStorageTryGet('searchUrl', 'os');
+        localStorageTryGet('startUrl', 'os');
+        localStorageTryGet('fieldSpecStr', 'os');
+        localStorageTryGet('searchArgsStr', 'os', defaultEsArgs);
+
         localStorageTryGet('whichEngine');
+
         if (!searchSettings.whichEngine) {
           searchSettings.whichEngine = 'solr';
         }
       }
       searchSettings.solr.searchArgsStr = searchSettings.solr.searchArgsStr.slice(1);
       searchSettings.es.searchArgsStr = searchSettings.es.searchArgsStr.slice(1);
+      searchSettings.os.searchArgsStr = searchSettings.os.searchArgsStr.slice(1);
       return searchSettings;
     };
 
@@ -81,19 +93,29 @@ angular.module('splain-app')
         localStorageService.set('solr_searchUrl', searchSettings.solr.searchUrl);
         localStorageService.set('solr_fieldSpecStr', searchSettings.solr.fieldSpecStr);
         localStorageService.set('solr_searchArgsStr', '!' + searchSettings.solr.searchArgsStr);
+
         localStorageService.set('es_startUrl', searchSettings.es.startUrl);
         localStorageService.set('es_searchUrl', searchSettings.es.searchUrl);
         localStorageService.set('es_fieldSpecStr', searchSettings.es.fieldSpecStr);
         localStorageService.set('es_searchArgsStr', '!' + searchSettings.es.searchArgsStr);
+
+        localStorageService.set('os_startUrl', searchSettings.os.startUrl);
+        localStorageService.set('os_searchUrl', searchSettings.os.searchUrl);
+        localStorageService.set('os_fieldSpecStr', searchSettings.os.fieldSpecStr);
+        localStorageService.set('os_searchArgsStr', '!' + searchSettings.os.searchArgsStr);
+
         localStorageService.set('whichEngine', searchSettings.whichEngine);
       }
       if (searchSettings.whichEngine === 'solr') {
         $location.search({'solr':  searchSettings.solr.startUrl, 'fieldSpec': searchSettings.solr.fieldSpecStr});
-      } else {
+      } else if (searchSettings.whichEngine === 'es') {
         $location.search({'esUrl':  searchSettings.es.searchUrl,
                           'esQuery': searchSettings.es.searchArgsStr,
                           'fieldSpec': searchSettings.es.fieldSpecStr});
-
+      } else if (searchSettings.whichEngine === 'os') {
+        $location.search({'osUrl':  searchSettings.os.searchUrl,
+                          'osQuery': searchSettings.os.searchArgsStr,
+                          'fieldSpec': searchSettings.os.fieldSpecStr});
       }
     };
 

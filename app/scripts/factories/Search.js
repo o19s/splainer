@@ -45,6 +45,13 @@ angular.module('splain-app')
               parsedArgs = '';
               console.error(SyntaxError);
             }
+          } else if (searchSettings.whichEngine === engines.OPENSEARCH) {
+            try {
+              parsedArgs = angular.fromJson(searchSettings.os.searchArgsStr);
+            } catch (SyntaxError) {
+              parsedArgs = '';
+              console.error(SyntaxError);
+            }
           } else {
             parsedArgs = solrUrlSvc.parseSolrArgs(searchSettings.solr.searchArgsStr);
           }
