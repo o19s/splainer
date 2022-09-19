@@ -49,7 +49,7 @@ angular.module('splain-app')
           settings.fieldSpecStr = parsedUrl.stored_fields; // jshint ignore:line
         }
         else {
-          settings.fieldSpecStr = '*';
+          settings.fieldSpecStr = 'title, *';
         }
 
         if (!angular.isDefined(parsedUrl.stored_fields)) { // jshint ignore:line
