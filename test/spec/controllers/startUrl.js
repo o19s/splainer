@@ -24,9 +24,7 @@ describe('startUrlCtrl', function() {
         scope = $rootScope.$new();
 
         var search = function() {
-          var deferred = $q.defer();
-          deferred.resolve();
-          return deferred.promise;
+          return $q.resolve();
         };
 
         scope.search = {'search': search};
