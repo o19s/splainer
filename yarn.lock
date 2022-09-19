@@ -92,10 +92,10 @@ angular-ui-bootstrap@~2.5.0:
   version "2.5.6"
   resolved "https://registry.yarnpkg.com/angular-ui-bootstrap/-/angular-ui-bootstrap-2.5.6.tgz#23937322ec641a6fbee16498cc32452aa199e7c5"
 
-angular@^1.7.9:
-  version "1.8.2"
-  resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.2.tgz#5983bbb5a9fa63e213cb7749199e0d352de3a2f1"
-  integrity sha512-IauMOej2xEe7/7Ennahkbb5qd/HFADiNuLSESz9Q27inmi32zB0lnAsFeLEWcox3Gd1F6YhNd1CP7/9IukJ0Gw==
+angular@1.8.3:
+  version "1.8.3"
+  resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.3.tgz#851ad75d5163c105a7e329555ef70c90aa706894"
+  integrity sha512-5qjkWIQQVsHj4Sb5TcEs4WZWpFeVFHXwxEBHUhrny41D8UrBAd6T/6nPPAsLngJCReIOqi95W3mxdveveutpZw==
 
 angular@~1.7.7:
   version "1.7.8"
@@ -4394,12 +4394,12 @@ spdx-license-ids@^3.0.0:
   resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-3.0.5.tgz#3694b5804567a458d3c8045842a6358632f62654"
   integrity sha512-J+FWzZoynJEXGphVIS+XEh3kFSjZX/1i9gFBaWQcB+/tmpe2qUsSBABpcxqxnAxFdiUFEgAX1bjYGQvIZmoz9Q==
 
-splainer-search@2.10.0:
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/splainer-search/-/splainer-search-2.10.0.tgz#f0eea8378a7f2f48ec678759cd1e0bce6931754c"
-  integrity sha512-iIAmRcqAipdA7oDgPGWlNSXyTbeUFNpe3vPxGIOjTdGp/n42SCVtcaY68yvIXSW5Sa6E8wTZSVYodUgNLOXaAA==
+splainer-search@2.19.0:
+  version "2.19.0"
+  resolved "https://registry.yarnpkg.com/splainer-search/-/splainer-search-2.19.0.tgz#81b006332decbf78ad5a7306db1a621fca8cf0ad"
+  integrity sha512-r7Z8ws7BaHJKM66cKESL581WRuHdLIZ5q4pTT319G1MVOdtqZ+TAPVJjxRSMuVB2DNMbVTpS4Y7rsXZyiWo5Yw==
   dependencies:
-    angular "^1.7.9"
+    angular "1.8.3"
     urijs "^1.19.7"
 
 split-string@^3.0.1, split-string@^3.0.2:
