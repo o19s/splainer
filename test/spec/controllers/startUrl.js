@@ -18,15 +18,13 @@ describe('startUrlCtrl', function() {
       $provide.value('$location', locationSvc);
       $provide.value('localStorageService', localStorageSvc);
     });
-    inject(function($rootScope, $controller, $httpBackend) {
+    inject(function($rootScope, $controller, $httpBackend, $q) {
       httpBackend = $httpBackend;
       createController = function() {
         scope = $rootScope.$new();
 
         var search = function() {
-          var promise = Promise.create(this.search);
-          promise.complete();
-          return promise;
+          return $q.resolve();
         };
 
         scope.search = {'search': search};
@@ -43,6 +41,7 @@ describe('startUrlCtrl', function() {
   it('bootstraps if solr arg in URL', function() {
     locationSvc.lastParams = {solr: 'http://localhost:1234/solr/stuff?q=foo&fl=id banana'};
     createController();
+    scope.$apply();
     expect(localStorageSvc.get('whichEngine')).toEqual('solr');
     expect(scope.start.solrSettings.startUrl).toBe(locationSvc.lastParams.solr);
     expect(localStorageSvc.get('solr_startUrl')).toEqual(scope.start.solrSettings.startUrl);
@@ -57,6 +56,7 @@ describe('startUrlCtrl', function() {
   it('bootstraps if es args in URL', function() {
     locationSvc.lastParams = {esUrl: 'http://localhost:9200/tmdb/_search', esQuery: '{"match": "foo"}', fieldSpec: 'id banana'};
     createController();
+    scope.$apply();
     expect(localStorageSvc.get('whichEngine')).toEqual('es');
     expect(scope.start.esSettings.startUrl).toBe('http://localhost:9200/tmdb/_search?stored_fields=id banana');
     expect(localStorageSvc.get('es_startUrl')).toEqual('http://localhost:9200/tmdb/_search?stored_fields=id banana');
@@ -72,6 +72,7 @@ describe('startUrlCtrl', function() {
     var overridingFieldSpec = 'id:banana f:id';
     locationSvc.lastParams = {solr: 'http://localhost:1234/solr/stuff?q=foo&fl=id banana', fieldSpec: overridingFieldSpec};
     createController();
+    scope.$apply();
     expect(scope.start.solrSettings.startUrl).toBe(locationSvc.lastParams.solr);
     expect(localStorageSvc.get('solr_startUrl')).toEqual(scope.start.solrSettings.startUrl);
     expect(scope.start.solrSettings.searchArgsStr).toContain('q=foo');
@@ -96,6 +97,7 @@ describe('startUrlCtrl', function() {
     expect(scope.start.solrSettings.startUrl).toBeFalsy();
     scope.start.solrSettings.startUrl = 'http://localhost:1234/solr/stuff?q=foto&fl=id apple';
     scope.start.submitSolr();
+    scope.$apply();
     expect(scope.start.solrSettings.startUrl).toBe(locationSvc.lastParams.solr);
     expect(localStorageSvc.get('solr_startUrl')).toEqual(scope.start.solrSettings.startUrl);
     expect(scope.start.solrSettings.searchArgsStr).toContain('q=foto');

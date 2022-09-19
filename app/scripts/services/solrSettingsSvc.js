@@ -37,7 +37,7 @@ angular.module('splain-app')
         var fl = parsedUrl.solrArgs.fl;
         userSettings.fieldSpecStr = fl[0];
       } else {
-        userSettings.fieldSpecStr = '*';
+        userSettings.fieldSpecStr = 'title, *';
       }
       userSettings.searchUrl = parsedUrl.solrEndpoint();
     };

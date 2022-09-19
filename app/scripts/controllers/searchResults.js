@@ -8,7 +8,7 @@
  * Controller of the frontendApp
  */
 angular.module('splain-app')
-  .controller('SearchResultsCtrl', function ($scope, splSearchSvc, settingsStoreSvc) {
+  .controller('SearchResultsCtrl', function ($scope, $q, splSearchSvc, settingsStoreSvc) {
 
     $scope.search = {};
 
@@ -20,13 +20,13 @@ angular.module('splain-app')
     $scope.search.search = function() {
       $scope.showParsedQueryDetails = false;
       $scope.showQueryDetails = false;
-      var promise = Promise.create($scope.search.search);
+      var deferred = $q.defer();
       $scope.currSearch.search()
       .then(function() {
-        $scope.currSearch.engine = settingsStoreSvc.settings.whichEngine
-        promise.complete();
+        $scope.currSearch.engine = settingsStoreSvc.settings.whichEngine;
+        deferred.resolve();
       });
-      return promise;
+      return deferred.promise;
     };
 
     $scope.search.reset = function() {

@@ -52,6 +52,24 @@ $(function() {
         editor.resize();
       }
     }, 200);
+
+    $('.os-query-params').height(height - 400);
+
+    // delay, because... computers!
+    // if on another page (/cases, or /teams) and switch to case page,
+    // then for some reason `$('#queryParams').height()` returns 100
+    // when toggling the pane ON, and the right size when OFF!!!
+    // a 100ms delay creates some weird behavior in the ace editor.
+    // 200ms works just fine. GO FIGURE!
+    setTimeout(function () {
+      $('.os-query-params').height(height - 400);
+
+      // must repaint the editor, or else.... BOOM!
+      if ( $('#os-query-params-editor').length > 0 ) {
+        var editor = ace.edit('os-query-params-editor');
+        editor.resize();
+      }
+    }, 200);
   }
 
   //set initially

@@ -7,17 +7,20 @@ angular.module('splain-app')
     'settingsStoreSvc',
     'solrSettingsSvc',
     'esSettingsSvc',
+    'osSettingsSvc',
     function (
       $scope,
       $location,
       settingsStoreSvc,
       solrSettingsSvc,
-      esSettingsSvc
+      esSettingsSvc,
+      osSettingsSvc
     ) {
       // initialize the start URL
       $scope.start = {};
       $scope.start.solrSettings = settingsStoreSvc.settings.solr;
       $scope.start.esSettings = settingsStoreSvc.settings.es;
+      $scope.start.osSettings = settingsStoreSvc.settings.os;
       $scope.start.whichEngine = settingsStoreSvc.settings.whichEngine;
 
 
@@ -51,6 +54,19 @@ angular.module('splain-app')
         search();
       };
 
+      var setOsSettings = function(settings) {
+        $scope.start.osSettings.startUrl      = settings.searchUrl;
+        $scope.start.osSettings.searchArgsStr = settings.searchArgsStr;
+        $scope.start.osSettings.fieldSpecStr = settings.fieldSpecStr;
+        osSettingsSvc.fromStartUrl($scope.start.osSettings);
+      };
+
+      var runOsSearch = function(settings) {
+        settingsStoreSvc.settings.whichEngine = 'os';
+        setOsSettings(settings);
+        search();
+      };
+
       // If we have something set in the URL, use that
       var overridingFieldSpec;
       if ($location.search().hasOwnProperty('fieldSpec')) {
@@ -60,13 +76,17 @@ angular.module('splain-app')
         $scope.start.solrSettings.startUrl = $location.search().solr;
         runSolrSearch(overridingFieldSpec);
       } else if ($location.search().hasOwnProperty('esUrl')) {
-        var settings = {
+        runEsSearch({
           searchUrl:      $location.search().esUrl,
           searchArgsStr:  $location.search().esQuery,
           fieldSpecStr: overridingFieldSpec
-        };
-
-        runEsSearch(settings);
+        });
+      } else if ($location.search().hasOwnProperty('osUrl')) {
+        runOsSearch({
+          searchUrl:      $location.search().osUrl,
+          searchArgsStr:  $location.search().osQuery,
+          fieldSpecStr: overridingFieldSpec
+        });
       }
 
       $scope.start.submitSolr = function() {
@@ -85,5 +105,16 @@ angular.module('splain-app')
 
         runEsSearch(settings);
       };
+
+      $scope.start.submitOs = function() {
+        var settings = {
+          searchUrl:      $scope.start.osSettings.startUrl,
+          searchArgsStr:  $scope.start.osSettings.searchArgsStr,
+        };
+
+        runOsSearch(settings);
+      };
+
+
     }
   ]);

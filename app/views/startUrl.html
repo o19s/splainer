@@ -6,9 +6,11 @@
         <ul class="nav nav-tabs">
           <li class="active"><a href="#solr_"data-toggle="tab">Solr</a></li>
           <li><a href="#es_" data-toggle="tab">Elasticsearch</a></li>
+          <li><a href="#os_" data-toggle="tab">OpenSearch</a></li>
         </ul>
 
         <div class="tab-content">
+
           <div class="tab-pane active" id="solr_">
             <div class="input-group">
               <input type="text" class="form-control" ng-model="start.solrSettings.startUrl" ng-init="start.solrSettings.startUrl='http://quepid-solr.dev.o19s.com:8985/solr/tmdb/select?q=*:*'">
@@ -36,6 +38,26 @@
             </div>
             <a href="" class="label label-default" ng-click="start.autoIndent()">Indent JSON</a>
           </div>
+
+          <div class="tab-pane" id="os_">
+            <div class="input-group">
+              <input type="text" class="form-control" ng-model="start.osSettings.startUrl" ng-init="start.osSettings.startUrl='https://reader:reader@quepid-opensearch.dev.o19s.com:9000/tmdb/_search'">
+              <span class="input-group-btn">
+                <button class="btn btn-primary" type="submit" dispatch-on-click="openEast" ng-click="start.submitOs()">Splain This!</button>
+              </span>
+            </div>
+            <div style="height: 300px; margin-top: 20px;" ui-ace="{
+                require: ['ace/ext/language_tools'],
+                useWrapMode: false,
+                tabSize: 2,
+                useSoftTabs: true,
+                mode: 'json'
+              }"
+                 ng-model="start.osSettings.searchArgsStr">
+            </div>
+            <a href="" class="label label-default" ng-click="start.autoIndent()">Indent JSON</a>
+          </div>
+
         </div>
       </div>
     </div>
@@ -46,7 +68,7 @@
     <div class="row">
       <div class="col-md-4">
         <h4>Understand</h4>
-        <p class="text-muted">Copy your Solr or Elasticseaarch URL out of your browser window and paste it here. We'll highlight the matches driving your results and explain to you "why" in human-understandable terms.</p>
+        <p class="text-muted">Copy your Solr, Elasticsearch, or OpenSearch URL from your browser window and paste it here. We'll highlight the matches driving your results and explain to you "why" in human-understandable terms.</p>
       </div>
       <div class="col-md-4">
         <h4>Act</h4>

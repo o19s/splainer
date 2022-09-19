@@ -71,6 +71,10 @@
                   <input type="radio" value="es" ng-model="workingWhichEngine">
                   Elasticsearch
                 </label>
+                <label>
+                  <input type="radio" value="os" ng-model="workingWhichEngine">
+                  OpenSearch
+                </label>
             </div>
 
             <div class="dev-header" ng-click="devSettingsSolr.toggle = !devSettingsSolr.toggle">
@@ -108,8 +112,22 @@
                   }" id="es-query-params-editor"
                   ng-model="workingSettings.searchArgsStr">
                 </div>
-              <a href="" class="pull-right label" ng-click="autoIndent()">Indent JSON</a>
+                <a href="" class="pull-right label" ng-click="autoIndent()">Indent JSON</a>
               </div>
+
+              <div ng-show="workingWhichEngine === 'os'">
+                <div class="os-query-params" ui-ace="{
+                    require: ['ace/ext/language_tools'],
+                    useWrapMode: true,
+                    useSoftTabs: true,
+                    onLoad: aceSettings,
+                    mode: 'json'
+                  }" id="os-query-params-editor"
+                     ng-model="workingSettings.searchArgsStr">
+                </div>
+                <a href="" class="pull-right label" ng-click="autoIndent()">Indent JSON</a>
+              </div>
+
             </div>
             <div class="dev-section">
               <button type="submit" class="btn btn-default">Rerun Query</button>
@@ -168,8 +186,10 @@
     <script src="scripts/directives/stackedChart.js"></script>
     <script src="scripts/services/solrSettingsSvc.js"></script>
     <script src="scripts/services/esSettingsSvc.js"></script>
+    <script src="scripts/services/osSettingsSvc.js"></script>
     <script src="scripts/services/splSearchSvc.js"></script>
     <script src="scripts/services/settingsStoreSvc.js"></script>
+    <script src="scripts/services/promise.js"></script>
     <script src="scripts/controllers/docRow.js"></script>
     <script src="scripts/controllers/detailedExplain.js"></script>
     <script src="scripts/controllers/detailedDoc.js"></script>

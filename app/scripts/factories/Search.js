@@ -2,11 +2,13 @@
 
 angular.module('splain-app')
   .factory('Search', [
+    '$q',
     'solrUrlSvc',
     'fieldSpecSvc',
     'searchSvc',
     'normalDocsSvc',
     function (
+      $q,
       solrUrlSvc,
       fieldSpecSvc,
       searchSvc,
@@ -41,6 +43,13 @@ angular.module('splain-app')
           if (searchSettings.whichEngine === engines.ELASTICSEARCH) {
             try {
               parsedArgs = angular.fromJson(searchSettings.es.searchArgsStr);
+            } catch (SyntaxError) {
+              parsedArgs = '';
+              console.error(SyntaxError);
+            }
+          } else if (searchSettings.whichEngine === engines.OPENSEARCH) {
+            try {
+              parsedArgs = angular.fromJson(searchSettings.os.searchArgsStr);
             } catch (SyntaxError) {
               parsedArgs = '';
               console.error(SyntaxError);
@@ -107,7 +116,7 @@ angular.module('splain-app')
         }
 
         function search() {
-          var promise     = Promise.create(self.search);
+          var deferred    = $q.defer();
           var fieldSpec   = fieldSpecSvc.createFieldSpec(searchSettings.fieldSpecStr());
           var parsedArgs  = null;
 
@@ -139,20 +148,19 @@ angular.module('splain-app')
               groupedResultToNormalDocs(fieldSpec, self.grouped);
 
               self.state = states.DID_SEARCH;
-              promise.complete();
+              deferred.resolve();
             }, function searchFailure(msg) {
               self.state    = states.IN_ERROR;
               self.linkUrl  = self.searcher.linkUrl;
               self.errorMsg = msg.searchError;
-              promise.complete();
-              return;
+              deferred.resolve(); // TODO: Should be reject here but something else is expecting happy days upstream
             });
 
-          return promise;
+          return deferred.promise;
         }
 
         function page() {
-          var promise = Promise.create(self.page);
+          var deferred = $q.defer();
 
           if (self.searcher === null) {
             return;
@@ -190,10 +198,12 @@ angular.module('splain-app')
                     groupByToAppend.push.apply(groupByToAppend, groupedBys);
                   }
                 });
+
+                deferred.resolve();
               });
           }
 
-          return promise;
+          return deferred.promise;
         }
       };
 

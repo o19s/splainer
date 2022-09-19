@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('splain-app')
-  .service('esSettingsSvc', [
-    function esSettingsSvc() {
+  .service('osSettingsSvc', [
+    function osSettingsSvc() {
       var self = this;
 
       // Function
@@ -37,7 +37,7 @@ angular.module('splain-app')
       };
 
       function fromStartUrl(settings) {
-        settings.whichEngine = 'es';
+        settings.whichEngine = 'os';
         var parsedUrl = parseUrl(settings.startUrl);
 
         if (settings.searchArgsStr.trim().length === 0) {

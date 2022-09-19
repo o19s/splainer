@@ -6,7 +6,8 @@ angular.module('splain-app')
     'settingsStoreSvc',
     'solrSettingsSvc',
     'esSettingsSvc',
-    function ($scope, settingsStoreSvc, solrSettingsSvc, esSettingsSvc) {
+    'osSettingsSvc',
+    function ($scope, settingsStoreSvc, solrSettingsSvc, esSettingsSvc, osSettingsSvc) {
 
       $scope.settings = settingsStoreSvc.settings;
       $scope.workingSettings = settingsStoreSvc.settings[settingsStoreSvc.settings.whichEngine];
@@ -21,7 +22,7 @@ angular.module('splain-app')
       });
 
       $scope.autoIndent = function() {
-        if ($scope.workingWhichEngine === 'es') {
+        if ($scope.workingWhichEngine === 'es' || $scope.workingWhichEngine === 'os')  {
           $scope.workingSettings.searchArgsStr = JSON.stringify(JSON.parse($scope.workingSettings.searchArgsStr), null, 2);
         }
       };
@@ -37,6 +38,9 @@ angular.module('splain-app')
         } else if ( $scope.workingWhichEngine === 'es' ) {
           settingsStoreSvc.settings.whichEngine = 'es';
           esSettingsSvc.fromTweakedSettings($scope.workingSettings);
+        } else if ( $scope.workingWhichEngine === 'os' ) {
+          settingsStoreSvc.settings.whichEngine = 'os';
+          osSettingsSvc.fromTweakedSettings($scope.workingSettings);
         }
 
         $scope.search.search()

@@ -38,7 +38,7 @@ describe('Service: solrSettingsSvc', function () {
     var startUrl = 'http://localhost:8983/solr/example?q=*:*';
     solrSettingsSvc.fromStartUrl(startUrl, settings);
     expect(settings.searchUrl).toEqual('http://localhost:8983/solr/example');
-    expect(settings.fieldSpecStr).toEqual('*');
+    expect(settings.fieldSpecStr).toEqual('title, *');
     expect(settings.searchArgsStr).toEqual('q=*:*');
     expect(settings.whichEngine).toEqual('solr');
     expect(settings.startUrl).toEqual('http://localhost:8983/solr/example?q=*:*');
@@ -49,7 +49,7 @@ describe('Service: solrSettingsSvc', function () {
     var startUrl = 'http://localhost:8983/solr/example';
     solrSettingsSvc.fromStartUrl(startUrl, settings);
     expect(settings.searchUrl).toEqual('http://localhost:8983/solr/example');
-    expect(settings.fieldSpecStr).toEqual('*');
+    expect(settings.fieldSpecStr).toEqual('title, *');
     expect(settings.searchArgsStr).toEqual('q=*:*');
     expect(settings.whichEngine).toEqual('solr');
     expect(settings.startUrl).toEqual('http://localhost:8983/solr/example');
