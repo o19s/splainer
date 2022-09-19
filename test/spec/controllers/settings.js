@@ -17,14 +17,12 @@ describe('SettingsCtrl', function() {
     });
 
 
-    inject(function($rootScope, $controller) {
+    inject(function($rootScope, $controller, $q) {
       createController = function() {
         scope = $rootScope.$new();
         scope.search = {};
         scope.search.search = function() {
-          var p = Promise.create(scope.search.search);
-          p.complete();
-          return p;
+          return $q.resolve();
         };
         scope.search.searcher = null;
         scope.search.docs = [];
@@ -109,6 +107,7 @@ describe('SettingsCtrl', function() {
         scope.workingSettings.fieldSpecStr = testFieldSpec;
         spyOn(scope.search, 'search').and.callThrough();
         scope.publishSearcher();
+        scope.$apply();
       });
 
       it('searches on submit', function() {

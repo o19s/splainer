@@ -38,7 +38,7 @@ describe('Service: esSettingsSvc', function () {
     esSettingsSvc.fromStartUrl(settings);
 
     expect(settings.searchUrl).toEqual('http://localhost:9200/statedecoded/_search');
-    expect(settings.fieldSpecStr).toEqual('*');
+    expect(settings.fieldSpecStr).toEqual('title, *');
     expect(settings.searchArgsStr).toEqual('{ "match_all": {} }');
     expect(settings.whichEngine).toEqual('es');
   });
@@ -50,7 +50,7 @@ describe('Service: esSettingsSvc', function () {
     esSettingsSvc.fromStartUrl(settings);
 
     expect(settings.searchUrl).toEqual('http://localhost:9200/statedecoded/_search');
-    expect(settings.fieldSpecStr).toEqual('*');
+    expect(settings.fieldSpecStr).toEqual('title, *');
     expect(settings.searchArgsStr).toEqual('{ "query": { "match": { "_all": "deer" } } }');
     expect(settings.whichEngine).toEqual('es');
   });
