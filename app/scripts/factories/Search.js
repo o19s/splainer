@@ -40,6 +40,8 @@ angular.module('splain-app')
         self.reset();
 
         var createSearcher = function(fieldSpec, parsedArgs, searchSettings) {
+          var activeSettings = searchSettings[searchSettings.whichEngine];
+
           if (searchSettings.whichEngine === engines.ELASTICSEARCH) {
             try {
               parsedArgs = angular.fromJson(searchSettings.es.searchArgsStr);
@@ -57,12 +59,15 @@ angular.module('splain-app')
           } else {
             parsedArgs = solrUrlSvc.parseSolrArgs(searchSettings.solr.searchArgsStr);
           }
+
           return searchSvc.createSearcher(
             fieldSpec,
             searchSettings.searchUrl(),
             parsedArgs,
             '',
-            {},
+            {
+              customHeaders: activeSettings.customHeaders
+            },
             searchSettings.whichEngine
           );
         };
