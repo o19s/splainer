@@ -17,25 +17,42 @@ angular.module('splain-app')
 
     // Next is Local Storage
     var initSearchArgs = function() {
-      var searchSettings = {solr: {customHeaders: '', searchUrl: '', fieldSpecStr: '', searchArgsStr: '', whichEngine: 'solr'},
-                            es: {customHeaders: '', searchUrl: '', fieldSpecStr: '', searchArgsStr: defaultEsArgs, whichEngine: 'es'},
-                            os: {customHeaders: '', searchUrl: '', fieldSpecStr: '', searchArgsStr: defaultEsArgs, whichEngine: 'os'},
-
-                            whichEngine: 'solr', // which engine was the last used
-
-                            searchUrl: function() {
-                              return this[this.whichEngine].searchUrl;
-                            },
-
-                            fieldSpecStr: function() {
-                              return this[this.whichEngine].fieldSpecStr;
-                            },
-
-                            searchArgsStr: function() {
-                              return this[this.whichEngine].searchArgsStr;
-                            },
-
-                            };
+      var searchSettings = {
+        solr: {
+          customHeaders: '',
+          headerType: 'None',
+          searchUrl: '',
+          fieldSpecStr: '',
+          searchArgsStr: '',
+          whichEngine: 'solr'
+        },
+        es: {
+          customHeaders: '',
+          headerType: 'Custom',
+          searchUrl: '',
+          fieldSpecStr: '',
+          searchArgsStr: defaultEsArgs,
+          whichEngine: 'es'
+        },
+        os: {
+          customHeaders: '',
+          headerType: 'None',
+          searchUrl: '',
+          fieldSpecStr: '',
+          searchArgsStr: defaultEsArgs,
+          whichEngine: 'os'
+        },
+        whichEngine: 'solr', // which engine was the last used
+        searchUrl: function() {
+          return this[this.whichEngine].searchUrl;
+        },
+        fieldSpecStr: function() {
+          return this[this.whichEngine].fieldSpecStr;
+        },
+        searchArgsStr: function() {
+          return this[this.whichEngine].searchArgsStr;
+        }
+      };
       var localStorageTryGet = function(key, engine, def) {
         var val;
         var prefix = '';
