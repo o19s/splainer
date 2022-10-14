@@ -27,6 +27,14 @@
                 <button class="btn btn-primary" type="submit" dispatch-on-click="openEast" ng-click="start.submitEs()">Splain This!</button>
               </span>
             </div>
+
+            <p>
+              <button type="button" class="btn btn-sm btn-default" ng-click="isHeaderConfigCollapsed = !isHeaderConfigCollapsed">Advanced Settings</button>
+            </p>
+            <div uib-collapse="!isHeaderConfigCollapsed">
+              <custom-headers settings="start.esSettings"></custom-headers>
+            </div>
+
             <div style="height: 300px; margin-top: 20px;" ui-ace="{
                 require: ['ace/ext/language_tools'],
                 useWrapMode: false,
@@ -46,6 +54,15 @@
                 <button class="btn btn-primary" type="submit" dispatch-on-click="openEast" ng-click="start.submitOs()">Splain This!</button>
               </span>
             </div>
+
+            <p>
+              <button type="button" class="btn btn-sm btn-default" ng-click="isHeaderConfigCollapsed = !isHeaderConfigCollapsed">Advanced Settings</button>
+            </p>
+            <div uib-collapse="!isHeaderConfigCollapsed">
+              <custom-headers settings="start.osSettings"></custom-headers>
+            </div>
+
+
             <div style="height: 300px; margin-top: 20px;" ui-ace="{
                 require: ['ace/ext/language_tools'],
                 useWrapMode: false,

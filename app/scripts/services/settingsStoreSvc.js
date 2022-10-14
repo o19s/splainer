@@ -17,25 +17,42 @@ angular.module('splain-app')
 
     // Next is Local Storage
     var initSearchArgs = function() {
-      var searchSettings = {solr: {searchUrl: '', fieldSpecStr: '', searchArgsStr: '', whichEngine: 'solr'},
-                            es: {searchUrl: '', fieldSpecStr: '', searchArgsStr: defaultEsArgs, whichEngine: 'es'},
-                            os: {searchUrl: '', fieldSpecStr: '', searchArgsStr: defaultEsArgs, whichEngine: 'os'},
-
-                            whichEngine: 'solr', // which engine was the last used
-
-                            searchUrl: function() {
-                              return this[this.whichEngine].searchUrl;
-                            },
-
-                            fieldSpecStr: function() {
-                              return this[this.whichEngine].fieldSpecStr;
-                            },
-
-                            searchArgsStr: function() {
-                              return this[this.whichEngine].searchArgsStr;
-                            },
-
-                            };
+      var searchSettings = {
+        solr: {
+          customHeaders: '',
+          headerType: 'None',
+          searchUrl: '',
+          fieldSpecStr: '',
+          searchArgsStr: '',
+          whichEngine: 'solr'
+        },
+        es: {
+          customHeaders: '',
+          headerType: 'Custom',
+          searchUrl: '',
+          fieldSpecStr: '',
+          searchArgsStr: defaultEsArgs,
+          whichEngine: 'es'
+        },
+        os: {
+          customHeaders: '',
+          headerType: 'None',
+          searchUrl: '',
+          fieldSpecStr: '',
+          searchArgsStr: defaultEsArgs,
+          whichEngine: 'os'
+        },
+        whichEngine: 'solr', // which engine was the last used
+        searchUrl: function() {
+          return this[this.whichEngine].searchUrl;
+        },
+        fieldSpecStr: function() {
+          return this[this.whichEngine].fieldSpecStr;
+        },
+        searchArgsStr: function() {
+          return this[this.whichEngine].searchArgsStr;
+        }
+      };
       var localStorageTryGet = function(key, engine, def) {
         var val;
         var prefix = '';
@@ -60,16 +77,19 @@ angular.module('splain-app')
         }
       };
       if (localStorageService.isSupported) {
+        localStorageTryGet('customHeaders', 'solr');
         localStorageTryGet('searchUrl', 'solr');
         localStorageTryGet('startUrl', 'solr');
         localStorageTryGet('fieldSpecStr', 'solr');
         localStorageTryGet('searchArgsStr', 'solr');
 
+        localStorageTryGet('customHeaders', 'es');
         localStorageTryGet('searchUrl', 'es');
         localStorageTryGet('startUrl', 'es');
         localStorageTryGet('fieldSpecStr', 'es');
         localStorageTryGet('searchArgsStr', 'es', defaultEsArgs);
 
+        localStorageTryGet('customHeaders', 'os');
         localStorageTryGet('searchUrl', 'os');
         localStorageTryGet('startUrl', 'os');
         localStorageTryGet('fieldSpecStr', 'os');
@@ -87,18 +107,21 @@ angular.module('splain-app')
       return searchSettings;
     };
 
-    var trySaveSolrArgs= function(searchSettings) {
+    var trySaveArgs= function(searchSettings) {
       if (localStorageService.isSupported) {
+        localStorageService.set('solr_customHeaders', searchSettings.solr.customHeaders);
         localStorageService.set('solr_startUrl', searchSettings.solr.startUrl);
         localStorageService.set('solr_searchUrl', searchSettings.solr.searchUrl);
         localStorageService.set('solr_fieldSpecStr', searchSettings.solr.fieldSpecStr);
         localStorageService.set('solr_searchArgsStr', '!' + searchSettings.solr.searchArgsStr);
 
+        localStorageService.set('es_customHeaders', searchSettings.es.customHeaders);
         localStorageService.set('es_startUrl', searchSettings.es.startUrl);
         localStorageService.set('es_searchUrl', searchSettings.es.searchUrl);
         localStorageService.set('es_fieldSpecStr', searchSettings.es.fieldSpecStr);
         localStorageService.set('es_searchArgsStr', '!' + searchSettings.es.searchArgsStr);
 
+        localStorageService.set('os_customHeaders', searchSettings.os.customHeaders);
         localStorageService.set('os_startUrl', searchSettings.os.startUrl);
         localStorageService.set('os_searchUrl', searchSettings.os.searchUrl);
         localStorageService.set('os_fieldSpecStr', searchSettings.os.fieldSpecStr);
@@ -126,7 +149,7 @@ angular.module('splain-app')
      * save changes to settings
      * */
     this.save = function() {
-      trySaveSolrArgs(this.settings);
+      trySaveArgs(this.settings);
     };
 
   });

@@ -217,3 +217,7 @@
     max-height: 400px;
     overflow-y: auto;
 }
+
+.black-label label {
+  color: black;
+}

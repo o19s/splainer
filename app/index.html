@@ -129,6 +129,16 @@
               </div>
 
             </div>
+
+            <div ng-show="workingWhichEngine !== 'solr'">
+              <div class="dev-header" ng-click="devSettingsHeaders.toggle = !devSettingsHeaders.toggle">
+                Custom Headers <span ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[devSettingsHeaders.toggle]" class="glyphicon glyphicon-plus-sign"></span>
+              </div>
+              <div class="dev-section black-label" ng-show="devSettingsHeaders.toggle">
+                <custom-headers settings="workingSettings"></custom-headers>
+              </div>
+            </div>
+
             <div class="dev-section">
               <button type="submit" class="btn btn-default">Rerun Query</button>
             </div>
@@ -178,8 +188,10 @@
     <script src="scripts/panes.js"></script>
     <script src="scripts/app.js"></script>
     <script src="scripts/factories/Search.js"></script>
+    <script src="scripts/controllers/customHeaders.js"></script>
     <script src="scripts/controllers/helpBox.js"></script>
     <script src="scripts/controllers/docSelector.js"></script>
+    <script src="scripts/directives/customHeaders.js"></script>
     <script src="scripts/directives/dispatchOnClick.js"></script>
     <script src="scripts/directives/docRow.js"></script>
     <script src="scripts/directives/docSelector.js"></script>
