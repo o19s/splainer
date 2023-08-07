@@ -6,9 +6,24 @@ You can access it via http://localhost:8983/v2/splainer and avoids common CORS a
 
 ## Building and installation
 
-This plugin assumes that you have already built the Splainer webapp and will package up the contents in the `../dist` directory.
+This plugin requires a manual custom step added after you run the main `grunt dist` process in the Splainer application that builds a complete webapp in the `../dist` directory.  _This should be automated someday ;-( _.
 
-See [main Splainer project](http://github.com/o19s/splainer) for more project information.
+1. Copy the following Javascript and paste it at the bottom of `/dist/scripts/app.js`:
+
+```
+/* Override default config values for talking to Solr
+ * JSONP->GET
+ * */
+angular.module('o19s.splainer-search')
+  .value('defaultSolrConfig', {
+    sanitize:     true,
+    highlight:    true,
+    debug:        true,
+    numberOfRows: 10,
+    escapeQuery:  true,
+    apiMethod:    'GET'
+  });
+```
 
 1. Export the private key:
 
@@ -16,13 +31,13 @@ See [main Splainer project](http://github.com/o19s/splainer) for more project in
 export SOLR_PACKAGE_SIGNING_PRIVATE_KEY_PATH=~/ssh/solr-private-key.pem
 ```
 
-2. Build the package:
+1. Build the package:
 
 ```
 mvn package
 ```
 
-3. Now for testing, host the solr-splainer-package/repo locally:
+1. Now for testing, host the solr-splainer-package/repo locally:
 
 First copy the generated jar into the repo directory:
 
@@ -34,16 +49,16 @@ cp target/solr-splainer-package* repo/
 python -m http.server
 ```
 
-4. In a Run Solr and install the package:
+1. In a Run Solr and install the package:
 
     tar -xf solr-9.3.0.tgz; cd solr-9.3.0/
-    bin/solr start -c -Denable.packages=true
+    bin/solr start -c -e films -Denable.packages=true
     bin/solr package add-repo splainer-dev "http://localhost:8000/repo/" 
     bin/solr package list-available
     bin/solr package install solr-splainer
     bin/solr package deploy solr-splainer -y -cluster
 
-5. Navigate to http://localhost:8983/v2/splainer on the browser.
+1. Navigate to http://localhost:8983/v2/splainer on the browser.
 
 ## Changes to make it work in Solr Admin UI
 
