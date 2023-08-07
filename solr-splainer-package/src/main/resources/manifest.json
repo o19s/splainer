@@ -1,0 +1,37 @@
+{
+  "version-constraint": "9 - 10",
+  "plugins": [
+    {
+      "name": "splainer",
+      "type": "cluster",
+      "setup-command": {
+        "path": "/api/cluster/plugin",
+        "method": "POST",
+        "payload": {
+          "add": {
+            "name": "${package-name}:${plugin-name}",
+            "class": "solr-splainer:com.o19s.splainer.SplainerHandler",
+            "version": "${package-version}",
+            "path-prefix": "${SPLAINER-PATH-PREFIX}"
+          }
+        }
+      },
+      "verify-command": {
+        "path": "/api/cluster/plugin",
+        "method": "GET",
+        "condition": "$['plugin'].['${package-name}:${plugin-name}'].['version']",
+        "expected": "${package-version}"
+      },
+      "uninstall-command": {
+        "path": "/api/cluster/plugin",
+        "method": "POST",
+        "payload": {
+          "remove": "${package-name}:${plugin-name}"
+        }
+      }
+    }
+  ],
+  "parameter-defaults": {
+    "SPLAINER-PATH-PREFIX": "splainer"
+  }
+}
