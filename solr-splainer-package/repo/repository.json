@@ -4,12 +4,12 @@
     "description": "Splainer for Solr",
     "versions": [
       {
-        "version": "1.0.0",
+        "version": "2.20.1",
         "date": "2023-08-07",
         "artifacts": [
           {
-            "url": "solr-splainer-package-1.0.0.jar",
-            "sig": "D40rN/r07ME+3HzYE6UAeWZvDH5w1w3zbt6+WDdM29kXwVbgA4Oyro/vDEHlfI9Rs1zpfMFMhaYX9mDw3jfVNQ=="
+            "url": "solr-splainer-package-2.20.1.jar",
+            "sig": "fKkR6CciTnNpMNBhXbtAdZfYxlmNFc2UuE64ljJ4B9f/Hj3Of5U6LrTj7Y8PfrioO6QF8DqXyd773WmZ9ncnWw=="
           }
         ]
       }
