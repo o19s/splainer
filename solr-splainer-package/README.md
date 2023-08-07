@@ -22,12 +22,12 @@ export SOLR_PACKAGE_SIGNING_PRIVATE_KEY_PATH=~/ssh/solr-private-key.pem
 mvn package
 ```
 
-3. Now for testing, host the solr-splainer-plugin/repo locally:
+3. Now for testing, host the solr-splainer-package/repo locally:
 
 First copy the generated jar into the repo directory:
 
 ```
-cp target/solr-splainer-plugin* repo/
+cp target/solr-splainer-package* repo/
 ```
 
 ```

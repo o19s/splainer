@@ -24,20 +24,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.o19s.splainer</groupId>
-  <artifactId>solr-splainer-plugin</artifactId>
+  <artifactId>solr-splainer-package</artifactId>
   
   <version>1.0.0</version>
 
-  <url>https://github.com/o19s/splainer/solr-splainer-plugin</url>
+  <url>https://github.com/o19s/splainer/solr-splainer-package</url>
   
-  <properties>
-    <compiler.version>11</compiler.version>
-
-
-    <!--suppress UnresolvedMavenProperty-->
-    <ui.directory>${maven.multiModuleProjectDirectory}/solr-splainer-ui</ui.directory>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.solr</groupId>

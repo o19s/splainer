@@ -13,4 +13,4 @@ deploy.sh
 
 docker-compose.override.yml
 
-solr-splainer-plugin/target
+solr-splainer-package/target
