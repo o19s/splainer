@@ -3,6 +3,17 @@
 This project lets you install Splainer into your Solr as a plugin.
 You can access it via http://localhost:8983/v2/splainer and avoids common CORS and other network problems that you might encounter using the hosted http://splainer.io site.
 
+## Installing Into Solr
+
+```
+bin/solr start -c -Denable.packages=true
+bin/solr package add-repo splainer "https://raw.githubusercontent.com/o19s/splainer/main/solr-splainer-package/repo/" 
+bin/solr package list-available
+bin/solr package install solr-splainer
+bin/solr package deploy solr-splainer -y -cluster
+```
+
+
 
 ## Building and installation
 
