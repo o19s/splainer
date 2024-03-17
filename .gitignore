@@ -12,5 +12,6 @@ deploy.sh
 *.swp
 
 docker-compose.override.yml
-yarn.lock
-package-lock.json
+
+solr-splainer-package/target
+solr-splainer-package/repo/*.jar

@@ -26,6 +26,10 @@ We have a Docker image published at https://hub.docker.com/r/o19s/splainer that 
 
 `docker run -d -p 9000:9000 o19s/splainer` and then go to http://localhost:9000
 
+### Splainer Package for Solr
+
+We have a Solr Package of Splainer that is compatible with Solr 9+.   Learn more in the [solr-splainer-package](./solr-splainer-package/README.md)
+
 ## Developing Splainer
 
 ### Npm/Yarn Dev Environment
