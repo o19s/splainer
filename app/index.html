@@ -119,6 +119,12 @@
       </div>
     </div>
 
+    <!-- Shared host for island-backed modals (see modalRegistry.js).
+         Auto-created at runtime if missing, but declaring it here keeps
+         the DOM structure stable for tests and avoids a layout shift on
+         first modal open. -->
+    <div id="splainer-modal-root"></div>
+
     <!-- Google Analytics:-->
     <script>
       (function (i, s, o, g, r, a, m) {
@@ -186,6 +192,8 @@
     <script src="scripts/islands/dist/solrSettingsWarning.js"></script>
     <script src="scripts/islands/dist/startUrl.js"></script>
     <script src="scripts/islands/dist/docRow.js"></script>
+    <script src="scripts/islands/dist/modalRegistry.js"></script>
+    <script src="scripts/islands/dist/detailedDoc.js"></script>
     <script src="scripts/factories/Search.js"></script>
     <script src="scripts/directives/customHeaders.js"></script>
     <script src="scripts/directives/settings.js"></script>
@@ -201,7 +209,6 @@
     <script src="scripts/services/splSearchSvc.js"></script>
     <script src="scripts/services/settingsStoreSvc.js"></script>
     <script src="scripts/controllers/detailedExplain.js"></script>
-    <script src="scripts/controllers/detailedDoc.js"></script>
     <script src="scripts/controllers/searchResults.js"></script>
     <script src="scripts/ace-config.js"></script>
     <!-- endbuild -->

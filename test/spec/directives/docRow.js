@@ -52,6 +52,9 @@ describe('docRow directive', function () {
           unmountCalls.push(rootEl);
         },
       },
+      // 9c: openShowDoc now routes through the modal registry instead of
+      // $uibModal. Stub it the same way the docRow island stub is stubbed.
+      openDocModal: jasmine.createSpy('openDocModal').and.returnValue({ close: function () {} }),
     };
   });
 
@@ -193,21 +196,21 @@ describe('docRow directive', function () {
     expect($uibModal.open.calls.mostRecent().args[0].resolve.canExplainOther()).toBe(true);
   });
 
-  it('onShowDoc opens the show-doc modal with the clicked doc', function () {
-    // PR 8.5 / Playwright covers the *Detailed* modal path. The show-doc
-    // modal (called from the island's title link click) has zero browser
-    // coverage. This is the only test in the suite that exercises it.
-    spyOn($uibModal, 'open').and.returnValue({});
-
+  it('onShowDoc opens the show-doc modal via the modal registry', function () {
+    // PR 9c: the show-doc path no longer uses $uibModal. The shim calls
+    // window.SplainerIslands.openDocModal('detailedDoc', doc, {}) which
+    // mounts the Preact island into #splainer-modal-root. PR 8.5 /
+    // Playwright still covers the Detailed (explain) modal path; the
+    // show-doc modal's only direct coverage is this stub assertion plus
+    // the existing Playwright test that asserts the dialog content.
     var compiled = compileDirective();
     var clickedDoc = compiled.scope.doc;
     capturedProps.onShowDoc(clickedDoc);
 
-    expect($uibModal.open).toHaveBeenCalled();
-    var args = $uibModal.open.calls.mostRecent().args[0];
-    expect(args.templateUrl).toBe('views/detailedDoc.html');
-    expect(args.controller).toBe('DetailedDocCtrl');
-    expect(args.resolve.doc()).toBe(clickedDoc);
+    expect(window.SplainerIslands.openDocModal).toHaveBeenCalled();
+    var args = window.SplainerIslands.openDocModal.calls.mostRecent().args;
+    expect(args[0]).toBe('detailedDoc');
+    expect(args[1]).toBe(clickedDoc);
   });
 
   // ─── Destroy hook ───────────────────────────────────────────────────────

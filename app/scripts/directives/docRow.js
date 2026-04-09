@@ -29,11 +29,12 @@ angular.module('splain-app').directive('docRow', [
       template: '',
       link: function (scope, element) {
         var rootEl = element[0];
-        var island = window.SplainerIslands && window.SplainerIslands.docRow;
-        if (!island) {
+        var splainerIslands = window.SplainerIslands || {};
+        var island = splainerIslands.docRow;
+        if (!island || typeof splainerIslands.openDocModal !== 'function') {
           throw new Error(
-            'docRow directive: SplainerIslands.docRow global is missing — ' +
-              'check that app/scripts/islands/dist/docRow.js is loaded.',
+            'docRow directive: SplainerIslands.docRow / openDocModal missing — ' +
+              'check that the islands/dist/*.js bundles are loaded.',
           );
         }
 
@@ -55,15 +56,7 @@ angular.module('splain-app').directive('docRow', [
         }
 
         function openShowDoc(doc) {
-          $uibModal.open({
-            templateUrl: 'views/detailedDoc.html',
-            controller: 'DetailedDocCtrl',
-            resolve: {
-              doc: function () {
-                return doc;
-              },
-            },
-          });
+          window.SplainerIslands.openDocModal('detailedDoc', doc, {});
         }
 
         function rerender() {
