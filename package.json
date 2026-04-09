@@ -16,7 +16,8 @@
     "jquery": "~3.6.1",
     "json3": "~3.3.3",
     "ng-json-explorer": "http://github.com/o19s/ng-json-explorer",
-    "splainer-search": "2.20.1"
+    "splainer-search": "file:../splainer-search",
+    "urijs": "^1.19.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

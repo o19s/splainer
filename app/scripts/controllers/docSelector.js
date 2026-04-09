@@ -50,6 +50,9 @@ angular.module('splain-app').controller('DocSelectorCtrl', [
       var searcher = createSearcher(fieldSpec, settings);
 
       $scope.currSearch.docs = []; // reset the array for a new search
+      // splainer-search 3.0.0 rejects on HTTP/parse errors instead of
+      // resolving with { error }; the .catch below preserves the prior
+      // user-visible behavior of surfacing failures via currSearch.errorMsg.
       searcher.explainOther(altQuery, fieldSpec).then(function () {
         $scope.currSearch.numFound = searcher.numFound;
         $scope.currSearch.lastQuery = altQuery;
@@ -76,6 +79,8 @@ angular.module('splain-app').controller('DocSelectorCtrl', [
             console.log('new max score: ' + $scope.currSearch.maxScore);
           }
         });
+      }).catch(function (err) {
+        $scope.currSearch.errorMsg = (err && err.message) || String(err);
       });
     };
 

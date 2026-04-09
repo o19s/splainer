@@ -297,14 +297,17 @@
     <script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
     <script src="node_modules/json3/lib/json3.js"></script>
     <script src="node_modules/ng-json-explorer/dist/angular-json-explorer.js"></script>
-    <script src="node_modules/splainer-search/splainer-search.js"></script>
+    <!-- urijs MUST load before the wired IIFE: splainer-search 3.0.0 expects
+         globalThis.URI at call time. -->
     <script src="node_modules/urijs/src/URI.js"></script>
+    <script src="node_modules/splainer-search/dist/splainer-search-wired.js"></script>
 
     <!-- endbuild -->
 
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="scripts/panes.js"></script>
     <script src="scripts/app.js"></script>
+    <script src="scripts/services/splainerSearchShim.js"></script>
     <script src="scripts/factories/Search.js"></script>
     <script src="scripts/controllers/customHeaders.js"></script>
     <script src="scripts/controllers/docSelector.js"></script>

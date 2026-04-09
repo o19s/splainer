@@ -29,7 +29,10 @@ module.exports = function (config) {
       'node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js',
       'node_modules/jquery/dist/jquery.js',
       'node_modules/ng-json-explorer/dist/angular-json-explorer.js',
-      'node_modules/splainer-search/splainer-search.js',
+      // urijs MUST come before the wired IIFE — splainer-search 3.0.0
+      // expects globalThis.URI at call time.
+      'node_modules/urijs/src/URI.js',
+      'node_modules/splainer-search/dist/splainer-search-wired.js',
       'app/scripts/**/*.js',
       'test/mock/**/*.js',
       'test/spec/**/*.js',
