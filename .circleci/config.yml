@@ -10,7 +10,19 @@ jobs:
   build:
     executor: docker-publisher
     steps:
-      - checkout
+      # HTTPS clone avoids SSH deploy keys; fine for this public repo.
+      # For PR builds, fetch GitHub pull/*/merge (or /head) so CIRCLE_SHA1 exists locally.
+      - run:
+          name: Checkout
+          command: |
+            set -e
+            git clone "https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git" .
+            if [ -n "${CIRCLE_PULL_REQUEST:-}" ]; then
+              PR_NUMBER="${CIRCLE_PULL_REQUEST##*/}"
+              git fetch origin "pull/${PR_NUMBER}/merge" \
+                || git fetch origin "pull/${PR_NUMBER}/head"
+            fi
+            git checkout "${CIRCLE_SHA1}"
       - setup_remote_docker
       - run:
           name: Build Docker image now
