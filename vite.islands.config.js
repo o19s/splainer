@@ -36,6 +36,8 @@ export const islands = [
   { name: 'customHeaders', entry: resolve(islandsDir, 'customHeaders.jsx') },
   { name: 'settings', entry: resolve(islandsDir, 'settings.jsx') },
   { name: 'docSelector', entry: resolve(islandsDir, 'docSelector.jsx') },
+  { name: 'solrSettingsWarning', entry: resolve(islandsDir, 'solrSettingsWarning.jsx') },
+  { name: 'startUrl', entry: resolve(islandsDir, 'startUrl.jsx') },
 ];
 
 export const distDir = resolve(islandsDir, 'dist');

@@ -12,21 +12,7 @@
   </div>
 
   <div ng-show="currSearch.state === currSearch.DID_SEARCH">
-    <div
-      ng-controller="SolrSettingsWarningCtrl"
-      class="alert alert-warning"
-      ng-show="warnings.shouldWarn(currSearch.settings.searchArgsStr())"
-    >
-      <ul
-        ng-repeat="(warning, arguments) in warnings.messages(currSearch.settings.searchArgsStr())"
-      >
-        <li>
-          Arguments Removed:
-          <span ng-repeat="argument in arguments"> <em>{{argument}} </em></span> because:
-          {{warning}}
-        </li>
-      </ul>
-    </div>
+    <solr-settings-warning curr-search="currSearch"></solr-settings-warning>
 
     <small>
       <a ng-if="currSearch.linkUrl.length > 0" href="{{currSearch.linkUrl}}" target="_blank"

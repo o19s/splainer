@@ -406,6 +406,140 @@ test.describe('splainer smoke', () => {
     expect(leakedKeys, `marker leaked into unexpected localStorage keys: ${leakedKeys.join(', ')}`).toEqual([]);
   });
 
+  test('clicking a doc-row title opens the detailed doc view with field data', async ({
+    page,
+  }) => {
+    // Precondition for PR 9 (docRow migration). The Test Specialist flagged
+    // results-subtree coverage as the safety net that has to land before any
+    // docRow work starts. This test proves the user-level click path for the
+    // title link — `<a ng-click="doc.showDoc()">` in docRow.html — works
+    // end-to-end: click the title, the $uibModal opens detailedDoc.html,
+    // and the modal body shows the doc fields splainer-search normalized
+    // from the Solr response.
+    //
+    // Uses canned Solr with a `subs`-shaped doc so the detailedDoc ng-repeat
+    // over doc.subs has something to render — the test would vacuously pass
+    // against an empty subs map otherwise.
+    await page.route('http://fake-solr.test/**', async (route) => {
+      await fulfillSolr(route, {
+        responseHeader: { status: 0, QTime: 1 },
+        response: {
+          numFound: 1,
+          start: 0,
+          docs: [
+            {
+              id: 'doc-42',
+              title: 'ROW_CLICK_TITLE_MARKER',
+              director: 'Someone',
+              release_year: 1999,
+            },
+          ],
+        },
+      });
+    });
+
+    const bookmarkedSolr = encodeURIComponent(
+      'http://fake-solr.test/solr/coll1/select?q=*:*',
+    );
+    await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title+director+release_year`);
+
+    // Wait for the initial search to render at least one doc-row.
+    await page.locator('doc-row').first().waitFor();
+
+    // The title link inside the first doc-row. Scoped to doc-row because
+    // other <a> elements on the page (tour, footer links) would match a
+    // bare locator. ng-bind-html populates the anchor text from
+    // docRow.title, so we can't locate by text — locate structurally
+    // and then assert the modal that results.
+    const titleLink = page.locator('doc-row').first().locator('h4 a').first();
+    await titleLink.click();
+
+    // The detailedDoc modal's only stable string is the template heading
+    // "Detailed Document View of doc: {{doc.id}}". Assert the heading is
+    // visible AND that the doc id is interpolated — this proves both
+    // (a) the $uibModal opened and (b) splainer-search normalized the
+    // canned doc into the shape detailedDoc.html expects (doc.id,
+    // doc.subs populated).
+    await expect(page.getByText(/Detailed Document View of doc:\s*doc-42/)).toBeVisible();
+
+    // And at least one of the canned sub fields made it into the modal
+    // body. Scoped to the dialog role because the field also appears in
+    // the underlying doc-row snippet — matching both would fail strict
+    // mode, and matching the modal is the assertion that actually proves
+    // the detailed view rendered.
+    await expect(page.getByRole('dialog').getByText('Someone')).toBeVisible();
+  });
+
+  test('detailed explain modal renders the explain tree content', async ({ page }) => {
+    // Precondition for PR 9 (docRow migration): the explain panel — one of
+    // the load-bearing user-visible features of splainer — has no direct
+    // coverage. Existing docSelector tests open the explain modal and
+    // interact with its altQuery form, but nothing asserts the explain tree
+    // itself rendered. A regression that broke the <pre>{{doc.explain().toStr()}}</pre>
+    // block (e.g. a breaking change in splainer-search's explain formatter)
+    // would slip through every current test.
+    //
+    // Asserts the Summarized tab's <pre> content contains the canned
+    // explain description. Doesn't pin on exact format — splainer-search's
+    // toStr() output may evolve — but requires the weight(title:canned)
+    // marker to appear somewhere in the explain view.
+    await page.route('http://fake-solr.test/**', async (route) => {
+      await fulfillSolr(route, {
+        responseHeader: { status: 0, QTime: 1 },
+        response: {
+          numFound: 1,
+          start: 0,
+          docs: [{ id: 'doc-1', title: 'canned title' }],
+        },
+        debug: {
+          explain: {
+            'doc-1': {
+              match: true,
+              value: 1.2345,
+              description: 'EXPLAIN_TREE_MARKER weight(title:canned)',
+              details: [],
+            },
+          },
+        },
+      });
+    });
+
+    const bookmarkedSolr = encodeURIComponent(
+      'http://fake-solr.test/solr/coll1/select?q=*:*',
+    );
+    await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title`);
+
+    await page.locator('doc-row').first().waitFor();
+
+    // Open the detailed explain modal via doc.showDetailed() — same entry
+    // path the existing docSelector tests use. Clicking the stacked-chart
+    // SVG is unreliable (coordinate-dependent), and showDetailed() is the
+    // app's own code path.
+    await page.evaluate(() => {
+      const docRow = document.querySelector('doc-row');
+      const scope = window.angular.element(docRow).scope();
+      scope.doc.showDetailed();
+      scope.$apply();
+    });
+
+    // Wait for the modal body — the detailedExplain.html template anchors
+    // on the "Explain for:" header.
+    await expect(page.getByText(/Explain for:/)).toBeVisible();
+
+    // The Summarized tab is the default-active uib-tab. Its <pre> should
+    // contain the canned marker from the explain description. Polled
+    // because splainer-search's explain parser may finish asynchronously
+    // after the modal opens.
+    await expect
+      .poll(async () =>
+        page.evaluate(() => {
+          const pres = Array.from(document.querySelectorAll('.explain-view pre'));
+          return pres.some((pre) => (pre.textContent || '').includes('EXPLAIN_TREE_MARKER'));
+        }),
+      )
+      .toBe(true);
+  });
+
   test('docSelector island: altQuery reaches the backend on the wire', async ({ page }) => {
     // PR 8 merge gate. Intercepts the outbound Solr request triggered by
     // the DocSelector's "Find Others" button and asserts that the altQuery
