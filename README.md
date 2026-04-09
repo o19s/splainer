@@ -98,7 +98,8 @@ From the root of the project,
 
 ### Using Docker Compose to test splainer-search with splainer
 
-* `docker-compose.override.yml.example` can be copied to `docker-compose.override.yml` and use it to override environment variables or work with a local copy of the [`splainer-search`](https://github.com/o19s/splainer-search) JS library during development defined in `docker-compose.yml`.  Example is included.  Just update the path to `splainer-search` with your local checkout!
+* By default, `package.json` installs [`splainer-search`](https://github.com/o19s/splainer-search) from GitHub (pinned commit) so Docker and CI do not need a sibling `../splainer-search` folder. When [PR #160](https://github.com/o19s/splainer-search/pull/160) changes, update the commit hash in that dependency URL and run `yarn install`. The `postinstall` script builds `splainer-search` `dist/` output when it is missing (git installs do not include prebuilt bundles).
+* For a live local checkout instead, run `yarn add splainer-search@file:../splainer-search` (or keep that change uncommitted), or copy `docker-compose.override.yml.example` to `docker-compose.override.yml` and mount your `splainer-search` tree into `node_modules/splainer-search` as in that example.
 
 https://docs.docker.com/compose/extends/
 

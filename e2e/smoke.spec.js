@@ -406,6 +406,151 @@ test.describe('splainer smoke', () => {
     expect(leakedKeys, `marker leaked into unexpected localStorage keys: ${leakedKeys.join(', ')}`).toEqual([]);
   });
 
+  test('docSelector island: altQuery reaches the backend on the wire', async ({ page }) => {
+    // PR 8 merge gate. Intercepts the outbound Solr request triggered by
+    // the DocSelector's "Find Others" button and asserts that the altQuery
+    // the user typed made it onto the wire. Validates the full chain:
+    //   Preact island (docSelector.jsx)
+    //     → directive shim (directives/docSelector.js) onExplainOther
+    //     → searchSvc.createSearcher + searcher.explainOther
+    //     → splainer-search 3.0.0 wired services → JSONP
+    //
+    // Solr was chosen over ES because the bookmarked-URL path is already
+    // proven hermetic for Solr (PR 3), and Solr's explainOther surfaces as
+    // a query parameter on the URL — assertable without guessing at
+    // engine-specific POST body shapes.
+    //
+    // The detailed-explain modal is opened programmatically via the first
+    // doc's showDetailed() rather than clicking through the stacked-chart's
+    // "Detailed" link: the click path couples to splainer-search's explain-
+    // tree parsing producing at least one hot match, and the DocSelector
+    // we're testing doesn't care *how* the modal opened.
+    const captured = [];
+    await page.route('http://fake-solr.test/**', async (route) => {
+      captured.push(route.request().url());
+      await fulfillSolr(route, {
+        responseHeader: { status: 0, QTime: 1 },
+        response: {
+          numFound: 1,
+          start: 0,
+          docs: [{ id: 'doc-1', title: 'canned title' }],
+        },
+        debug: {
+          explain: {
+            'doc-1': {
+              match: true,
+              value: 1,
+              description: 'weight(title:canned)',
+              details: [],
+            },
+          },
+        },
+      });
+    });
+
+    const bookmarkedSolr = encodeURIComponent(
+      'http://fake-solr.test/solr/coll1/select?q=*:*',
+    );
+    await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title`);
+
+    // Wait for the initial search to land and render the first doc-row.
+    await expect.poll(() => captured.length).toBeGreaterThan(0);
+    await page.locator('doc-row').first().waitFor();
+
+    // Open the detailed-explain modal via the first doc's showDetailed().
+    // This uses the app's own code path — $uibModal.open with
+    // views/detailedExplain.html — the same thing clicking "Detailed"
+    // would trigger.
+    await page.evaluate(() => {
+      const docRow = document.querySelector('doc-row');
+      const scope = window.angular.element(docRow).scope();
+      scope.doc.showDetailed();
+      scope.$apply();
+    });
+
+    // Wait for the DocSelector island inside the modal.
+    await page.locator('[data-role="alt-query"]').waitFor();
+
+    // Clear captures so we assert against the *post-explainOther* request.
+    captured.length = 0;
+
+    const marker = 'PR8altmarker' + Math.random().toString(36).slice(2, 10);
+    await page.locator('[data-role="alt-query"]').fill(marker);
+    await page.locator('[data-role="find-others"]').click();
+
+    // Solr's explainOther surfaces as query parameters on the URL.
+    // splainer-search 3.0.0 either sets explainOther=<q> or re-runs the
+    // query with q=<q> + explainOther=true. Either way, the marker appears
+    // somewhere in the URL of the second request.
+    await expect
+      .poll(() => captured.some((u) => u.includes(marker)))
+      .toBe(true);
+  });
+
+  test('docSelector island: backend error surfaces the error banner', async ({ page }) => {
+    // Closes PR 5's zero-coverage .catch: splainer-search 3.0.0 rejects on
+    // HTTP/parse errors, and PR 5 added a .catch on explainOther() to
+    // surface the rejection. Until this test, no suite exercised the
+    // rejection path end-to-end for the DocSelector flow.
+    let searchCount = 0;
+    await page.route('http://fake-solr.test/**', async (route) => {
+      searchCount++;
+      if (searchCount === 1) {
+        // Initial search succeeds — populates results so the modal can open.
+        await fulfillSolr(route, {
+          responseHeader: { status: 0, QTime: 1 },
+          response: {
+            numFound: 1,
+            start: 0,
+            docs: [{ id: 'doc-1', title: 'canned title' }],
+          },
+          debug: {
+            explain: {
+              'doc-1': {
+                match: true,
+                value: 1,
+                description: 'weight(title:canned)',
+                details: [],
+              },
+            },
+          },
+        });
+      } else {
+        // explainOther fails with 500 — the rejection we care about.
+        await route.fulfill({
+          status: 500,
+          contentType: 'text/plain',
+          headers: corsHeaders,
+          body: 'simulated solr failure',
+        });
+      }
+    });
+
+    const bookmarkedSolr = encodeURIComponent(
+      'http://fake-solr.test/solr/coll1/select?q=*:*',
+    );
+    await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title`);
+
+    await expect.poll(() => searchCount).toBeGreaterThan(0);
+    await page.locator('doc-row').first().waitFor();
+
+    await page.evaluate(() => {
+      const docRow = document.querySelector('doc-row');
+      const scope = window.angular.element(docRow).scope();
+      scope.doc.showDetailed();
+      scope.$apply();
+    });
+    await page.locator('[data-role="alt-query"]').waitFor();
+
+    await page.locator('[data-role="alt-query"]').fill('anything');
+    await page.locator('[data-role="find-others"]').click();
+
+    // The island renders the rejection's .message in the error banner.
+    // Durable assertion: banner visible, no pinning on the exact text —
+    // splainer-search's error format may evolve.
+    await expect(page.locator('[data-role="alt-query-error"]')).toBeVisible();
+  });
+
   test('search error path surfaces an error message', async ({ page }) => {
     // Coverage gap left by the 6 xdescribe'd Karma specs in
     // test/spec/controllers/searchResults.js — those tests covered the

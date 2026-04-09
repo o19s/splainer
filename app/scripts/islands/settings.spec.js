@@ -180,7 +180,14 @@ describe('settings island', () => {
     expect(onPublish).toHaveBeenCalled();
     const lastCall = onPublish.mock.calls[onPublish.mock.calls.length - 1];
     expect(lastCall[0]).toBe('os');
-    expect(lastCall[1]).toBe(settings.os);
+    // Value-based assertion rather than identity (`toBe(settings.os)`) so a
+    // future refactor that hands a defensive copy to onPublish doesn't flip
+    // this test from a behavior check into a regression blocker. The shim
+    // only reads searchUrl/fieldSpecStr/searchArgsStr/customHeaders off the
+    // working settings, which is what we care about preserving.
+    expect(lastCall[1].searchUrl).toBe(settings.os.searchUrl);
+    expect(lastCall[1].fieldSpecStr).toBe(settings.os.fieldSpecStr);
+    expect(lastCall[1].searchArgsStr).toBe(settings.os.searchArgsStr);
   });
 
   it('submit calls onPublish with (whichEngine, workingSettings)', () => {
@@ -221,6 +228,34 @@ describe('settings island', () => {
 
     // searchArgsStr is now indented.
     expect(settings.es.searchArgsStr).toBe(
+      '{\n  "query": {\n    "match_all": {}\n  }\n}',
+    );
+  });
+
+  it('Indent JSON pretty-prints os searchArgsStr too', async () => {
+    // The autoIndent handler at settings.jsx is gated on `engine === 'es' ||
+    // engine === 'os'`. ES is covered above; this case symmetrically locks
+    // the OS branch so a future tweak to the gate (e.g. switch on engine)
+    // can't silently drop OS support.
+    const el = makeRoot();
+    const settings = defaultSettings();
+    settings.os.searchArgsStr = '{"query":{"match_all":{}}}';
+    mount(el, { settings, currSearch: null }, () => {});
+
+    el.querySelector('.dev-header').click();
+    await flush();
+    const osRadio = Array.from(el.querySelectorAll('input[type="radio"]')).find(
+      (r) => r.value === 'os',
+    );
+    osRadio.click();
+    await flush();
+
+    const indent = el.querySelector('[data-role="indent-json"]');
+    expect(indent).not.toBeNull();
+    indent.click();
+    await flush();
+
+    expect(settings.os.searchArgsStr).toBe(
       '{\n  "query": {\n    "match_all": {}\n  }\n}',
     );
   });

@@ -12,8 +12,15 @@
 // this via scripts/build-islands.mjs, which loops over the entries below
 // and invokes Vite's programmatic build() API once per island.
 //
-// To add a new island in PRs 8–10: append to the `islands` array, write
+// To add a new island in PRs 9–10: append to the `islands` array, write
 // the .jsx file, copy the directive shim pattern. No other config change.
+//
+// TODO(PR9): with PR 9 adding multiple entries (DocRow, DetailedDoc,
+// DocExplain), revisit whether a glob-based entry discovery
+// (`fs.readdirSync(islandsDir).filter(f => f.endsWith('.jsx'))`) is worth
+// it. At three entries the explicit list is still clearer than the glob;
+// at five-plus it probably isn't. DX/Tooling's PR 8 ask, noted here so PR
+// 9 doesn't re-derive the reasoning.
 //
 // Run `yarn build:islands` once before serving (grunt serve) or testing
 // (npm test). For dev iteration, run `yarn build:islands:watch` in a
@@ -28,6 +35,7 @@ const islandsDir = resolve(here, 'app/scripts/islands');
 export const islands = [
   { name: 'customHeaders', entry: resolve(islandsDir, 'customHeaders.jsx') },
   { name: 'settings', entry: resolve(islandsDir, 'settings.jsx') },
+  { name: 'docSelector', entry: resolve(islandsDir, 'docSelector.jsx') },
 ];
 
 export const distDir = resolve(islandsDir, 'dist');

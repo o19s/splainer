@@ -17,7 +17,7 @@
     "json3": "~3.3.3",
     "ng-json-explorer": "http://github.com/o19s/ng-json-explorer",
     "preact": "^10.29.1",
-    "splainer-search": "file:../splainer-search",
+    "splainer-search": "https://github.com/o19s/splainer-search.git#2754904ba122c33ccf995d3536623d0aaa231cf8",
     "urijs": "^1.19.7"
   },
   "devDependencies": {
@@ -67,6 +67,7 @@
   },
   "scripts": {
     "preinstall": "npx --yes only-allow yarn",
+    "postinstall": "node scripts/ensure-splainer-search-dist.mjs",
     "test": "yarn build:islands && grunt test",
     "test:new": "vitest run",
     "test:new:watch": "vitest",

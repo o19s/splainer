@@ -6446,8 +6446,9 @@ spdx-license-ids@^3.0.0:
   resolved "https://registry.npmjs.org/spdx-license-ids/-/spdx-license-ids-3.0.12.tgz"
   integrity sha512-rr+VVSXtRhO4OHbXUiAF7xW3Bo9DuuF6C5jH+q/x15j2jniycgKbxU09Hr0WqlSLUs4i4ltHGXqTe7VHclYWyA==
 
-"splainer-search@file:../splainer-search":
+"splainer-search@https://github.com/o19s/splainer-search.git#2754904ba122c33ccf995d3536623d0aaa231cf8":
   version "3.0.0"
+  resolved "https://github.com/o19s/splainer-search.git#2754904ba122c33ccf995d3536623d0aaa231cf8"
   dependencies:
     urijs "^1.19.7"
 
