@@ -5,6 +5,16 @@
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  // JSX → preact for spec files. Vitest 4 uses oxc (not esbuild) under
+  // the hood and emits `react/jsx-dev-runtime` imports regardless of any
+  // esbuild jsxImportSource hint. The resolve aliases below redirect those
+  // imports to Preact's runtime — same end result, more reliable mechanism.
+  resolve: {
+    alias: {
+      'react/jsx-dev-runtime': 'preact/jsx-dev-runtime',
+      'react/jsx-runtime': 'preact/jsx-runtime',
+    },
+  },
   test: {
     include: [
       'src/**/*.test.js',
@@ -13,7 +23,7 @@ export default defineConfig({
       // Grunt's existing connect middleware can serve them via <script>
       // tags without infra changes. They move to src/ in PR 10.5 once
       // Vite owns the build.
-      'app/scripts/islands/**/*.spec.js',
+      'app/scripts/islands/**/*.spec.{js,jsx}',
     ],
     environment: 'jsdom',
   },

@@ -33,6 +33,11 @@ module.exports = function (config) {
       // expects globalThis.URI at call time.
       'node_modules/urijs/src/URI.js',
       'node_modules/splainer-search/dist/splainer-search-wired.js',
+      // Preact (+ hooks) UMD globals — required by the built island IIFEs
+      // under app/scripts/islands/dist/. Without these, Karma loads the
+      // bundles and they fail with "preact is not defined".
+      'node_modules/preact/dist/preact.umd.js',
+      'node_modules/preact/hooks/dist/hooks.umd.js',
       'app/scripts/**/*.js',
       'test/mock/**/*.js',
       'test/spec/**/*.js',
@@ -43,7 +48,11 @@ module.exports = function (config) {
       'app/scripts/panes.js',
       // Vitest specs live alongside the islands they test; Karma must not
       // try to load them. See vitest.config.js for the matching include.
-      'app/scripts/islands/**/*.spec.js',
+      'app/scripts/islands/**/*.spec.{js,jsx}',
+      // Karma can't parse JSX. The .jsx sources are compiled by
+      // `yarn build:islands` (vite.islands.config.js) into the dist/
+      // folder which Karma loads alongside the rest of app/scripts/.
+      'app/scripts/islands/**/*.jsx',
     ],
 
     // web server port

@@ -9,6 +9,8 @@
  * classic scripts (not ESM), and tests use Jasmine + `inject`. Test-only helpers
  * (e.g. under test/mock/) are linted together with specs via the test/ config block.
  * Playwright specs under e2e/ are ESM with Node + browser globals (callbacks run in the page).
+ * Preact islands under app/scripts/islands/ are ESM (Vitest specs + Vite-built .jsx); they
+ * override the classic-script rule for the rest of app/scripts.
  *
  * Parser ecmaVersion is 2018 so trailing commas in argument lists parse correctly.
  */
@@ -27,7 +29,15 @@ const unusedVarsOptions = {
 
 export default [
   {
-    ignores: ['node_modules/**', 'dist/**', '.tmp/**', 'coverage/**', 'solr-splainer-package/**'],
+    ignores: [
+      'node_modules/**',
+      'dist/**',
+      '.tmp/**',
+      'coverage/**',
+      'solr-splainer-package/**',
+      // Vite IIFE output; not hand-edited source (see vite.islands.config.js).
+      'app/scripts/islands/dist/**',
+    ],
   },
   js.configs.recommended,
   {
@@ -39,6 +49,25 @@ export default [
         ...globals.browser,
         ...globals.node,
         angular: 'readonly',
+      },
+    },
+    rules: {
+      'no-unused-vars': ['error', unusedVarsOptions],
+    },
+  },
+  {
+    files: ['app/scripts/islands/**/*.js', 'app/scripts/islands/**/*.jsx'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
       },
     },
     rules: {

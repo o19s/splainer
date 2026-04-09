@@ -17,7 +17,8 @@
     "json3": "~3.3.3",
     "ng-json-explorer": "http://github.com/o19s/ng-json-explorer",
     "splainer-search": "file:../splainer-search",
-    "urijs": "^1.19.7"
+    "urijs": "^1.19.7",
+    "preact": "^10.29.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
@@ -54,6 +55,7 @@
     "puppeteer": "^18.0.2",
     "serve-static": "^1.15.0",
     "time-grunt": "^2.0.0",
+    "@testing-library/preact": "^3.2.4",
     "jsdom": "^29.0.2",
     "vite": "^8.0.7",
     "vitest": "^4.1.2",
@@ -64,12 +66,14 @@
   },
   "scripts": {
     "preinstall": "npx --yes only-allow yarn",
-    "test": "grunt test",
+    "test": "yarn build:islands && grunt test",
     "test:new": "vitest run",
     "test:new:watch": "vitest",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
+    "test:e2e": "yarn build:islands && playwright test",
+    "test:e2e:ui": "yarn build:islands && playwright test --ui",
     "dev:vite": "vite",
+    "build:islands": "vite build --config vite.islands.config.js",
+    "build:islands:watch": "vite build --config vite.islands.config.js --watch",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",

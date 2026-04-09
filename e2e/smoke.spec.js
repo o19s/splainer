@@ -4,6 +4,12 @@
 // survive whatever framework replaces Angular.
 import { test, expect } from '@playwright/test';
 
+// All canned-backend responses need this so the browser doesn't block the
+// cross-origin response. Extracted because it's used in 4 fulfill blocks
+// and the literal `{ 'Access-Control-Allow-Origin': '*' }` is opaque at
+// the call site — the named constant says what role it plays.
+const corsHeaders = { 'Access-Control-Allow-Origin': '*' };
+
 // Fulfill a Solr request — JSONP-aware. splainer-search 3.0.0 prefers JSONP
 // for Solr (dynamic <script> injection), so the response body must be a
 // callback invocation, not raw JSON. Falls back to JSON for non-JSONP probes.
@@ -15,14 +21,14 @@ async function fulfillSolr(route, body) {
     await route.fulfill({
       status: 200,
       contentType: 'application/javascript',
-      headers: { 'Access-Control-Allow-Origin': '*' },
+      headers: corsHeaders,
       body: `${callback}(${json});`,
     });
   } else {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
-      headers: { 'Access-Control-Allow-Origin': '*' },
+      headers: corsHeaders,
       body: json,
     });
   }
@@ -143,6 +149,127 @@ test.describe('splainer smoke', () => {
       .toBe(true);
   });
 
+  test('customHeaders island renders and updates the editor body in a real browser', async ({
+    page,
+  }) => {
+    // PR 6 coverage: the customHeaders Preact island is used in 3 places
+    // (startUrl ES tab, startUrl OS tab, dev sidebar) and Vitest only
+    // covers the textarea-fallback path under jsdom. This test opens the
+    // ES tab in a real browser (where window.ace is loaded), expands the
+    // Advanced Settings section, and exercises the island end-to-end —
+    // verifying that (a) the island mounts via the directive shim,
+    // (b) the Ace `useEffect` lifecycle works (no pageerror), and
+    // (c) picking a header type populates the editor body via the
+    // template side effect.
+    await page.goto('/');
+    await page.locator('a[href="#es_"]').click();
+    await page.locator('#es_').getByRole('button', { name: 'Advanced Settings' }).click();
+
+    // The select rendered by the Preact island. There are multiple
+    // [data-role="header-type"] elements on the page (one per call site),
+    // so we scope to the ES tab pane.
+    const select = page.locator('#es_ [data-role="header-type"]');
+    await expect(select).toBeVisible();
+
+    // ES initial state is 'Custom' per settingsStoreSvc.js — different
+    // from Solr/OS which default to 'None'. The point of this assertion
+    // is to confirm the island is honoring the initial settings, not to
+    // pin a specific default.
+    await expect(select).toHaveValue('Custom');
+
+    // Pick API Key. The island's setHeaderType handler should populate
+    // the editor body with the API Key template via the side effect.
+    await select.selectOption('API Key');
+
+    // Read what actually landed in the Angular scope and Ace editor after
+    // the change. Polled because the change-handler → $apply → digest →
+    // $watch → Preact-render → useEffect → ace.setValue chain takes a few
+    // microtasks to settle and Playwright's selectOption returns before
+    // it's done.
+    await expect
+      .poll(async () =>
+        page.evaluate(() => {
+          const container = document.querySelector('#es_ [data-role="header-editor"]');
+          const customHeadersEl = document.querySelector('#es_ custom-headers');
+          const scope = window.angular.element(customHeadersEl).isolateScope();
+          const aceVal =
+            window.ace && container && container.tagName !== 'TEXTAREA'
+              ? window.ace.edit(container).getValue()
+              : container && container.value;
+          return {
+            scopeHeaderType: scope && scope.settings && scope.settings.headerType,
+            aceBody: aceVal,
+          };
+        }),
+      )
+      .toEqual({
+        scopeHeaderType: 'API Key',
+        aceBody: expect.stringContaining('Authorization'),
+      });
+  });
+
+  test('configured headers reach the backend HTTP request', async ({ page }) => {
+    // The user-meaningful contract of the customHeaders feature: when a
+    // user picks "API Key" and enters their key, the resulting Solr/ES/OS
+    // request includes the Authorization header. Without this assertion,
+    // the entire CustomHeaders island can be working perfectly at the
+    // Angular/Preact/DOM layer while the headers silently fail to reach
+    // the backend (because of a bug in the directive shim, splainer-search
+    // 3.0.0's wired services, or anywhere else in the chain). This is the
+    // *only* test that exercises the integration end-to-end.
+    //
+    // We capture *all* intercepted requests, not just the last one — splainer
+    // makes one request today, but a future preflight/retry/batch could
+    // make several and we'd want to assert that *any* of them carried the
+    // header rather than racing on which call wins the closure assignment.
+    const captured = [];
+    await page.route('**/fake-es.test/**', async (route) => {
+      captured.push(route.request().headers());
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        headers: corsHeaders,
+        body: JSON.stringify({
+          took: 1,
+          timed_out: false,
+          _shards: { total: 1, successful: 1, skipped: 0, failed: 0 },
+          hits: {
+            total: { value: 1, relation: 'eq' },
+            max_score: 1,
+            hits: [{ _id: '1', _score: 1, _source: { title: 'canned' } }],
+          },
+        }),
+      });
+    });
+
+    await page.goto('/');
+    await page.locator('a[href="#es_"]').click();
+    // Set the ES URL to our intercepted host.
+    await page
+      .locator('#es_ input[ng-model="start.esSettings.startUrl"]')
+      .fill('http://fake-es.test/_search');
+    // Open the Advanced Settings panel and pick API Key — the island's
+    // setHeaderType handler populates the body with the Authorization
+    // template via the directive shim → scope mutation → splainer-search.
+    await page.locator('#es_').getByRole('button', { name: 'Advanced Settings' }).click();
+    await page.locator('#es_ [data-role="header-type"]').selectOption('API Key');
+
+    // Submit the search.
+    await page.locator('#es_').getByRole('button', { name: 'Splain This!' }).click();
+
+    // Poll until at least one captured request had the Authorization header.
+    // Polled because the click → digest → splainer-search → fetch chain
+    // takes a few microtasks. Header names are lowercased in Playwright's
+    // headers() output.
+    await expect
+      .poll(() =>
+        captured.some(
+          (h) => typeof h.authorization === 'string' && h.authorization.includes('ApiKey'),
+        ),
+      )
+      .toBe(true);
+  });
+
   test('search error path surfaces an error message', async ({ page }) => {
     // Coverage gap left by the 6 xdescribe'd Karma specs in
     // test/spec/controllers/searchResults.js — those tests covered the
@@ -157,7 +284,7 @@ test.describe('splainer smoke', () => {
       route.fulfill({
         status: 500,
         contentType: 'text/plain',
-        headers: { 'Access-Control-Allow-Origin': '*' },
+        headers: corsHeaders,
         body: 'simulated solr failure',
       }),
     );

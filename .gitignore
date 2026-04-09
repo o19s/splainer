@@ -8,6 +8,8 @@ coverage/
 test-results/
 playwright-report/
 .playwright/
+# Built island bundles — output of `yarn build:islands`
+app/scripts/islands/dist/
 yarn-error.log
 
 deploy.sh
