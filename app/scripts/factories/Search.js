@@ -30,7 +30,7 @@ angular.module('splain-app')
 
         // This logic I think is an old artifact, and doesn't matter,
         // but tests need updating.
-        if (searchSettings.hasOwnProperty('whichEngine')) {
+        if (Object.prototype.hasOwnProperty.call(searchSettings, 'whichEngine')) {
           self.engine               = searchSettings.whichEngine;
         } else {
           self.engine = 'solr';
@@ -114,7 +114,7 @@ angular.module('splain-app')
           var idFieldName = fieldSpec.id;
           var id          = doc[idFieldName];
 
-          if (id && self.overridingExplains.hasOwnProperty(id)) {
+          if (id && Object.prototype.hasOwnProperty.call(self.overridingExplains, id)) {
             return self.overridingExplains[id];
           }
           return null;
@@ -198,7 +198,7 @@ angular.module('splain-app')
                 groupedResultToNormalDocs(fieldSpec, grouped);
 
                 angular.forEach(grouped, function(groupedBys, groupByKey) {
-                  if (self.grouped.hasOwnProperty(groupByKey)) {
+                  if (Object.prototype.hasOwnProperty.call(self.grouped, groupByKey)) {
                     var groupByToAppend = self.grouped[groupByKey];
                     groupByToAppend.push.apply(groupByToAppend, groupedBys);
                   }

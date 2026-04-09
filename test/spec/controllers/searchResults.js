@@ -87,7 +87,7 @@ describe('searchResultsCtrl', function() {
 
   it('starts in NO_SEARCH', function() {
     createController();
-    expect(scope.currSearch.hasOwnProperty('state')).toBeTruthy();
+    expect(Object.prototype.hasOwnProperty.call(scope.currSearch, 'state')).toBeTruthy();
     expect(scope.currSearch.state).toEqual(scope.currSearch.NO_SEARCH);
   });
 

@@ -3,7 +3,6 @@
 describe('startUrlCtrl', function() {
   var createController = null;
   var scope = null;
-  var httpBackend = null;
   var locationSvc = null;
   var localStorageSvc = null;
 
@@ -18,8 +17,7 @@ describe('startUrlCtrl', function() {
       $provide.value('$location', locationSvc);
       $provide.value('localStorageService', localStorageSvc);
     });
-    inject(function($rootScope, $controller, $httpBackend, $q) {
-      httpBackend = $httpBackend;
+    inject(function($rootScope, $controller, $q) {
       createController = function() {
         scope = $rootScope.$new();
 

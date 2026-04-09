@@ -27,7 +27,7 @@ angular.module('splain-app')
       var condensedWarnings = {};
       angular.forEach(getWarnings(argsStr), function(warning, argument) {
         // warning => [arg1, arg2...] 
-        if (condensedWarnings.hasOwnProperty(warning)) {
+        if (Object.prototype.hasOwnProperty.call(condensedWarnings, warning)) {
           condensedWarnings[warning].push(argument);
         } else {
           condensedWarnings[warning] = [argument];

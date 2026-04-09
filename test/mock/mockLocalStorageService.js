@@ -7,7 +7,7 @@ window.MockLocalStorageService = function() {
   };
 
   this.get = function(key) {
-    if (!this.store.hasOwnProperty(key)) {
+    if (!Object.prototype.hasOwnProperty.call(this.store, key)) {
       return null;
     }
     return this.store[key];

@@ -66,7 +66,7 @@ angular.module('splain-app')
         }
         try {
           val = localStorageService.get(prefix + key);
-        } catch (SyntaxError) {
+        } catch (_e) {
           val = null;
         }
 

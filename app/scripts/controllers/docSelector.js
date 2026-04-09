@@ -25,7 +25,7 @@ angular.module('splain-app')
         if (settings.whichEngine === 'es' || settings.whichEngine === 'os') {
           try {
             args = angular.fromJson(settings.searchArgsStr());
-          } catch (SyntaxError) {
+          } catch (_e) {
             args = '';
           }
         } else {

@@ -33,7 +33,7 @@ angular.module('splain-app')
       }
       if (overrideFieldSpec) {
         userSettings.fieldSpecStr = overrideFieldSpec;
-      } else if (parsedUrl.solrArgs.hasOwnProperty('fl')) {
+      } else if (Object.prototype.hasOwnProperty.call(parsedUrl.solrArgs, 'fl')) {
         var fl = parsedUrl.solrArgs.fl;
         userSettings.fieldSpecStr = fl[0];
       } else {

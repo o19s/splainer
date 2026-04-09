@@ -69,22 +69,23 @@ angular.module('splain-app')
 
       // If we have something set in the URL, use that
       var overridingFieldSpec;
-      if ($location.search().hasOwnProperty('fieldSpec')) {
-        overridingFieldSpec = $location.search().fieldSpec;
+      var searchParams = $location.search();
+      if (Object.prototype.hasOwnProperty.call(searchParams, 'fieldSpec')) {
+        overridingFieldSpec = searchParams.fieldSpec;
       }
-      if ($location.search().hasOwnProperty('solr')) {
-        $scope.start.solrSettings.startUrl = $location.search().solr;
+      if (Object.prototype.hasOwnProperty.call(searchParams, 'solr')) {
+        $scope.start.solrSettings.startUrl = searchParams.solr;
         runSolrSearch(overridingFieldSpec);
-      } else if ($location.search().hasOwnProperty('esUrl')) {
+      } else if (Object.prototype.hasOwnProperty.call(searchParams, 'esUrl')) {
         runEsSearch({
-          searchUrl:      $location.search().esUrl,
-          searchArgsStr:  $location.search().esQuery,
+          searchUrl:      searchParams.esUrl,
+          searchArgsStr:  searchParams.esQuery,
           fieldSpecStr: overridingFieldSpec
         });
-      } else if ($location.search().hasOwnProperty('osUrl')) {
+      } else if (Object.prototype.hasOwnProperty.call(searchParams, 'osUrl')) {
         runOsSearch({
-          searchUrl:      $location.search().osUrl,
-          searchArgsStr:  $location.search().osQuery,
+          searchUrl:      searchParams.osUrl,
+          searchArgsStr:  searchParams.osQuery,
           fieldSpecStr: overridingFieldSpec
         });
       }

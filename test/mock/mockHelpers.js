@@ -10,7 +10,7 @@ window.parseUrlParams = function(queryString) {
     var qpSplit = queryParam.split('=');
     var param = qpSplit[0];
     var value = qpSplit[1];
-    if (!parsedParams.hasOwnProperty(param)) {
+    if (!Object.prototype.hasOwnProperty.call(parsedParams, param)) {
       parsedParams[param] = [];
     }
     parsedParams[param].push(value);
@@ -36,11 +36,11 @@ window.urlContainsParams = function(url, params) {
       }
       var missingParam = false;
       var urlEncodedArgs = requestedUrl.substr(url.length);
-      var parsedParams = parseUrlParams(urlEncodedArgs);
+      var parsedParams = window.parseUrlParams(urlEncodedArgs);
       angular.forEach(params, function(values, param) {
         if (values instanceof Array) {
           angular.forEach(values, function(value) {
-            if (!arrayContains(parsedParams[param], value)) {
+            if (!window.arrayContains(parsedParams[param], value)) {
               missingParam = true;
             }
           });

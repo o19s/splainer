@@ -43,13 +43,13 @@ angular.module('splain-app')
         if (settings.searchArgsStr.trim().length === 0) {
           settings.searchArgsStr = '{ "match_all": {} }';
         }
-        if (settings.fieldSpecStr && angular.isString(settings.fieldSpecStr)) {
-          settings.fieldSpecStr = settings.fieldSpecStr;
-        } else if ( angular.isDefined(parsedUrl.stored_fields) ) {
-          settings.fieldSpecStr = parsedUrl.stored_fields;
-        }
-        else {
-          settings.fieldSpecStr = 'title, *';
+        // Keep a user-provided string; otherwise take stored_fields from the URL or default.
+        if (!(settings.fieldSpecStr && angular.isString(settings.fieldSpecStr))) {
+          if ( angular.isDefined(parsedUrl.stored_fields) ) {
+            settings.fieldSpecStr = parsedUrl.stored_fields;
+          } else {
+            settings.fieldSpecStr = 'title, *';
+          }
         }
 
         if (!angular.isDefined(parsedUrl.stored_fields)) {
