@@ -6507,7 +6507,7 @@ vary@^1:
   resolved "https://registry.npmjs.org/vary/-/vary-1.1.2.tgz"
   integrity sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==
 
-"vite@^6.0.0 || ^7.0.0 || ^8.0.0":
+"vite@^6.0.0 || ^7.0.0 || ^8.0.0", vite@^8.0.7:
   version "8.0.7"
   resolved "https://registry.yarnpkg.com/vite/-/vite-8.0.7.tgz#e3028877022e04bcfb67180738f256108256aa13"
   integrity sha512-P1PbweD+2/udplnThz3btF4cf6AgPky7kk23RtHUkJIU5BIxwPprhRGmOAHs6FTI7UiGbTNrgNP6jSYD6JaRnw==
