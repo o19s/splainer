@@ -725,4 +725,64 @@ test.describe('splainer smoke', () => {
       )
       .toBe(true);
   });
+
+  test('clicking stacked-chart Detailed link opens the explain modal', async ({ page }) => {
+    // PR 8.5 prep test for PR 9bc (DocExplain rewrite). Written against the
+    // Angular code so it lands green on main, then must survive the rewrite
+    // unchanged. If 9bc breaks this test, the failure points squarely at the
+    // rewrite — not at "is the test even right?". Decouples "can we test
+    // this?" from "have we rewritten this?".
+    //
+    // Click target: the [data-testid="stacked-chart-detailed"] anchor in
+    // app/views/stackedChart.html — NOT scope.doc.showDetailed() like the
+    // PR 8 tests. The whole point is real user interaction.
+    await page.route('http://fake-solr.test/**', async (route) => {
+      await fulfillSolr(route, {
+        responseHeader: { status: 0, QTime: 1 },
+        response: {
+          numFound: 1,
+          start: 0,
+          docs: [{ id: 'doc-1', title: 'canned title' }],
+        },
+        debug: {
+          explain: {
+            'doc-1': {
+              match: true,
+              value: 1.5,
+              description: 'weight(title:canned in 0) [SchemaSimilarity]',
+              details: [],
+            },
+          },
+        },
+      });
+    });
+
+    const bookmarkedSolr = encodeURIComponent(
+      'http://fake-solr.test/solr/coll1/select?q=*:*',
+    );
+    await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title`);
+
+    // Wait for the row, then click the Detailed link inside its stacked chart.
+    await page.locator('[data-testid="doc-row"]').first().waitFor();
+    await page
+      .locator('[data-testid="doc-row"]')
+      .first()
+      .locator('[data-testid="stacked-chart-detailed"]')
+      .click();
+
+    // Modal opens, header is visible, body contains the explain string from
+    // the canned response. The body assertion is what proves the explain tree
+    // actually rendered — header alone could be there even if rendering broke.
+    await expect(page.locator('[data-testid="detailed-explain-modal"]')).toBeVisible();
+    await expect(page.locator('[data-testid="detailed-explain-body"]')).toContainText(
+      'weight(title:canned',
+    );
+
+    // Baseline close behavior — ESC dismisses the modal. PR 9bc swaps
+    // ui.bootstrap for native <dialog>; this assertion is the floor that
+    // swap has to preserve. Without it, 9bc could ship a modal that opens
+    // fine but traps the user and no test would catch it.
+    await page.keyboard.press('Escape');
+    await expect(page.locator('[data-testid="detailed-explain-modal"]')).toBeHidden();
+  });
 });

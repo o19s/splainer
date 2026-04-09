@@ -4,7 +4,7 @@
       <div class="graph-label">{{match.description}}</div>
       <uib-progressbar value="match.percentage"></uib-progressbar>
     </div>
-    <a ng-if="detailed" style="font-size: 10px" ng-click="detailed()">Detailed</a>
+    <a ng-if="detailed" data-testid="stacked-chart-detailed" style="font-size: 10px" ng-click="detailed()">Detailed</a>
   </div>
 
   <!-- collapse if > 3-->
@@ -19,7 +19,7 @@
         <uib-progressbar value="match.percentage"></uib-progressbar>
       </div>
     </div>
-    <a style="font-size: 10px" href="" ng-click="detailed()">Detailed</a>
+    <a data-testid="stacked-chart-detailed" style="font-size: 10px" href="" ng-click="detailed()">Detailed</a>
     &nbsp;&nbsp;&nbsp;
     <a href="" style="font-size: 10px" ng-click="showAll=!showAll"
       >Show {{showAll ? 'Less' : 'More'}}</a
