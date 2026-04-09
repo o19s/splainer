@@ -39,7 +39,12 @@ module.exports = function (config) {
     ],
 
     // list of files / patterns to exclude
-    exclude: ['app/scripts/panes.js'],
+    exclude: [
+      'app/scripts/panes.js',
+      // Vitest specs live alongside the islands they test; Karma must not
+      // try to load them. See vitest.config.js for the matching include.
+      'app/scripts/islands/**/*.spec.js',
+    ],
 
     // web server port
     port: 8080,
