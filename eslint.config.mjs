@@ -1,12 +1,15 @@
 /**
- * ESLint flat config for Splainer (AngularJS 1.x, ES5 scripts).
+ * ESLint flat config for Splainer (AngularJS 1.x, classic script syntax).
  *
  * Aligned with splainer-search where it applies:
  * - `eslint:recommended` + `eslint-config-prettier`
  * - Same `no-unused-vars` options as splainer-search (.eslintrc.cjs)
  *
  * Splainer differs from splainer-search in language mode: app and tests are
- * classic scripts (not ESM), and tests use Jasmine + `inject`.
+ * classic scripts (not ESM), and tests use Jasmine + `inject`. Test-only helpers
+ * (e.g. under test/mock/) are linted together with specs via the test/ config block.
+ *
+ * Parser ecmaVersion is 2018 so trailing commas in argument lists parse correctly.
  */
 import js from '@eslint/js';
 import eslintConfigPrettier from 'eslint-config-prettier';
@@ -27,9 +30,9 @@ export default [
   },
   js.configs.recommended,
   {
-    files: ['Gruntfile.js', 'app/scripts/**/*.js', 'mockHelpers.js'],
+    files: ['Gruntfile.js', 'app/scripts/**/*.js'],
     languageOptions: {
-      ecmaVersion: 5,
+      ecmaVersion: 2018,
       sourceType: 'script',
       globals: {
         ...globals.browser,
@@ -44,7 +47,7 @@ export default [
   {
     files: ['test/**/*.js'],
     languageOptions: {
-      ecmaVersion: 5,
+      ecmaVersion: 2018,
       sourceType: 'script',
       globals: {
         ...globals.browser,
