@@ -38,6 +38,7 @@ export const islands = [
   { name: 'docSelector', entry: resolve(islandsDir, 'docSelector.jsx') },
   { name: 'solrSettingsWarning', entry: resolve(islandsDir, 'solrSettingsWarning.jsx') },
   { name: 'startUrl', entry: resolve(islandsDir, 'startUrl.jsx') },
+  { name: 'docRow', entry: resolve(islandsDir, 'docRow.jsx') },
 ];
 
 export const distDir = resolve(islandsDir, 'dist');
