@@ -23,13 +23,7 @@ const unusedVarsOptions = {
 
 export default [
   {
-    ignores: [
-      'node_modules/**',
-      'dist/**',
-      '.tmp/**',
-      'coverage/**',
-      'solr-splainer-package/**',
-    ],
+    ignores: ['node_modules/**', 'dist/**', '.tmp/**', 'coverage/**', 'solr-splainer-package/**'],
   },
   js.configs.recommended,
   {

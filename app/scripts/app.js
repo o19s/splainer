@@ -15,11 +15,11 @@ angular
     'ui.bootstrap',
     'ngJsonExplorer',
     'ui.ace',
-    'o19s.splainer-search'
+    'o19s.splainer-search',
   ])
   .config([
     '$locationProvider',
-    function($locationProvider) {
+    function ($locationProvider) {
       $locationProvider.hashPrefix('');
-    }
+    },
   ]);

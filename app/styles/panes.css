@@ -1,40 +1,37 @@
-
-
 .pane_container {
-    position: relative;
-    overflow: hidden;
+  position: relative;
+  overflow: hidden;
 }
 
-
 .pane_main {
-    display: inline-block;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
+  display: inline-block;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .pane_east {
-    display: none;
-    position: fixed;
-    min-width: 300px;
-    height: 100%;
-    background: #333;
-    color: #CCC;
-    overflow: scroll;
+  display: none;
+  position: fixed;
+  min-width: 300px;
+  height: 100%;
+  background: #333;
+  color: #ccc;
+  overflow: scroll;
 }
 
 .east-slider {
-    display: none;
-    position: fixed;
-    width: 6px;
-    height: 100%;
-    background: none repeat scroll 0% 0% rgb(221, 221, 221);
-    cursor: col-resize;
-    border: 0px solid rgb(187, 187, 187);
-    z-index: 500;
+  display: none;
+  position: fixed;
+  width: 6px;
+  height: 100%;
+  background: none repeat scroll 0% 0% rgb(221, 221, 221);
+  cursor: col-resize;
+  border: 0px solid rgb(187, 187, 187);
+  z-index: 500;
 }
 
 .east-slider:hover {
-    background: none repeat scroll 0% 0% rgb(66, 139, 202);
+  background: none repeat scroll 0% 0% rgb(66, 139, 202);
 }

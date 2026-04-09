@@ -1,6 +1,7 @@
 'use strict';
 
-angular.module('splain-app')
+angular
+  .module('splain-app')
   .controller('DocExplainCtrl', function DocExplainCtrl($scope, doc, canExplainOther) {
     // this controller is a bit silly just because
     // modals need their own controller
@@ -8,7 +9,7 @@ angular.module('splain-app')
     $scope.altDoc = null;
     $scope.canExplainOther = canExplainOther;
     $scope.toggled = false;
-    $scope.toggleCompare = function() {
+    $scope.toggleCompare = function () {
       $scope.toggled = !$scope.toggled;
       if (!$scope.toggled) {
         $scope.altDoc = null;

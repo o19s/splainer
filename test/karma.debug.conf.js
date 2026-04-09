@@ -3,7 +3,7 @@
 // Generated on 2014-07-17 using
 // generator-karma 0.8.3
 
-module.exports = function(config) {
+module.exports = function (config) {
   'use strict';
 
   config.set({
@@ -30,7 +30,7 @@ module.exports = function(config) {
       'node_modules/splainer-search/splainer-search.js',
       'scripts/**/*.js',
       'test/mock/**/*.js',
-      'test/spec/**/*.js'
+      'test/spec/**/*.js',
     ],
 
     // list of files / patterns to exclude
@@ -47,15 +47,10 @@ module.exports = function(config) {
     // - Safari (only Mac)
     // - PhantomJS
     // - IE (only Windows)
-    browsers: [
-      'Chrome'
-    ],
+    browsers: ['Chrome'],
 
     // Which plugins to enable
-    plugins: [
-      'karma-chrome-launcher',
-      'karma-jasmine'
-    ],
+    plugins: ['karma-chrome-launcher', 'karma-jasmine'],
 
     // Continuous Integration mode
     // if true, it capture browsers, run tests and exit

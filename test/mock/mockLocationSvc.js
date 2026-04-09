@@ -1,9 +1,8 @@
 'use strict';
 
-window.MockLocationSvc = function() {
-
+window.MockLocationSvc = function () {
   this.lastParams = null;
-  this.search = function(params) {
+  this.search = function (params) {
     if (params) {
       this.lastParams = params;
     }

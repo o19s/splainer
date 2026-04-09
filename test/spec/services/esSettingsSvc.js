@@ -1,7 +1,6 @@
 'use strict';
 
 describe('Service: esSettingsSvc', function () {
-
   // load the service's module
   beforeEach(module('splain-app'));
 
@@ -11,17 +10,17 @@ describe('Service: esSettingsSvc', function () {
     esSettingsSvc = _esSettingsSvc_;
   }));
 
-  var stubSettings = function() {
+  var stubSettings = function () {
     return {
-      startUrl:       '',
-      whichEngine:    '',
-      searchUrl:      '',
-      fieldSpecStr:   '',
-      searchArgsStr:  ''
+      startUrl: '',
+      whichEngine: '',
+      searchUrl: '',
+      fieldSpecStr: '',
+      searchArgsStr: '',
     };
   };
 
-  it('parses start URL -> URL + args', function() {
+  it('parses start URL -> URL + args', function () {
     var settings = stubSettings();
     settings.startUrl = 'http://localhost:9200/statedecoded/_search?stored_fields=title catch_line';
     esSettingsSvc.fromStartUrl(settings);
@@ -32,7 +31,7 @@ describe('Service: esSettingsSvc', function () {
     expect(settings.whichEngine).toEqual('es');
   });
 
-  it('uses default (*) fieldspec when no fields specified', function() {
+  it('uses default (*) fieldspec when no fields specified', function () {
     var settings = stubSettings();
     settings.startUrl = 'http://localhost:9200/statedecoded/_search';
     esSettingsSvc.fromStartUrl(settings);
@@ -43,7 +42,7 @@ describe('Service: esSettingsSvc', function () {
     expect(settings.whichEngine).toEqual('es');
   });
 
-  it('uses the args string if set', function() {
+  it('uses the args string if set', function () {
     var settings = stubSettings();
     settings.startUrl = 'http://localhost:9200/statedecoded/_search';
     settings.searchArgsStr = '{ "query": { "match": { "_all": "deer" } } }';
@@ -55,7 +54,7 @@ describe('Service: esSettingsSvc', function () {
     expect(settings.whichEngine).toEqual('es');
   });
 
-  it('updates start URL from args updates', function() {
+  it('updates start URL from args updates', function () {
     var settings = stubSettings();
     settings.startUrl = 'http://localhost:9200/statedecoded/_search?stored_fields=title catch_line';
     esSettingsSvc.fromStartUrl(settings);

@@ -7,9 +7,9 @@
  * # MainCtrl
  * Controller of the frontendApp
  */
-angular.module('splain-app')
+angular
+  .module('splain-app')
   .controller('SearchResultsCtrl', function ($scope, $q, splSearchSvc, settingsStoreSvc) {
-
     $scope.search = {};
 
     $scope.showParsedQueryDetails = false;
@@ -17,19 +17,18 @@ angular.module('splain-app')
 
     /* Initiate a new search with the latest settings
      * */
-    $scope.search.search = function() {
+    $scope.search.search = function () {
       $scope.showParsedQueryDetails = false;
       $scope.showQueryDetails = false;
       var deferred = $q.defer();
-      $scope.currSearch.search()
-      .then(function() {
+      $scope.currSearch.search().then(function () {
         $scope.currSearch.engine = settingsStoreSvc.settings.whichEngine;
         deferred.resolve();
       });
       return deferred.promise;
     };
 
-    $scope.search.reset = function() {
+    $scope.search.reset = function () {
       var searchSettings = settingsStoreSvc.settings;
       $scope.currSearch = splSearchSvc.createSearch(searchSettings);
       $scope.showParsedQueryDetails = false;
@@ -37,5 +36,4 @@ angular.module('splain-app')
     };
 
     $scope.search.reset();
-
   });

@@ -77,8 +77,8 @@
 }
 
 .loading {
-    background-image:url('../images/ajax-loader.gif');
-    text-align: center
+  background-image: url('../images/ajax-loader.gif');
+  text-align: center;
 }
 
 .alert {
@@ -106,7 +106,7 @@
 
 .pane_main .navbar-brand {
   font-style: italic;
-  color: #FFF;
+  color: #fff;
   padding: 10px 0 0 0;
   margin: 0;
   height: auto;
@@ -116,24 +116,24 @@
 
 .navbar-header small {
   font-size: 11px;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
   display: block;
   margin: 3px 0 0 25px;
 }
 
 .tweak-button small {
   font-size: 11px;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
   display: block;
   margin: 3px 0 10px 25px;
 }
 
 .tweak-button small a {
-  color: rgba(255,255,255,0.75);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .navbar-header small a {
-  color: rgba(255,255,255,0.75);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .pane_east h3 {
@@ -150,19 +150,19 @@
   margin: 0 0 0px 0;
 }
 
-.dev-header{
-  background:#222;
-  background:-webkit-gradient(linear,0 0,0 100%,from(#282828),to(#222));
-  color:#F0F0F0;
-  padding:15px;
-  border-bottom:1px solid #363636;
-  cursor:pointer
+.dev-header {
+  background: #222;
+  background: -webkit-gradient(linear, 0 0, 0 100%, from(#282828), to(#222));
+  color: #f0f0f0;
+  padding: 15px;
+  border-bottom: 1px solid #363636;
+  cursor: pointer;
 }
 
-.dev-header .glyphicon{
-  margin-left:10px;
-  font-size:14px;
-  font-weight:400
+.dev-header .glyphicon {
+  margin-left: 10px;
+  font-size: 14px;
+  font-weight: 400;
 }
 
 .dev-section {
@@ -170,26 +170,26 @@
 }
 
 .fieldLabel {
-  font-weight:  bold;
+  font-weight: bold;
 }
 
 .osc_logo {
-    height: 2em;
+  height: 2em;
 }
 
 .grouped .docRow {
-    margin-left: 0.5em;
+  margin-left: 0.5em;
 }
 
 /*dont style inspector-* tags, style the corresponding bootstrap
  *   classes (or your own)*/
 .popover {
-        max-width: 800px;
-            width: auto;
+  max-width: 800px;
+  width: auto;
 }
 
 .modal-content {
-    overflow-x: auto;
+  overflow-x: auto;
 }
 
 .navbar-secondary .navbar-nav {
@@ -209,13 +209,13 @@
 }
 
 .selectableDoc:hover {
-    background-color: #EEE;
-    cursor:pointer;
+  background-color: #eee;
+  cursor: pointer;
 }
 
 .explain-view {
-    max-height: 400px;
-    overflow-y: auto;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .black-label label {

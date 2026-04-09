@@ -1,14 +1,14 @@
 'use strict';
 
-angular.module('splain-app')
+angular
+  .module('splain-app')
   .service('solrSettingsSvc', function solrSettingsSvc(solrUrlSvc, fieldSpecSvc) {
-
-    var reconstructFullUrl = function(userSettings) {
+    var reconstructFullUrl = function (userSettings) {
       var fieldSpec = fieldSpecSvc.createFieldSpec(userSettings.fieldSpecStr);
       var fl = null;
       if (fieldSpec.subs !== '*') {
         fl = [fieldSpec.title];
-        angular.forEach(fieldSpec.subs, function(subFieldName) {
+        angular.forEach(fieldSpec.subs, function (subFieldName) {
           fl.push(subFieldName);
         });
         fl = [fl.join(' ')];
@@ -20,11 +20,11 @@ angular.module('splain-app')
       return solrUrlSvc.buildUrl(userSettings.searchUrl, parsedArgs);
     };
 
-    var newlineSolrArgs = function(searchArgsStr) {
+    var newlineSolrArgs = function (searchArgsStr) {
       return searchArgsStr.split('&').join('\n&');
     };
 
-    var fromParsedUrl = function(userSettings, parsedUrl, overrideFieldSpec) {
+    var fromParsedUrl = function (userSettings, parsedUrl, overrideFieldSpec) {
       var argsToUse = angular.copy(parsedUrl.solrArgs);
       solrUrlSvc.removeUnsupported(argsToUse);
       userSettings.searchArgsStr = newlineSolrArgs(solrUrlSvc.formatSolrArgs(argsToUse));
@@ -45,7 +45,7 @@ angular.module('splain-app')
     /* Update/sanitize settings from user input when tweaking
      * (ie user updates solr URL or search args, fields, etc)
      * */
-    this.fromTweakedSettings = function(searchSettings) {
+    this.fromTweakedSettings = function (searchSettings) {
       var parsedUrl = solrUrlSvc.parseSolrUrl(searchSettings.searchUrl);
       if (parsedUrl !== null && parsedUrl.solrArgs && Object.keys(parsedUrl.solrArgs).length > 0) {
         fromParsedUrl(searchSettings, parsedUrl);
@@ -58,7 +58,7 @@ angular.module('splain-app')
      * (ie from start screen)
      *
      * */
-    this.fromStartUrl = function(newStartUrl, searchSettings, overrideFieldSpec) {
+    this.fromStartUrl = function (newStartUrl, searchSettings, overrideFieldSpec) {
       searchSettings.whichEngine = 'solr';
       searchSettings.startUrl = newStartUrl;
       var parsedUrl = solrUrlSvc.parseSolrUrl(newStartUrl);
@@ -67,5 +67,4 @@ angular.module('splain-app')
       }
       return searchSettings;
     };
-
   });

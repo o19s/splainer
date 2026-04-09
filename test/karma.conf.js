@@ -4,7 +4,7 @@
 // generator-karma 0.8.3
 process.env.CHROME_BIN = require('puppeteer').executablePath();
 
-module.exports = function(config) {
+module.exports = function (config) {
   'use strict';
 
   config.set({
@@ -32,7 +32,7 @@ module.exports = function(config) {
       'node_modules/splainer-search/splainer-search.js',
       'app/scripts/**/*.js',
       'test/mock/**/*.js',
-      'test/spec/**/*.js'
+      'test/spec/**/*.js',
     ],
 
     // list of files / patterns to exclude
@@ -49,26 +49,20 @@ module.exports = function(config) {
     // - Safari (only Mac)
     // - PhantomJS
     // - IE (only Windows)
-    browsers: [
-      'ChromeHeadlessNoSandbox'
-    ],
+    browsers: ['ChromeHeadlessNoSandbox'],
 
     customLaunchers: {
       ChromeHeadlessNoSandbox: {
         base: 'ChromeHeadless',
-        flags: ['--no-sandbox', '--headless']
-      }
+        flags: ['--no-sandbox', '--headless'],
+      },
     },
 
     // Which plugins to enable
-    plugins: [
-      'karma-chrome-launcher',
-      'karma-jasmine',
-      'karma-coverage'
-    ],
+    plugins: ['karma-chrome-launcher', 'karma-jasmine', 'karma-coverage'],
 
     preprocessors: {
-      'app/scripts/**/*.js': ['coverage']
+      'app/scripts/**/*.js': ['coverage'],
     },
 
     reporters: ['progress', 'coverage'],

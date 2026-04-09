@@ -1,7 +1,6 @@
 'use strict';
 
 describe('Service: settingsStoreSvc', function () {
-
   // load the service's module
   beforeEach(module('splain-app'));
 
@@ -11,30 +10,29 @@ describe('Service: settingsStoreSvc', function () {
 
   var setupSvc = null;
 
-  beforeEach(function() {
-
+  beforeEach(function () {
     /* global MockLocalStorageService*/
     /* global MockLocationSvc*/
     localStorageSvc = new MockLocalStorageService();
     locationSvc = new MockLocationSvc();
 
-    module(function($provide) {
+    module(function ($provide) {
       $provide.value('localStorageService', localStorageSvc);
       $provide.value('$location', locationSvc);
     });
 
-    setupSvc = function() {
+    setupSvc = function () {
       inject(function (_settingsStoreSvc_) {
         settingsStoreSvc = _settingsStoreSvc_;
       });
     };
   });
 
-  beforeEach(function() {
+  beforeEach(function () {
     localStorageSvc.reset();
   });
 
-  it('initializes from nothing', function() {
+  it('initializes from nothing', function () {
     setupSvc();
     var settings = settingsStoreSvc.settings;
     expect(settings.solr.startUrl).toEqual('');
@@ -48,7 +46,7 @@ describe('Service: settingsStoreSvc', function () {
     expect(settings.whichEngine).toEqual('solr');
   });
 
-  it('initializes es query params to valid JSON', function() {
+  it('initializes es query params to valid JSON', function () {
     setupSvc();
     var settings = settingsStoreSvc.settings;
     // if this throws, test fails which is what we expect
@@ -61,7 +59,7 @@ describe('Service: settingsStoreSvc', function () {
   var testWhichEngine = 'solr';
   var testSolrSearchArgsStr = 'q=*:*';
 
-  it('loads whats stored', function() {
+  it('loads whats stored', function () {
     localStorageSvc.set('solr_startUrl', testSolrStartUrl);
     localStorageSvc.set('solr_searchUrl', testSolrSearchUrl);
     localStorageSvc.set('solr_fieldSpecStr', testSolrFielgcldSpecStr);
@@ -76,7 +74,7 @@ describe('Service: settingsStoreSvc', function () {
     expect(settings.whichEngine).toEqual(testWhichEngine);
   });
 
-  it('saves updates', function() {
+  it('saves updates', function () {
     setupSvc();
     var settings = settingsStoreSvc.settings;
     settings.solr.startUrl = testSolrStartUrl;
@@ -94,7 +92,7 @@ describe('Service: settingsStoreSvc', function () {
     expect(locationSvc.lastParams.solr).toEqual(testSolrStartUrl);
   });
 
-  it('navigates on updates', function() {
+  it('navigates on updates', function () {
     setupSvc();
     var settings = settingsStoreSvc.settings;
     settings.solr.startUrl = testSolrStartUrl;
@@ -111,7 +109,7 @@ describe('Service: settingsStoreSvc', function () {
   var testEsFieldSpecStr = testSolrFielgcldSpecStr;
   var testSearchArgsStr = '{"_match": "_all"}';
 
-  it('navigates on es updates', function() {
+  it('navigates on es updates', function () {
     setupSvc();
     var settings = settingsStoreSvc.settings;
     settings.es.startUrl = testEsStartUrl;
@@ -123,14 +121,13 @@ describe('Service: settingsStoreSvc', function () {
     expect(locationSvc.lastParams.esUrl).toEqual(testEsStartUrl);
     expect(locationSvc.lastParams.esQuery).toEqual(testSearchArgsStr);
     expect(locationSvc.lastParams.fieldSpec).toEqual(testEsFieldSpecStr);
-
   });
 
   var testOsStartUrl = 'http://localhost:9200/tmdb/_search';
   var testOsFieldSpecStr = '*';
   var testOsSearchArgsStr = '{"_match": "_all"}';
 
-  it('navigates on opensearch updates', function() {
+  it('navigates on opensearch updates', function () {
     setupSvc();
     var settings = settingsStoreSvc.settings;
     settings.os.startUrl = testOsStartUrl;
@@ -142,6 +139,5 @@ describe('Service: settingsStoreSvc', function () {
     expect(locationSvc.lastParams.osUrl).toEqual(testOsStartUrl);
     expect(locationSvc.lastParams.osQuery).toEqual(testOsSearchArgsStr);
     expect(locationSvc.lastParams.fieldSpec).toEqual(testOsFieldSpecStr);
-
   });
 });

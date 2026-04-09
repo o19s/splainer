@@ -1,22 +1,18 @@
 'use strict';
 
-angular.module('splain-app')
+angular
+  .module('splain-app')
   .service('settingsStoreSvc', function settingsStoreSvc(localStorageService, $location) {
-
     this.ENGINES = {};
     // these need to be angular values
     this.ENGINES.SOLR = 'solr';
     this.ENGINES.ELASTICSEARCH = 'es';
     this.ENGINES.OPENSEARCH = 'os';
 
-    var defaultEsArgs = '!{\n' +
-                        '  "query": {\n' +
-                        '    "match_all": {}\n' +
-                        '  }\n' +
-                        '}    ';
+    var defaultEsArgs = '!{\n' + '  "query": {\n' + '    "match_all": {}\n' + '  }\n' + '}    ';
 
     // Next is Local Storage
-    var initSearchArgs = function() {
+    var initSearchArgs = function () {
       var searchSettings = {
         solr: {
           customHeaders: '',
@@ -24,7 +20,7 @@ angular.module('splain-app')
           searchUrl: '',
           fieldSpecStr: '',
           searchArgsStr: '',
-          whichEngine: 'solr'
+          whichEngine: 'solr',
         },
         es: {
           customHeaders: '',
@@ -32,7 +28,7 @@ angular.module('splain-app')
           searchUrl: '',
           fieldSpecStr: '',
           searchArgsStr: defaultEsArgs,
-          whichEngine: 'es'
+          whichEngine: 'es',
         },
         os: {
           customHeaders: '',
@@ -40,20 +36,20 @@ angular.module('splain-app')
           searchUrl: '',
           fieldSpecStr: '',
           searchArgsStr: defaultEsArgs,
-          whichEngine: 'os'
+          whichEngine: 'os',
         },
         whichEngine: 'solr', // which engine was the last used
-        searchUrl: function() {
+        searchUrl: function () {
           return this[this.whichEngine].searchUrl;
         },
-        fieldSpecStr: function() {
+        fieldSpecStr: function () {
           return this[this.whichEngine].fieldSpecStr;
         },
-        searchArgsStr: function() {
+        searchArgsStr: function () {
           return this[this.whichEngine].searchArgsStr;
-        }
+        },
       };
-      var localStorageTryGet = function(key, engine, def) {
+      var localStorageTryGet = function (key, engine, def) {
         var val;
         var prefix = '';
         var settings = searchSettings;
@@ -107,7 +103,7 @@ angular.module('splain-app')
       return searchSettings;
     };
 
-    var trySaveArgs= function(searchSettings) {
+    var trySaveArgs = function (searchSettings) {
       if (localStorageService.isSupported) {
         localStorageService.set('solr_customHeaders', searchSettings.solr.customHeaders);
         localStorageService.set('solr_startUrl', searchSettings.solr.startUrl);
@@ -130,15 +126,22 @@ angular.module('splain-app')
         localStorageService.set('whichEngine', searchSettings.whichEngine);
       }
       if (searchSettings.whichEngine === 'solr') {
-        $location.search({'solr':  searchSettings.solr.startUrl, 'fieldSpec': searchSettings.solr.fieldSpecStr});
+        $location.search({
+          solr: searchSettings.solr.startUrl,
+          fieldSpec: searchSettings.solr.fieldSpecStr,
+        });
       } else if (searchSettings.whichEngine === 'es') {
-        $location.search({'esUrl':  searchSettings.es.searchUrl,
-                          'esQuery': searchSettings.es.searchArgsStr,
-                          'fieldSpec': searchSettings.es.fieldSpecStr});
+        $location.search({
+          esUrl: searchSettings.es.searchUrl,
+          esQuery: searchSettings.es.searchArgsStr,
+          fieldSpec: searchSettings.es.fieldSpecStr,
+        });
       } else if (searchSettings.whichEngine === 'os') {
-        $location.search({'osUrl':  searchSettings.os.searchUrl,
-                          'osQuery': searchSettings.os.searchArgsStr,
-                          'fieldSpec': searchSettings.os.fieldSpecStr});
+        $location.search({
+          osUrl: searchSettings.os.searchUrl,
+          osQuery: searchSettings.os.searchArgsStr,
+          fieldSpec: searchSettings.os.fieldSpecStr,
+        });
       }
     };
 
@@ -148,8 +151,7 @@ angular.module('splain-app')
     /*
      * save changes to settings
      * */
-    this.save = function() {
+    this.save = function () {
       trySaveArgs(this.settings);
     };
-
   });
