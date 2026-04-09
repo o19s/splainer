@@ -10,8 +10,14 @@ function makeRoot() {
 }
 
 // Minimal doc fake matching the splainer-search doc shape that
-// app/views/docRow.html relies on. The island calls these methods at
+// app/views/docRow.html relied on. The island calls these methods at
 // render time; the fake just returns whatever the test wants to display.
+//
+// Intentionally omits `hotMatchesOutOf` — the StackedChart child renders
+// null defensively when it's missing, so chart-agnostic tests stay
+// uncoupled from the chart's render shape. The two chart-aware tests
+// below override the doc with a `hotMatchesOutOf` that returns canned
+// hot matches.
 function makeDoc(overrides = {}) {
   return {
     score: () => 1.5,
@@ -23,6 +29,14 @@ function makeDoc(overrides = {}) {
     image: null,
     ...overrides,
   };
+}
+
+// For the chart-aware tests only — adds a single canned hot match.
+function makeDocWithChart(overrides = {}) {
+  return makeDoc({
+    hotMatchesOutOf: () => [{ description: 'title:canned', percentage: 75 }],
+    ...overrides,
+  });
 }
 
 describe('docRow island', () => {
@@ -39,7 +53,7 @@ describe('docRow island', () => {
 
   it('renders the doc score and title', () => {
     const el = makeRoot();
-    mount(el, makeDoc(), {});
+    mount(el, makeDoc(), { maxScore: 1 });
     expect(el.querySelector('[data-testid="doc-row"]')).not.toBeNull();
     expect(el.textContent).toContain('1.5');
     expect(el.textContent).toContain('canned');
@@ -56,7 +70,7 @@ describe('docRow island', () => {
       makeDoc({
         subSnippets: () => ({ body: 'foo', title: 'bar' }),
       }),
-      {},
+      { maxScore: 1 },
     );
     const labels = Array.from(el.querySelectorAll('.fieldLabel')).map((l) =>
       l.textContent.trim(),
@@ -74,7 +88,7 @@ describe('docRow island', () => {
       makeDoc({
         subSnippets: () => ({ tags: ['alpha', 'beta', 'gamma'] }),
       }),
-      {},
+      { maxScore: 1 },
     );
     expect(el.textContent).toContain('alpha, beta, gamma');
   });
@@ -89,7 +103,7 @@ describe('docRow island', () => {
         hasImage: () => true,
         image: 'http://example.com/full.png',
       }),
-      {},
+      { maxScore: 1 },
     );
     const imgs = el.querySelectorAll('img');
     expect(imgs.length).toBe(2);
@@ -101,67 +115,46 @@ describe('docRow island', () => {
     const el = makeRoot();
     const onShowDoc = vi.fn();
     const doc = makeDoc();
-    mount(el, doc, { onShowDoc });
+    mount(el, doc, { maxScore: 1, onShowDoc });
     const link = el.querySelector('a');
     link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
     expect(onShowDoc).toHaveBeenCalledTimes(1);
     expect(onShowDoc).toHaveBeenCalledWith(doc);
   });
 
-  it('reports the chart-host element to registerChartHost', () => {
-    // The directive shim needs a stable reference to the chart slot so it
-    // can $compile <stacked-chart> into it. registerChartHost is called
-    // on every render with the live DOM node; the shim takes the most
-    // recent one. This test asserts the wiring exists.
+  // ─── PR 9b: StackedChart child rendering ──────────────────────────────
+  // Replaces the three chart-host tests from 9a, which validated the
+  // Preact-parent / Angular-child inversion bridge. That bridge is gone;
+  // StackedChart is a JSX child now and the assertions move to behaviors
+  // observable in the rendered DOM tree.
+
+  it('renders the StackedChart child with the doc hot matches', () => {
     const el = makeRoot();
-    const registerChartHost = vi.fn();
-    mount(el, makeDoc(), { registerChartHost });
-    expect(registerChartHost).toHaveBeenCalled();
-    const arg = registerChartHost.mock.calls[0][0];
-    expect(arg).not.toBeNull();
-    expect(arg.getAttribute('data-role')).toBe('chart-host');
+    mount(el, makeDocWithChart(), { maxScore: 1, onShowDetailed: () => {} });
+    // The chart renders one .graph-explain row per hot match.
+    expect(el.querySelectorAll('.graph-explain').length).toBeGreaterThan(0);
+    expect(el.textContent).toContain('title:canned');
+    // The Detailed link with the load-bearing PR 8.5 testid is present.
+    expect(el.querySelector('[data-testid="stacked-chart-detailed"]')).not.toBeNull();
   });
 
-  it('preserves DOM children injected externally into the chart-host across re-renders', () => {
-    // **The actual load-bearing test for the PR 9a chart-host pattern.**
-    //
-    // The directive shim $compile's <stacked-chart> into the chart-host
-    // <div> via Angular, *outside* Preact's vtree. The pattern only
-    // works if Preact's reconciler does not see — and therefore does
-    // not remove — children that Preact didn't add itself. Preact
-    // tracks its own children via vnode metadata, not by querying the
-    // real DOM, so externally-injected children survive re-renders.
-    //
-    // The previous test (chart-host element identity) only proves the
-    // host <div> is reused. This test directly verifies the property
-    // the pattern depends on: inject a sentinel child, re-mount with
-    // new props, assert the sentinel is still there.
-    //
-    // If a future Preact upgrade ever changes this behavior (gains
-    // "remove unknown children" semantics), this test fires
-    // immediately and points at the right area, instead of showing up
-    // as "the chart vanishes after the first digest tick" in a
-    // browser session.
+  it('clicking the StackedChart Detailed link fires onShowDetailed', () => {
     const el = makeRoot();
-    const registerChartHost = vi.fn();
-    mount(el, makeDoc(), { registerChartHost });
-    const host = registerChartHost.mock.calls[0][0];
+    const onShowDetailed = vi.fn();
+    mount(el, makeDocWithChart(), { maxScore: 1, onShowDetailed });
+    el.querySelector('[data-testid="stacked-chart-detailed"]').dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true }),
+    );
+    expect(onShowDetailed).toHaveBeenCalledTimes(1);
+  });
 
-    // Simulate Angular's $compile injecting a child element.
-    const sentinel = document.createElement('span');
-    sentinel.setAttribute('data-sentinel', 'angular-injected');
-    sentinel.textContent = 'I am injected by Angular';
-    host.appendChild(sentinel);
-    expect(host.contains(sentinel)).toBe(true);
-
-    // Re-mount with new props, simulating the directive shim's $watch
-    // firing rerender after a doc mutation.
-    mount(el, makeDoc({ score: () => 99 }), { registerChartHost });
-
-    // The sentinel must still be in place. If Preact wiped it, this
-    // assertion fails and the chart-host pattern is broken.
-    expect(host.contains(sentinel)).toBe(true);
-    expect(host.querySelector('[data-sentinel="angular-injected"]')).not.toBeNull();
+  it('omits the Detailed link in the <=3 branch when no onShowDetailed callback is provided', () => {
+    // The <=3 branch matches the old template's `ng-if="detailed"`.
+    // (The >3 branch always renders the Detailed link — see the
+    // stackedChart spec for that case.)
+    const el = makeRoot();
+    mount(el, makeDocWithChart(), { maxScore: 1 });
+    expect(el.querySelector('[data-testid="stacked-chart-detailed"]')).toBeNull();
   });
 
   it('re-mounts cleanly after an unmount', () => {
@@ -172,43 +165,13 @@ describe('docRow island', () => {
     // root again. Verify the second mount produces a fresh, valid
     // tree — not a stale-state ghost from the first mount.
     const el = makeRoot();
-    mount(el, makeDoc(), {});
+    mount(el, makeDoc(), { maxScore: 1 });
     expect(el.querySelector('[data-testid="doc-row"]')).not.toBeNull();
     unmount(el);
     expect(el.querySelector('[data-testid="doc-row"]')).toBeNull();
-    mount(el, makeDoc({ score: () => 7 }), {});
+    mount(el, makeDoc({ score: () => 7 }), { maxScore: 1 });
     expect(el.querySelector('[data-testid="doc-row"]')).not.toBeNull();
     expect(el.textContent).toContain('7');
-  });
-
-  it('reports the SAME chart-host element across re-renders', () => {
-    // Load-bearing property: Preact reuses the same DOM node for the
-    // chart-host <div> across re-renders. The directive shim's
-    // registerChartHost early-returns on identity equality and assumes
-    // it never has to recompile <stacked-chart> after first mount. If
-    // Preact ever swapped the underlying node, the shim's old chart
-    // would dangle on a detached element and the new node would render
-    // empty. This test locks the property in.
-    //
-    // Also a regression check for "Preact wipes Angular-injected
-    // children on re-render" — if that happened, the chart would vanish
-    // mid-session in production. Preact does NOT do that (it tracks its
-    // own children via vnode metadata, not by querying real DOM), and
-    // this test enforces the assumption from the only direction Vitest
-    // can: by asserting the host element identity is stable.
-    const el = makeRoot();
-    const registerChartHost = vi.fn();
-    const doc1 = makeDoc({ score: () => 1.5 });
-    const doc2 = makeDoc({ score: () => 2.5 });
-    mount(el, doc1, { registerChartHost });
-    const firstHost = registerChartHost.mock.calls[0][0];
-    // Re-mount with a different doc (simulating the directive shim's
-    // $watch firing rerender after a doc mutation).
-    mount(el, doc2, { registerChartHost });
-    const lastHost = registerChartHost.mock.calls[registerChartHost.mock.calls.length - 1][0];
-    expect(lastHost).toBe(firstHost);
-    // And the host element must still be in the DOM — not detached.
-    expect(el.contains(lastHost)).toBe(true);
   });
 
   // ───────────────────────────────────────────────────────────────────────
@@ -226,7 +189,7 @@ describe('docRow island', () => {
         getHighlightedTitle: () =>
           'safe text <img src=x onerror="window.__xss=1"> more',
       }),
-      {},
+      { maxScore: 1 },
     );
     // The image tag may survive (it's in DOMPurify's allowlist), but the
     // onerror attribute MUST be stripped.
@@ -250,7 +213,7 @@ describe('docRow island', () => {
           body: 'highlighted <em>term</em> <script>window.__xss2=1</script> trailing',
         }),
       }),
-      {},
+      { maxScore: 1 },
     );
     expect(el.querySelector('script')).toBeNull();
     expect(el.textContent).toContain('highlighted');
@@ -271,7 +234,7 @@ describe('docRow island', () => {
         getHighlightedTitle: () =>
           '<a href="javascript:window.__xss3=1">click</a>',
       }),
-      {},
+      { maxScore: 1 },
     );
     // Strong assertion: the literal "javascript:" must not appear ANYWHERE
     // in the rendered HTML. This catches both possible sanitization
@@ -291,7 +254,7 @@ describe('docRow island', () => {
 
   it('unmount tears down the rendered DOM', () => {
     const el = makeRoot();
-    mount(el, makeDoc(), {});
+    mount(el, makeDoc(), { maxScore: 1 });
     expect(el.querySelector('[data-testid="doc-row"]')).not.toBeNull();
     unmount(el);
     expect(el.querySelector('[data-testid="doc-row"]')).toBeNull();

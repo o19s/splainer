@@ -6,19 +6,19 @@
 // modal-open path is covered end-to-end by the PR 8.5 Playwright test.
 // This spec covers the *shim* — the cross-framework glue layer that owns:
 //
-//   - the doc.showDetailed mutation (used by the still-Angular
-//     <stacked-chart> child)
+//   - the doc.showDetailed mutation (preserved for the existing
+//     Playwright tests that call it programmatically — removed in 9d)
 //   - the two $uibModal.open call sites (Detailed explain modal and
-//     show-doc modal)
-//   - the $compile path that injects <stacked-chart> into the
-//     island-rendered chart-host slot
+//     show-doc modal — both move to native <dialog> in 9c/9d)
 //   - the $watch lifecycle (deep on doc, shallow on maxScore)
-//   - the destroy hook (chart scope teardown + island unmount)
+//   - the destroy hook (island unmount)
 //
-// Without this spec, the shim's coverage was Vitest (island only, no
-// Angular) + one Playwright path (the explain modal). The "show doc"
-// modal path, the doc-transition path, and the destroy hook had zero
-// coverage. Following PR 7 (settings) and PR 8 (docSelector) precedent.
+// **PR 9b changes:** the chart-host plumbing tests from 9a are gone —
+// the inversion bridge they validated no longer exists. <stacked-chart>
+// is now a Preact island rendered directly inside the docRow island as
+// a JSX child; there is no more $compile-into-host path to test. The
+// shim no longer injects $compile and no longer has a registerChartHost
+// callback.
 describe('docRow directive', function () {
   var $compile = null;
   var $rootScope = null;
@@ -27,26 +27,26 @@ describe('docRow directive', function () {
   var savedIslandsGlobal = null;
   var mountCalls = null;
   var unmountCalls = null;
-  var capturedCallbacks = null;
+  var capturedProps = null;
 
   beforeEach(module('splain-app'));
 
   beforeEach(function () {
     // Stub the SplainerIslands global so the shim's link function finds
     // a usable island without loading the Preact bundle. The mount stub
-    // captures the callbacks the shim passes (onShowDoc and
-    // registerChartHost) so the test can invoke them directly. Same
+    // captures the props the shim passes (maxScore, onShowDoc,
+    // onShowDetailed) so the test can invoke them directly. Same
     // pattern as test/spec/directives/docSelector.js — see PR 8 spec
     // for the rationale.
     savedIslandsGlobal = window.SplainerIslands;
     mountCalls = [];
     unmountCalls = [];
-    capturedCallbacks = null;
+    capturedProps = null;
     window.SplainerIslands = {
       docRow: {
-        mount: function (rootEl, doc, callbacks) {
+        mount: function (rootEl, doc, props) {
           mountCalls.push({ rootEl: rootEl, doc: doc });
-          capturedCallbacks = callbacks;
+          capturedProps = props;
         },
         unmount: function (rootEl) {
           unmountCalls.push(rootEl);
@@ -58,25 +58,6 @@ describe('docRow directive', function () {
   afterEach(function () {
     window.SplainerIslands = savedIslandsGlobal;
   });
-
-  // Override <stacked-chart> with a no-op stub. The shim $compile's a
-  // <stacked-chart> element into the chart-host slot; the real directive
-  // would require its template + a doc with hotMatchesOutOf(). The stub
-  // is enough to verify $compile was invoked into the slot.
-  //
-  // See PR 8 docSelector spec for the `terminal: true` warning — same
-  // applies here. We never click the stub, so terminal is fine.
-  beforeEach(module(function ($compileProvider) {
-    $compileProvider.directive('stackedChart', function () {
-      return {
-        priority: 10000,
-        terminal: true,
-        restrict: 'E',
-        template: '<div data-test-stub-stacked-chart></div>',
-        scope: {},
-      };
-    });
-  }));
 
   beforeEach(inject(function (
     _$compile_,
@@ -123,22 +104,20 @@ describe('docRow directive', function () {
     expect(first.doc.id).toBe('doc-1');
   });
 
-  it('passes both onShowDoc and registerChartHost callbacks to the island', function () {
+  it('passes maxScore, onShowDoc, and onShowDetailed to the island', function () {
     compileDirective();
-    expect(capturedCallbacks).not.toBeNull();
-    expect(typeof capturedCallbacks.onShowDoc).toBe('function');
-    expect(typeof capturedCallbacks.registerChartHost).toBe('function');
+    expect(capturedProps).not.toBeNull();
+    expect(capturedProps.maxScore).toBe(1);
+    expect(typeof capturedProps.onShowDoc).toBe('function');
+    expect(typeof capturedProps.onShowDetailed).toBe('function');
   });
 
-  // ─── doc.showDetailed mutation ──────────────────────────────────────────
+  // ─── doc.showDetailed mutation (preserved until 9d) ─────────────────────
 
-  it('attaches doc.showDetailed before mounting (so <stacked-chart> can call it)', function () {
-    // The still-Angular <stacked-chart> child binds detailed="doc.showDetailed".
-    // The mutation MUST happen before the chart is compiled (otherwise the
-    // binding is undefined). The shim's order is: assign showDetailed, then
-    // mount the island, then useLayoutEffect → registerChartHost → $compile
-    // <stacked-chart>. By the time <stacked-chart> evaluates the binding,
-    // doc.showDetailed exists. Locking that ordering in.
+  it('attaches doc.showDetailed for programmatic test access', function () {
+    // Existing Playwright tests call scope.doc.showDetailed() directly
+    // to open the explain modal. Until 9d removes the doc-mutation
+    // pattern entirely, the shim must continue attaching this handle.
     var compiled = compileDirective();
     expect(typeof compiled.scope.doc.showDetailed).toBe('function');
   });
@@ -146,19 +125,14 @@ describe('docRow directive', function () {
   it('preserves doc.showDetailed across a doc mutation', function () {
     // When the deep $watch fires (e.g. splainer-search mutates the doc
     // object), the shim re-runs rerender, which re-attaches showDetailed.
-    // The function reference is the same closure, so the chart's
-    // detailed="doc.showDetailed" binding stays valid.
     var compiled = compileDirective();
     var firstShowDetailed = compiled.scope.doc.showDetailed;
     expect(typeof firstShowDetailed).toBe('function');
 
-    // Mutate the doc (simulating splainer-search updating it in place).
     compiled.scope.doc.someNewField = 'updated';
     compiled.scope.$digest();
 
     expect(typeof compiled.scope.doc.showDetailed).toBe('function');
-    // Same closure across re-renders within one directive instance.
-    expect(compiled.scope.doc.showDetailed).toBe(firstShowDetailed);
   });
 
   // ─── Modal openers ──────────────────────────────────────────────────────
@@ -175,10 +149,24 @@ describe('docRow directive', function () {
     expect(args.templateUrl).toBe('views/detailedExplain.html');
     expect(args.controller).toBe('DocExplainCtrl');
     expect(args.size).toBe('lg');
-    // Resolve.doc is a function returning the directive's doc.
     expect(args.resolve.doc()).toBe(compiled.scope.doc);
-    // canExplainOther: solr is in the allowlist.
     expect(args.resolve.canExplainOther()).toBe(true);
+  });
+
+  it('onShowDetailed (the island prop) also opens the explain modal', function () {
+    // The island calls props.onShowDetailed when the StackedChart
+    // Detailed link is clicked. This is the post-9b call path; the
+    // doc.showDetailed mutation above is the legacy path. Both must
+    // open the same modal.
+    spyOn($uibModal, 'open').and.returnValue({});
+    settingsStoreSvc.settings.whichEngine = 'solr';
+
+    compileDirective();
+    capturedProps.onShowDetailed();
+
+    expect($uibModal.open).toHaveBeenCalled();
+    var args = $uibModal.open.calls.mostRecent().args[0];
+    expect(args.templateUrl).toBe('views/detailedExplain.html');
   });
 
   it('canExplainOther returns false for an unsupported engine', function () {
@@ -213,47 +201,13 @@ describe('docRow directive', function () {
 
     var compiled = compileDirective();
     var clickedDoc = compiled.scope.doc;
-    capturedCallbacks.onShowDoc(clickedDoc);
+    capturedProps.onShowDoc(clickedDoc);
 
     expect($uibModal.open).toHaveBeenCalled();
     var args = $uibModal.open.calls.mostRecent().args[0];
     expect(args.templateUrl).toBe('views/detailedDoc.html');
     expect(args.controller).toBe('DetailedDocCtrl');
     expect(args.resolve.doc()).toBe(clickedDoc);
-  });
-
-  // ─── Chart compile path ─────────────────────────────────────────────────
-
-  it('registerChartHost compiles a <stacked-chart> into the host element', function () {
-    var compiled = compileDirective();
-    // The island stub never actually creates a chart-host element. Build
-    // one manually and feed it to the shim's registerChartHost callback,
-    // which is the same code path that would run in production via the
-    // island's useLayoutEffect.
-    var hostEl = document.createElement('div');
-    hostEl.setAttribute('data-role', 'chart-host');
-    capturedCallbacks.registerChartHost(hostEl);
-
-    // The shim should have $compile'd the stub <stacked-chart> into the
-    // host element.
-    expect(hostEl.querySelector('[data-test-stub-stacked-chart]')).not.toBeNull();
-    // Side effect cleanup: don't leak the synthetic element.
-    compiled.scope.$destroy();
-  });
-
-  it('registerChartHost is idempotent on the same host element', function () {
-    // The early-return in registerChartHost is load-bearing: it prevents
-    // re-compiling <stacked-chart> on every digest tick. Verify it.
-    compileDirective();
-    var hostEl = document.createElement('div');
-    capturedCallbacks.registerChartHost(hostEl);
-    var firstChildCount = hostEl.children.length;
-    expect(firstChildCount).toBe(1);
-
-    // Second call with the same host element — should NOT add another
-    // <stacked-chart>.
-    capturedCallbacks.registerChartHost(hostEl);
-    expect(hostEl.children.length).toBe(1);
   });
 
   // ─── Destroy hook ───────────────────────────────────────────────────────
@@ -263,31 +217,5 @@ describe('docRow directive', function () {
     expect(unmountCalls.length).toBe(0);
     compiled.scope.$destroy();
     expect(unmountCalls.length).toBe(1);
-  });
-
-  it('tears down the compiled chart scope on destroy', function () {
-    // The shim creates a child scope for <stacked-chart> via scope.$new().
-    // On destroy it must call $destroy on that scope to release watchers
-    // and event listeners; otherwise repeated mount/destroy cycles in a
-    // long ng-repeat could leak Angular scopes. We can't directly inspect
-    // the chart scope (it's local to the shim), but we can verify the
-    // destroy hook runs without throwing on the .scope().$destroy() and
-    // .remove() calls — both of which require a valid jqLite element.
-    var compiled = compileDirective();
-    var hostEl = document.createElement('div');
-    capturedCallbacks.registerChartHost(hostEl);
-    expect(function () {
-      compiled.scope.$destroy();
-    }).not.toThrow();
-  });
-
-  it('does not throw when destroyed before any chart compile', function () {
-    // Edge case: directive mounts but is destroyed before its island ever
-    // calls registerChartHost (e.g. ng-repeat removes the row immediately).
-    // The destroy hook's `if (compiledChart)` guard handles this; verify.
-    var compiled = compileDirective();
-    expect(function () {
-      compiled.scope.$destroy();
-    }).not.toThrow();
   });
 });
