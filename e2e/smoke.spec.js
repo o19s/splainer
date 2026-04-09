@@ -58,17 +58,17 @@ test.describe('splainer smoke', () => {
   test('app boots and shows the Solr URL form', async ({ page }) => {
     await page.goto('/');
     // The StartUrl view renders three engine forms (Solr, ES, OpenSearch).
-    // The Solr URL input is bound to start.solrSettings.startUrl.
-    const solrInput = page.locator('input[ng-model="start.solrSettings.startUrl"]');
+    // Selectors target data-role attributes rather than ng-model so the
+    // tests survive PRs 8-10, which rewrite StartUrl off Angular.
+    const solrInput = page.locator('[data-role="solr-start-url"]');
     await expect(solrInput).toBeVisible();
   });
 
   test('Solr URL input accepts a value and submit button is enabled', async ({ page }) => {
     await page.goto('/');
-    const solrInput = page.locator('input[ng-model="start.solrSettings.startUrl"]');
+    const solrInput = page.locator('[data-role="solr-start-url"]');
     await solrInput.fill('http://localhost:8983/solr/techproducts/select?q=*:*');
-    // The submit button lives in the same form; ng-click="start.submitSolr()".
-    const submit = page.locator('[ng-click="start.submitSolr()"]').first();
+    const submit = page.locator('[data-role="solr-submit"]').first();
     await expect(submit).toBeVisible();
     await expect(submit).toBeEnabled();
   });
@@ -123,8 +123,8 @@ test.describe('splainer smoke', () => {
 
     await page.goto('/');
     const url = 'http://fake-solr.test/solr/persist/select?q=*:*';
-    await page.locator('input[ng-model="start.solrSettings.startUrl"]').fill(url);
-    await page.locator('[ng-click="start.submitSolr()"]').first().click();
+    await page.locator('[data-role="solr-start-url"]').fill(url);
+    await page.locator('[data-role="solr-submit"]').first().click();
 
     // Poll-wait for the localStorage write — it happens inside Angular's
     // $digest after fetch resolves, so there's no DOM signal we can await.
@@ -164,6 +164,7 @@ test.describe('splainer smoke', () => {
     await page.goto('/');
     await page.locator('a[href="#es_"]').click();
     await page.locator('#es_').getByRole('button', { name: 'Advanced Settings' }).click();
+    // Framework-agnostic: data-role on the ES URL input survives deangularize.
 
     // The select rendered by the Preact island. There are multiple
     // [data-role="header-type"] elements on the page (one per call site),
@@ -189,21 +190,36 @@ test.describe('splainer smoke', () => {
     await expect
       .poll(async () =>
         page.evaluate(() => {
+          // Read the header type off the DOM select *and* the settings store.
+          // Both checks matter: the DOM-only read would pass a regression
+          // where the Preact island updates its <select> but fails to
+          // propagate the change into settingsStoreSvc (a "UI shows right,
+          // store is wrong" bug class). The store read uses Angular's
+          // injector, which will disappear with the directive shim in PR 11 —
+          // at that point this block should read whatever public API
+          // replaces settingsStoreSvc.
+          const select = document.querySelector('#es_ [data-role="header-type"]');
           const container = document.querySelector('#es_ [data-role="header-editor"]');
-          const customHeadersEl = document.querySelector('#es_ custom-headers');
-          const scope = window.angular.element(customHeadersEl).isolateScope();
           const aceVal =
             window.ace && container && container.tagName !== 'TEXTAREA'
               ? window.ace.edit(container).getValue()
               : container && container.value;
+          const storeHeaderType = window.angular
+            ? window.angular
+                .element(document.querySelector('settings-island'))
+                .injector()
+                .get('settingsStoreSvc').settings.es.headerType
+            : null;
           return {
-            scopeHeaderType: scope && scope.settings && scope.settings.headerType,
+            domHeaderType: select && select.value,
+            storeHeaderType: storeHeaderType,
             aceBody: aceVal,
           };
         }),
       )
       .toEqual({
-        scopeHeaderType: 'API Key',
+        domHeaderType: 'API Key',
+        storeHeaderType: 'API Key',
         aceBody: expect.stringContaining('Authorization'),
       });
   });
@@ -246,7 +262,7 @@ test.describe('splainer smoke', () => {
     await page.locator('a[href="#es_"]').click();
     // Set the ES URL to our intercepted host.
     await page
-      .locator('#es_ input[ng-model="start.esSettings.startUrl"]')
+      .locator('#es_ [data-role="es-start-url"]')
       .fill('http://fake-es.test/_search');
     // Open the Advanced Settings panel and pick API Key — the island's
     // setHeaderType handler populates the body with the Authorization
@@ -268,6 +284,126 @@ test.describe('splainer smoke', () => {
         ),
       )
       .toBe(true);
+  });
+
+  test('settings island: configured search args reach the backend on the wire', async ({
+    page,
+  }) => {
+    // PR 7 merge gate. Intercepts the outbound ES request and asserts that a
+    // unique marker the user typed into the dev-sidebar Search Args editor
+    // landed in the request body. This is the only test that proves the full
+    // chain from Settings island → directive shim → onPublish callback →
+    // esSettingsSvc.fromTweakedSettings → splainer-search 3.0.0 wired
+    // services → fetch is wired correctly. Internal-contract tests catch
+    // refactor regressions; this one catches silent integration breaks.
+    //
+    // Includes Security's two negative assertions: the marker must NOT be
+    // logged to the console and must NOT leak into a new localStorage entry
+    // beyond the expected settings keys.
+    const captured = [];
+    await page.route('**/fake-es.test/**', async (route) => {
+      captured.push({
+        url: route.request().url(),
+        body: route.request().postData(),
+        headers: route.request().headers(),
+      });
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        headers: corsHeaders,
+        body: JSON.stringify({
+          took: 1,
+          timed_out: false,
+          _shards: { total: 1, successful: 1, skipped: 0, failed: 0 },
+          hits: {
+            total: { value: 1, relation: 'eq' },
+            max_score: 1,
+            hits: [{ _id: '1', _score: 1, _source: { title: 'canned' } }],
+          },
+        }),
+      });
+    });
+
+    await page.goto('/');
+
+    // Use the StartUrl ES tab to seed an initial ES search and route the
+    // backend to fake-es.test. This populates settingsStoreSvc.settings.es
+    // and triggers the first search, which puts the dev sidebar into the
+    // 'es' engine — the state we want to test the dev sidebar against.
+    await page.locator('a[href="#es_"]').click();
+    await page
+      .locator('#es_ [data-role="es-start-url"]')
+      .fill('http://fake-es.test/_search');
+    await page.locator('#es_').getByRole('button', { name: 'Splain This!' }).click();
+
+    // Wait until the first search lands so the dev sidebar's Settings island
+    // is mounted in 'es' mode.
+    await expect.poll(() => captured.length).toBeGreaterThan(0);
+    captured.length = 0; // clear; we want to assert against the *post-edit* request
+
+    // Mutate searchArgsStr via the Angular store rather than the Ace editor
+    // input. We're testing the *publish* chain (Settings island → directive
+    // shim → onPublish → esSettingsSvc.fromTweakedSettings → fetch). The
+    // editor → store mutation path has its own coverage in
+    // app/scripts/islands/settings.spec.js (Vitest, textarea fallback) and
+    // is structurally identical to PR 6's customHeaders editor wiring,
+    // which has its own browser-level Playwright test. Going through the
+    // store keeps this test focused on the integration boundary it owns,
+    // and avoids Ace's programmatic-setValue idiosyncrasies (the change
+    // event doesn't fire reliably for API writes vs. user keystrokes).
+    const marker = 'PR7_MARKER_' + Math.random().toString(36).slice(2, 10);
+    const newArgs = JSON.stringify({ query: { match: { title: marker } } });
+    await page.evaluate((value) => {
+      const svc = window.angular
+        .element(document.querySelector('settings-island'))
+        .injector()
+        .get('settingsStoreSvc');
+      // Wrap in $apply so the directive's deep $watch fires and the island
+      // re-renders with the new searchArgsStr before we click submit.
+      const $rootScope = window.angular
+        .element(document.querySelector('settings-island'))
+        .injector()
+        .get('$rootScope');
+      $rootScope.$apply(function () {
+        svc.settings.es.searchArgsStr = value;
+      });
+    }, newArgs);
+
+    // Click the new Settings island's Rerun Query button — uses the
+    // post-island data-role selector, NOT the legacy Angular ng-click.
+    // This selector existing at all is the test's red→green signal.
+    await page.locator('[data-role="rerun-query"]').click();
+
+    // Poll until at least one captured request body contains the marker.
+    await expect
+      .poll(() => captured.some((c) => typeof c.body === 'string' && c.body.includes(marker)))
+      .toBe(true);
+
+    // --- Security: negative assertions ---
+
+    // (a) The marker must not have been logged to the console at any point.
+    // The beforeEach captures all console.error / pageerror events; assert
+    // none of them mention the marker. (Console.log and console.info aren't
+    // captured here, but pageerror is the channel that catches accidental
+    // serialization-of-settings-into-error-stacks regressions.)
+    const leakedToConsole = consoleErrors.some((e) => e.includes(marker));
+    expect(leakedToConsole, 'marker leaked into console errors').toBe(false);
+
+    // (b) The marker must only appear in the expected localStorage key
+    // (es_searchArgsStr or its splainer:v3:* successor). Any other key
+    // containing the marker is an unexpected leak.
+    const leakedKeys = await page.evaluate((m) => {
+      const out = [];
+      for (let i = 0; i < window.localStorage.length; i++) {
+        const k = window.localStorage.key(i);
+        const v = window.localStorage.getItem(k);
+        if (v && v.includes(m) && !/searchArgsStr$/.test(k)) {
+          out.push(k);
+        }
+      }
+      return out;
+    }, marker);
+    expect(leakedKeys, `marker leaked into unexpected localStorage keys: ${leakedKeys.join(', ')}`).toEqual([]);
   });
 
   test('search error path surfaces an error message', async ({ page }) => {

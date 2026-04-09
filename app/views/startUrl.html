@@ -17,6 +17,7 @@
                 class="form-control"
                 ng-model="start.solrSettings.startUrl"
                 ng-init="start.solrSettings.startUrl='http://quepid-solr.dev.o19s.com:8985/solr/tmdb/select?q=*:*'"
+                data-role="solr-start-url"
               />
               <span class="input-group-btn">
                 <button
@@ -24,6 +25,7 @@
                   type="submit"
                   dispatch-on-click="openEast"
                   ng-click="start.submitSolr()"
+                  data-role="solr-submit"
                 >
                   Splain This!
                 </button>
@@ -38,6 +40,7 @@
                 class="form-control"
                 ng-model="start.esSettings.startUrl"
                 ng-init="start.esSettings.startUrl='http://quepid-elasticsearch.dev.o19s.com:9206/tmdb/_search'"
+                data-role="es-start-url"
               />
               <span class="input-group-btn">
                 <button
@@ -45,6 +48,7 @@
                   type="submit"
                   dispatch-on-click="openEast"
                   ng-click="start.submitEs()"
+                  data-role="es-submit"
                 >
                   Splain This!
                 </button>
@@ -85,6 +89,7 @@
                 class="form-control"
                 ng-model="start.osSettings.startUrl"
                 ng-init="start.osSettings.startUrl='https://reader:reader@quepid-opensearch.dev.o19s.com:9000/tmdb/_search'"
+                data-role="os-start-url"
               />
               <span class="input-group-btn">
                 <button
@@ -92,6 +97,7 @@
                   type="submit"
                   dispatch-on-click="openEast"
                   ng-click="start.submitOs()"
+                  data-role="os-submit"
                 >
                   Splain This!
                 </button>

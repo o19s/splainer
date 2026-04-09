@@ -14,7 +14,7 @@
  * JSX uses Preact automatic runtime (see vite.islands.config.js); no `h` import.
  */
 import { render } from 'preact';
-import { useEffect, useRef } from 'preact/hooks';
+import { useAceEditor } from './useAceEditor.js';
 
 const HEADER_TEMPLATES = {
   None: '',
@@ -23,82 +23,7 @@ const HEADER_TEMPLATES = {
 };
 
 function AceEditor({ value, readOnly, onChange }) {
-  const containerRef = useRef(null);
-  const editorRef = useRef(null);
-  // Two refs make this work with Ace's imperative event model:
-  //   - onChangeRef so the change handler always calls the *latest* prop
-  //     (Preact passes a fresh onChange on every $watch tick from the
-  //     directive shim; the one-shot useEffect closure would otherwise
-  //     capture only the first one).
-  //   - suppressRef to break the echo loop: when our value-sync useEffect
-  //     calls editor.setValue(), Ace fires its 'change' event, which would
-  //     re-enter onChange and re-trigger the digest. We set suppressRef
-  //     during programmatic writes so the handler short-circuits.
-  const onChangeRef = useRef(onChange);
-  const suppressRef = useRef(false);
-
-  // Keep onChangeRef pointed at the latest prop. Done in an effect (not as
-  // a side effect during render) so this stays compatible with strict /
-  // concurrent rendering — the React anti-pattern docs warn about exactly
-  // this. useEffect (post-paint) is sufficient because the ref is consumed
-  // by an Ace event listener, not by a child effect that needs the value
-  // before paint.
-  useEffect(() => {
-    onChangeRef.current = onChange;
-  });
-
-  // Instantiate Ace once after the container is in the DOM.
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.ace || !containerRef.current) return;
-    const editor = window.ace.edit(containerRef.current);
-    editor.setTheme('ace/theme/chrome');
-    editor.session.setMode('ace/mode/json');
-    editor.session.setUseWrapMode(false);
-    // try/finally so a setValue throw can't leave suppressRef stuck true —
-    // a stuck suppressRef silently drops every subsequent user keystroke,
-    // which is the worst possible failure mode (no error, just dead input).
-    suppressRef.current = true;
-    try {
-      editor.setValue(value || '', -1);
-    } finally {
-      suppressRef.current = false;
-    }
-    editor.setReadOnly(!!readOnly);
-    const handler = () => {
-      if (suppressRef.current) return;
-      onChangeRef.current(editor.getValue());
-    };
-    editor.session.on('change', handler);
-    editorRef.current = editor;
-    return () => {
-      editor.session.off('change', handler);
-      editor.destroy();
-      editorRef.current = null;
-    };
-    // Intentionally one-shot: we own the editor instance and sync prop
-    // changes via the separate effect below. Re-running this effect on
-    // every render would destroy and recreate Ace on every keystroke.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Sync external value/readOnly changes into the live editor without
-  // tearing it down. Wrapped in suppressRef (with try/finally — see the
-  // first useEffect) so the resulting Ace 'change' event doesn't echo
-  // back through onChange and re-enter the digest.
-  useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-    if (editor.getValue() !== (value || '')) {
-      suppressRef.current = true;
-      try {
-        editor.setValue(value || '', -1);
-      } finally {
-        suppressRef.current = false;
-      }
-    }
-    editor.setReadOnly(!!readOnly);
-  }, [value, readOnly]);
-
+  const containerRef = useAceEditor(value, onChange, { readOnly });
   return <div ref={containerRef} data-role="header-editor" style={{ height: '150px' }} />;
 }
 

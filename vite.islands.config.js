@@ -2,55 +2,70 @@
 //
 // Each .jsx file under app/scripts/islands/ is compiled to an IIFE bundle
 // at app/scripts/islands/dist/<name>.js. Preact is externalized — the
-// build references `window.preact.h`, `window.preact.render`, etc., which
+// build references `window.preact.*` (and `window.preactHooks.*`), which
 // are loaded by app/index.html before any island script.
+//
+// Multi-entry note (PR 7): Vite library mode does not support multiple
+// entries with IIFE format ("Multiple entry points are not supported when
+// output formats include 'umd' or 'iife'"). Each IIFE needs its own scope,
+// so we run one build per island. The package.json scripts orchestrate
+// this via scripts/build-islands.mjs, which loops over the entries below
+// and invokes Vite's programmatic build() API once per island.
+//
+// To add a new island in PRs 8–10: append to the `islands` array, write
+// the .jsx file, copy the directive shim pattern. No other config change.
 //
 // Run `yarn build:islands` once before serving (grunt serve) or testing
 // (npm test). For dev iteration, run `yarn build:islands:watch` in a
 // separate terminal alongside `grunt serve` or `yarn dev:vite`.
-//
-// This is intentionally a *small* build step that lives under the existing
-// Grunt prod pipeline. The full Grunt → Vite swap happens in PR 10.5 once
-// Angular is gone; until then, islands are pre-built ESM-to-IIFE and the
-// rest of splainer goes through Grunt unchanged.
-import { defineConfig } from 'vite';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const islandsDir = resolve(here, 'app/scripts/islands');
 
-export default defineConfig({
-  esbuild: {
-    jsx: 'automatic',
-    jsxImportSource: 'preact',
-  },
-  build: {
-    outDir: resolve(islandsDir, 'dist'),
-    emptyOutDir: true,
-    minify: false, // dev/test artifact; readable stack traces matter more than size
-    sourcemap: true,
-    lib: {
-      // One entry per island. Add new islands here in PRs 7–10.
-      entry: {
-        customHeaders: resolve(islandsDir, 'customHeaders.jsx'),
-      },
-      formats: ['iife'],
-      // The IIFE name is per-entry; Vite uses `${name}` interpolation.
-      // We don't actually use the global var — each island file attaches
-      // to window.SplainerIslands.* as a side effect — but Vite requires
-      // a name for IIFE output.
-      name: 'SplainerIslandBundle',
-      fileName: (_format, entryName) => `${entryName}.js`,
+// Each island is built as its own IIFE bundle. Add new islands here.
+export const islands = [
+  { name: 'customHeaders', entry: resolve(islandsDir, 'customHeaders.jsx') },
+  { name: 'settings', entry: resolve(islandsDir, 'settings.jsx') },
+];
+
+export const distDir = resolve(islandsDir, 'dist');
+
+// Returns a Vite config object for a single island. Consumed by
+// scripts/build-islands.mjs (one call per island).
+export function configFor({ name, entry }, { watch = false } = {}) {
+  return {
+    esbuild: {
+      jsx: 'automatic',
+      jsxImportSource: 'preact',
     },
-    rollupOptions: {
-      external: ['preact', 'preact/hooks'],
-      output: {
-        globals: {
-          preact: 'preact',
-          'preact/hooks': 'preactHooks',
+    build: {
+      outDir: distDir,
+      // Don't wipe the dist between islands — we'd lose the previous one.
+      // The build script empties the dir once before the loop.
+      emptyOutDir: false,
+      minify: false, // dev/test artifact; readable stack traces matter more than size
+      sourcemap: true,
+      watch: watch ? {} : null,
+      lib: {
+        entry,
+        formats: ['iife'],
+        // Each IIFE needs a unique global name; we don't read it (the
+        // island attaches to window.SplainerIslands.* as a side effect)
+        // but Vite/Rollup require it for IIFE output.
+        name: `SplainerIsland_${name}`,
+        fileName: () => `${name}.js`,
+      },
+      rollupOptions: {
+        external: ['preact', 'preact/hooks'],
+        output: {
+          globals: {
+            preact: 'preact',
+            'preact/hooks': 'preactHooks',
+          },
         },
       },
     },
-  },
-});
+  };
+}

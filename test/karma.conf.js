@@ -53,6 +53,10 @@ module.exports = function (config) {
       // `yarn build:islands` (vite.islands.config.js) into the dist/
       // folder which Karma loads alongside the rest of app/scripts/.
       'app/scripts/islands/**/*.jsx',
+      // ESM source files at the islands/ root (e.g. useAceEditor.js) —
+      // bundled into dist/ by Vite, not loadable as classic Karma scripts.
+      // Single-level glob so dist/ subfiles are still picked up.
+      'app/scripts/islands/*.js',
     ],
 
     // web server port

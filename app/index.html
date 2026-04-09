@@ -112,147 +112,12 @@
       <div class="east-slider"></div>
       <div class="pane_east">
         <h3>Search Controls</h3>
-        <form
-          class="form-horizontal"
-          style="height: 100%; min-height: 100%"
-          id="queryParams"
-          role="form"
-          ng-controller="SettingsCtrl"
-          ng-submit="publishSearcher()"
-        >
-          <div
-            class="dev-header"
-            ng-click="devSettingsSearchEngine.toggle = !devSettingsSearchEngine.toggle"
-          >
-            Search Engine
-            <span
-              ng-class="{true: 'glyphicon-plus-sign', false: 'glyphicon-minus-sign'}[!devSettingsSearchEngine.toggle]"
-              class="glyphicon"
-            ></span>
-          </div>
-          <div class="dev-section" ng-show="devSettingsSearchEngine.toggle">
-            <label>
-              <input type="radio" value="solr" ng-model="workingWhichEngine" />
-              Solr
-            </label>
-            <label>
-              <input type="radio" value="es" ng-model="workingWhichEngine" />
-              Elasticsearch
-            </label>
-            <label>
-              <input type="radio" value="os" ng-model="workingWhichEngine" />
-              OpenSearch
-            </label>
-          </div>
-
-          <div class="dev-header" ng-click="devSettingsSolr.toggle = !devSettingsSolr.toggle">
-            Search URL
-            <span
-              ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsSolr.toggle]"
-              class="glyphicon glyphicon-minus-sign"
-            ></span>
-          </div>
-          <div class="dev-section" ng-show="!devSettingsSolr.toggle">
-            <input
-              type="text"
-              ng-model="workingSettings.searchUrl"
-              placeholder="Enter URL to your request handler"
-              class="form-control"
-            />
-          </div>
-
-          <div class="dev-header" ng-click="devSettingsFields.toggle = !devSettingsFields.toggle">
-            Displayed Fields
-            <span
-              ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsFields.toggle]"
-              class="glyphicon glyphicon-minus-sign"
-            ></span>
-          </div>
-          <div class="dev-section" ng-show="!devSettingsFields.toggle">
-            <input
-              id="inputFieldSpec"
-              type="text"
-              ng-show="!currSearch.searcher.isTemplateCall()"
-              ng-model="workingSettings.fieldSpecStr"
-              placeholder="Fields you'd like to display"
-              class="form-control"
-            />
-            <span ng-show="currSearch.searcher.isTemplateCall()">
-              When using ES Templates, specify fields to view via <code>_source</code> defined in
-              the search template.
-            </span>
-          </div>
-
-          <div class="dev-header" ng-click="devSettingsArgs.toggle = !devSettingsArgs.toggle">
-            Search Args
-            <span
-              ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[!devSettingsArgs.toggle]"
-              class="glyphicon glyphicon-minus-sign"
-            ></span>
-          </div>
-          <div class="dev-section" ng-show="!devSettingsArgs.toggle">
-            <div ng-show="workingWhichEngine === 'solr'">
-              <textarea
-                id="inputSolrArgsStr"
-                ng-model="workingSettings.searchArgsStr"
-                rows="10"
-                class="form-control ng-pristine ng-valid"
-              ></textarea>
-            </div>
-
-            <div ng-show="workingWhichEngine === 'es'">
-              <div
-                class="es-query-params"
-                ui-ace="{
-                    require: ['ace/ext/language_tools'],
-                    useWrapMode: true,
-                    useSoftTabs: true,
-                    onLoad: aceSettings,
-                    mode: 'json'
-                  }"
-                id="es-query-params-editor"
-                ng-model="workingSettings.searchArgsStr"
-              ></div>
-              <a href="" class="pull-right label" ng-click="autoIndent()">Indent JSON</a>
-            </div>
-
-            <div ng-show="workingWhichEngine === 'os'">
-              <div
-                class="os-query-params"
-                ui-ace="{
-                    require: ['ace/ext/language_tools'],
-                    useWrapMode: true,
-                    useSoftTabs: true,
-                    onLoad: aceSettings,
-                    mode: 'json'
-                  }"
-                id="os-query-params-editor"
-                ng-model="workingSettings.searchArgsStr"
-              ></div>
-              <a href="" class="pull-right label" ng-click="autoIndent()">Indent JSON</a>
-            </div>
-          </div>
-
-          <div ng-show="workingWhichEngine !== 'solr'">
-            <div
-              class="dev-header"
-              ng-click="devSettingsHeaders.toggle = !devSettingsHeaders.toggle"
-            >
-              Custom Headers
-              <span
-                ng-class="{true: 'glyphicon-minus-sign', false: 'glyphicon-plus-sign'}[devSettingsHeaders.toggle]"
-                class="glyphicon glyphicon-plus-sign"
-              ></span>
-            </div>
-            <div class="dev-section black-label" ng-show="devSettingsHeaders.toggle">
-              <custom-headers settings="workingSettings"></custom-headers>
-            </div>
-          </div>
-
-          <div class="dev-section">
-            <button type="submit" class="btn btn-default">Rerun Query</button>
-          </div>
-        </form>
+        <!-- Settings island (PR 7). Replaces the inline ng-controller="SettingsCtrl"
+             form. The directive shim at app/scripts/directives/settings.js mounts
+             the Preact island built from app/scripts/islands/settings.jsx. The
+             legacy <custom-headers> directive is intentionally still alive for
+             startUrl.html (PRs 8-10); PR 11 deletes both. -->
+        <settings-island curr-search="currSearch" search="search"></settings-island>
       </div>
     </div>
 
@@ -318,9 +183,11 @@
          (see vite.islands.config.js). Each file attaches itself to
          window.SplainerIslands.<name> as a side effect. -->
     <script src="scripts/islands/dist/customHeaders.js"></script>
+    <script src="scripts/islands/dist/settings.js"></script>
     <script src="scripts/factories/Search.js"></script>
     <script src="scripts/controllers/docSelector.js"></script>
     <script src="scripts/directives/customHeaders.js"></script>
+    <script src="scripts/directives/settings.js"></script>
     <script src="scripts/directives/dispatchOnClick.js"></script>
     <script src="scripts/directives/docRow.js"></script>
     <script src="scripts/directives/docSelector.js"></script>
@@ -334,7 +201,6 @@
     <script src="scripts/controllers/detailedExplain.js"></script>
     <script src="scripts/controllers/detailedDoc.js"></script>
     <script src="scripts/controllers/searchResults.js"></script>
-    <script src="scripts/controllers/settings.js"></script>
     <script src="scripts/controllers/solrSettingsWarning.js"></script>
     <script src="scripts/controllers/startUrl.js"></script>
     <script src="scripts/ace-config.js"></script>

@@ -118,7 +118,7 @@ export default [
   },
   // Root tooling configs (ESM): Node globals such as `process` for CI flags.
   {
-    files: ['playwright.config.js'],
+    files: ['playwright.config.js', 'scripts/**/*.{js,mjs}'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
