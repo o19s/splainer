@@ -19,6 +19,7 @@
     "splainer-search": "2.20.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.17.0",
     "angular-mocks": "^1.8.3",
     "autoprefixer": "^9.8.8",
     "grunt": "^1.5.3",
@@ -30,7 +31,6 @@
     "grunt-contrib-cssmin": "^4.0.0",
     "grunt-contrib-htmlmin": "^3.1.0",
     "grunt-contrib-imagemin": "^4.0.0",
-    "grunt-contrib-jshint": "^3.2.0",
     "grunt-contrib-uglify": "^5.2.2",
     "grunt-contrib-watch": "^1.1.0",
     "grunt-filerev": "^2.3.1",
@@ -40,22 +40,30 @@
     "grunt-postcss": "^0.9.0",
     "grunt-svgmin": "^6.0.1",
     "grunt-usemin": "^3.1.0",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^10.0.1",
+    "globals": "^15.14.0",
     "jasmine-core": "^4.4.0",
-    "jshint-stylish": "^2.2.1",
     "karma": "^6.4.0",
     "karma-chrome-launcher": "^3.1.1",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "^5.1.0",
     "load-grunt-tasks": "^5.1.0",
+    "prettier": "^3.4.2",
     "puppeteer": "^18.0.2",
     "serve-static": "^1.15.0",
     "time-grunt": "^2.0.0"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18.18.0"
   },
   "scripts": {
-    "test": "grunt test"
+    "preinstall": "npx --yes only-allow yarn",
+    "test": "grunt test",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "browserslist": [
     "last 1 version",

@@ -47,7 +47,6 @@ describe('SettingsCtrl', function() {
     it('loads partial', function() {
       localStorage.isSupported = true;
       var  testUrl = 'http://localhost:8983/solr/collection1/select';
-      /*jshint camelcase: false */
       localStorage.store.solr_searchUrl = testUrl;
       createController();
       expect(scope.workingSettings.searchUrl).toEqual(testUrl);
@@ -59,7 +58,6 @@ describe('SettingsCtrl', function() {
       localStorage.isSupported = true;
       var testUrl = 'http://localhost:8983/solr/collection1/select';
       var testArgsStr = 'q=*:*&fq=blah&qq=blarg';
-      /*jshint camelcase: false */
       localStorage.store.whichEngine = 'solr';
       localStorage.store.solr_searchUrl = testUrl;
       localStorage.store.solr_searchArgsStr = '!' + testArgsStr;
@@ -73,7 +71,6 @@ describe('SettingsCtrl', function() {
       var testUrl = 'http://localhost:9200/tmdb/movies/_search';
       var testArgsStr = '{}';
       localStorage.store.whichEngine = 'es';
-      /*jshint camelcase: false */
       localStorage.store.es_searchUrl = testUrl;
       localStorage.store.es_searchArgsStr = '!' + testArgsStr;
       createController();

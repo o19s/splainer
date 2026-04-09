@@ -1,0 +1,9 @@
+node_modules
+coverage
+*.min.js
+dist/
+.tmp
+solr-splainer-package
+package-lock.json
+yarn.lock
+*.md

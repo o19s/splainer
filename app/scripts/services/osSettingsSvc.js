@@ -45,14 +45,14 @@ angular.module('splain-app')
         }
         if (settings.fieldSpecStr && angular.isString(settings.fieldSpecStr)) {
           settings.fieldSpecStr = settings.fieldSpecStr;
-        } else if ( angular.isDefined(parsedUrl.stored_fields) ) { // jshint ignore:line
-          settings.fieldSpecStr = parsedUrl.stored_fields; // jshint ignore:line
+        } else if ( angular.isDefined(parsedUrl.stored_fields) ) {
+          settings.fieldSpecStr = parsedUrl.stored_fields;
         }
         else {
           settings.fieldSpecStr = 'title, *';
         }
 
-        if (!angular.isDefined(parsedUrl.stored_fields)) { // jshint ignore:line
+        if (!angular.isDefined(parsedUrl.stored_fields)) {
           settings.startUrl = parsedUrl.url + '?stored_fields=' + settings.fieldSpecStr;
         }
 
