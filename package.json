@@ -16,14 +16,20 @@
     "jquery": "~3.6.1",
     "json3": "~3.3.3",
     "ng-json-explorer": "http://github.com/o19s/ng-json-explorer",
+    "preact": "^10.29.1",
     "splainer-search": "file:../splainer-search",
-    "urijs": "^1.19.7",
-    "preact": "^10.29.1"
+    "urijs": "^1.19.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "@playwright/test": "^1.59.1",
+    "@testing-library/preact": "^3.2.4",
     "angular-mocks": "^1.8.3",
     "autoprefixer": "^9.8.8",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "globals": "^15.14.0",
     "grunt": "^1.5.3",
     "grunt-concurrent": "^3.0.0",
     "grunt-contrib-clean": "^2.0.1",
@@ -42,10 +48,8 @@
     "grunt-postcss": "^0.9.0",
     "grunt-svgmin": "^6.0.1",
     "grunt-usemin": "^3.1.0",
-    "eslint": "^9.17.0",
-    "eslint-config-prettier": "^10.0.1",
-    "globals": "^15.14.0",
     "jasmine-core": "^4.4.0",
+    "jsdom": "^29.0.2",
     "karma": "^6.4.0",
     "karma-chrome-launcher": "^3.1.1",
     "karma-coverage": "~2.2.0",
@@ -55,11 +59,8 @@
     "puppeteer": "^18.0.2",
     "serve-static": "^1.15.0",
     "time-grunt": "^2.0.0",
-    "@testing-library/preact": "^3.2.4",
-    "jsdom": "^29.0.2",
     "vite": "^8.0.7",
-    "vitest": "^4.1.2",
-    "@playwright/test": "^1.59.1"
+    "vitest": "^4.1.2"
   },
   "engines": {
     "node": ">=18.18.0"

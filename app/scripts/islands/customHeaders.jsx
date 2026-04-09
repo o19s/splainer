@@ -78,6 +78,7 @@ function AceEditor({ value, readOnly, onChange }) {
     // Intentionally one-shot: we own the editor instance and sync prop
     // changes via the separate effect below. Re-running this effect on
     // every render would destroy and recreate Ace on every keystroke.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Sync external value/readOnly changes into the live editor without

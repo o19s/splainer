@@ -16,6 +16,7 @@
  */
 import js from '@eslint/js';
 import eslintConfigPrettier from 'eslint-config-prettier';
+import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 
 const unusedVarsOptions = {
@@ -70,8 +71,18 @@ export default [
         ...globals.node,
       },
     },
+    plugins: {
+      'react-hooks': reactHooks,
+    },
     rules: {
       'no-unused-vars': ['error', unusedVarsOptions],
+      // rules-of-hooks is mechanically decidable; zero false positives → error.
+      'react-hooks/rules-of-hooks': 'error',
+      // exhaustive-deps stays as warn because PR 6's three-ref pattern
+      // (onChangeRef updated via a no-deps useEffect) is intentionally
+      // non-exhaustive. Warn-level keeps the lint visible without forcing
+      // // eslint-disable graffiti at every imperative-library wrapper.
+      'react-hooks/exhaustive-deps': 'warn',
     },
   },
   {
