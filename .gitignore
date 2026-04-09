@@ -5,6 +5,9 @@ node_modules
 .sass-cache
 dist/
 coverage/
+test-results/
+playwright-report/
+.playwright/
 yarn-error.log
 
 deploy.sh

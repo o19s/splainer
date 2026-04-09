@@ -52,7 +52,9 @@
     "prettier": "^3.4.2",
     "puppeteer": "^18.0.2",
     "serve-static": "^1.15.0",
-    "time-grunt": "^2.0.0"
+    "time-grunt": "^2.0.0",
+    "vitest": "^4.1.2",
+    "@playwright/test": "^1.59.1"
   },
   "engines": {
     "node": ">=18.18.0"
@@ -60,6 +62,10 @@
   "scripts": {
     "preinstall": "npx --yes only-allow yarn",
     "test": "grunt test",
+    "test:new": "vitest run",
+    "test:new:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",

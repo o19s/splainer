@@ -8,6 +8,7 @@
  * Splainer differs from splainer-search in language mode: app and tests are
  * classic scripts (not ESM), and tests use Jasmine + `inject`. Test-only helpers
  * (e.g. under test/mock/) are linted together with specs via the test/ config block.
+ * Playwright specs under e2e/ are ESM with Node + browser globals (callbacks run in the page).
  *
  * Parser ecmaVersion is 2018 so trailing commas in argument lists parse correctly.
  */
@@ -59,6 +60,31 @@ export default [
     },
     rules: {
       'no-unused-vars': ['error', unusedVarsOptions],
+    },
+  },
+  {
+    files: ['e2e/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: {
+        ...globals.node,
+        ...globals.browser,
+      },
+    },
+    rules: {
+      'no-unused-vars': ['error', unusedVarsOptions],
+    },
+  },
+  // Root tooling configs (ESM): Node globals such as `process` for CI flags.
+  {
+    files: ['playwright.config.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: {
+        ...globals.node,
+      },
     },
   },
   eslintConfigPrettier,
