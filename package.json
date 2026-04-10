@@ -24,6 +24,8 @@
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@playwright/test": "^1.59.1",
+    "@stryker-mutator/core": "^9.6.0",
+    "@stryker-mutator/vitest-runner": "^9.6.0",
     "@testing-library/preact": "^3.2.4",
     "angular-mocks": "^1.8.3",
     "autoprefixer": "^9.8.8",
@@ -72,6 +74,9 @@
     "test": "yarn build:islands && grunt test",
     "test:new": "vitest run",
     "test:new:watch": "vitest",
+    "stryker": "stryker run",
+    "stryker:full": "stryker run --force",
+    "stryker:dry": "stryker run --dryRunOnly",
     "test:e2e": "yarn build:islands && playwright test",
     "test:e2e:ui": "yarn build:islands && playwright test --ui",
     "dev:vite": "vite",

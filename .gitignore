@@ -5,6 +5,10 @@ node_modules
 .sass-cache
 dist/
 coverage/
+.stryker-tmp/
+reports/mutation/
+reports/stryker-incremental.json
+stryker.log
 test-results/
 playwright-report/
 .playwright/

@@ -409,13 +409,10 @@ test.describe('splainer smoke', () => {
   test('clicking a doc-row title opens the detailed doc view with field data', async ({
     page,
   }) => {
-    // Precondition for PR 9 (docRow migration). The Test Specialist flagged
-    // results-subtree coverage as the safety net that has to land before any
-    // docRow work starts. This test proves the user-level click path for the
-    // title link — `<a ng-click="doc.showDoc()">` in docRow.html — works
-    // end-to-end: click the title, the $uibModal opens detailedDoc.html,
-    // and the modal body shows the doc fields splainer-search normalized
-    // from the Solr response.
+    // Proves the user-level click path for the doc-row title link works
+    // end-to-end: click the title, the detailedDoc modal opens, and the
+    // modal body shows the doc fields splainer-search normalized from the
+    // Solr response.
     //
     // Uses canned Solr with a `subs`-shaped doc so the detailedDoc ng-repeat
     // over doc.subs has something to render — the test would vacuously pass
@@ -444,14 +441,13 @@ test.describe('splainer smoke', () => {
     await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title+director+release_year`);
 
     // Wait for the initial search to render at least one doc-row.
-    await page.locator('doc-row').first().waitFor();
+    await page.locator('[data-testid="doc-row"]').first().waitFor();
 
     // The title link inside the first doc-row. Scoped to doc-row because
     // other <a> elements on the page (tour, footer links) would match a
-    // bare locator. ng-bind-html populates the anchor text from
-    // docRow.title, so we can't locate by text — locate structurally
-    // and then assert the modal that results.
-    const titleLink = page.locator('doc-row').first().locator('h4 a').first();
+    // bare locator. The anchor text comes from the highlighted title,
+    // so we locate structurally and then assert the modal that results.
+    const titleLink = page.locator('[data-testid="doc-row"]').first().locator('h4 a').first();
     await titleLink.click();
 
     // The detailedDoc modal's only stable string is the template heading
@@ -471,13 +467,10 @@ test.describe('splainer smoke', () => {
   });
 
   test('docSelector island: altQuery reaches the backend on the wire', async ({ page }) => {
-    // Originally a PR 8 DocSelector merge gate. After PR 9d this test
-    // covers the *DocExplain* island's alt-query path: the form lives
-    // inside the new <dialog>, and the explainOther closure that
-    // dispatches the request is the one in directives/docRow.js (a
-    // copy-paste of docSelector.js's closure — both shims die in PR 11).
-    // The test name is preserved to keep test-result tracking stable;
-    // the coverage moved islands but the assertion shape didn't.
+    // Originally a PR 8 DocSelector merge gate. After PR 10 this test
+    // covers the DocExplain island's alt-query path: the form lives
+    // inside the <dialog>, and the explainOther closure that dispatches
+    // the request lives in directives/searchResults.js.
     //
     // Solr was chosen over ES because the bookmarked-URL path is already
     // proven hermetic for Solr (PR 3), and Solr's explainOther surfaces as
@@ -707,5 +700,128 @@ test.describe('splainer smoke', () => {
     // fine but traps the user and no test would catch it.
     await page.keyboard.press('Escape');
     await expect(page.locator('[data-testid="detailed-explain-modal"]')).toBeHidden();
+  });
+
+  test('Search Args stays below Search Engine header when switching engines', async ({
+    page,
+  }) => {
+    // Regression test: switching engines in the Tweak panel must not cause
+    // the Search Args content to render above the Search Engine header.
+    await page.route('http://fake-solr.test/**', async (route) => {
+      await fulfillSolr(route, {
+        responseHeader: { status: 0, QTime: 1 },
+        response: {
+          numFound: 1,
+          start: 0,
+          docs: [{ id: 'doc-1', title: 'Test Result' }],
+        },
+      });
+    });
+    const bookmarkedSolr = encodeURIComponent(
+      'http://fake-solr.test/solr/coll1/select?q=*:*',
+    );
+    await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title`);
+    await page.locator('[data-testid="doc-row"]').first().waitFor();
+
+    // Open the Tweak panel and expand Search Engine.
+    await page.locator('a:has-text("Tweak")').click();
+    await page.waitForTimeout(300);
+    await page.locator('.dev-header:has-text("Search Engine")').click();
+
+    // Helper: assert the search-args-editor textarea is visually below
+    // the Search Engine header inside the settings form.
+    async function assertArgsBelow(label) {
+      await page.waitForTimeout(800);
+      const ok = await page.evaluate(() => {
+        const east = document.querySelector('.pane_east');
+        if (!east) return false;
+        const headers = Array.from(east.querySelectorAll('.dev-header'));
+        const engineHeader = headers.find(h => h.textContent.includes('Search Engine'));
+        const argsEditor = east.querySelector('[data-role="search-args-editor"]');
+        if (!engineHeader || !argsEditor) return false;
+        return argsEditor.getBoundingClientRect().top > engineHeader.getBoundingClientRect().bottom;
+      });
+      expect(ok, `${label}: Search Args should be below Search Engine header`).toBe(true);
+    }
+
+    await assertArgsBelow('initial Solr');
+
+    await page.locator('input[name="whichEngine"][value="es"]').click();
+    await assertArgsBelow('after switch to ES');
+
+    await page.locator('input[name="whichEngine"][value="os"]').click();
+    await assertArgsBelow('after switch to OS');
+
+    await page.locator('input[name="whichEngine"][value="solr"]').click();
+    await assertArgsBelow('after switch back to Solr');
+
+    await page.locator('input[name="whichEngine"][value="es"]').click();
+    await assertArgsBelow('after second switch to ES');
+  });
+
+  test('engine switch via Tweak panel + Rerun Query shows results (not error)', async ({
+    page,
+  }) => {
+    // PR 10 coverage: switch engine in the dev sidebar and rerun.
+    // The bug: after switching from Solr to ES (or vice versa), clicking
+    // Rerun Query showed the IN_ERROR state instead of new results.
+
+    // Intercept both Solr and ES backends.
+    await page.route('http://fake-solr.test/**', async (route) => {
+      await fulfillSolr(route, {
+        responseHeader: { status: 0, QTime: 1 },
+        response: {
+          numFound: 1,
+          start: 0,
+          docs: [{ id: 'solr-1', title: 'Solr Result' }],
+        },
+      });
+    });
+    await page.route('**/fake-es.test/**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        headers: corsHeaders,
+        body: JSON.stringify({
+          took: 1,
+          timed_out: false,
+          _shards: { total: 1, successful: 1, skipped: 0, failed: 0 },
+          hits: {
+            total: { value: 1, relation: 'eq' },
+            max_score: 1,
+            hits: [{ _id: 'es-1', _score: 1, _source: { title: 'ES Result' } }],
+          },
+        }),
+      });
+    });
+
+    // Start with a Solr search.
+    const bookmarkedSolr = encodeURIComponent(
+      'http://fake-solr.test/solr/coll1/select?q=*:*',
+    );
+    await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title`);
+    await page.locator('[data-testid="doc-row"]').first().waitFor();
+    await expect(page.getByText('Solr Result')).toBeVisible();
+
+    // Open the Tweak panel.
+    await page.locator('a:has-text("Tweak")').click();
+    await page.waitForTimeout(300);
+
+    // Expand the Search Engine section and switch to ES.
+    await page.locator('.dev-header:has-text("Search Engine")').click();
+    await page.locator('input[name="whichEngine"][value="es"]').click();
+
+    // Configure ES URL in the sidebar input so the search can succeed.
+    // First, wait for the settings island to remount after engine change.
+    await page.waitForTimeout(200);
+    const urlInput = page.locator('[data-role="search-url"]');
+    await urlInput.fill('http://fake-es.test/_search');
+
+    // Click Rerun Query.
+    await page.locator('[data-role="rerun-query"]').click();
+
+    // Should show ES results, not an error.
+    await expect(page.locator('.alert-error')).toBeHidden({ timeout: 5000 });
+    await expect(page.getByText('ES Result')).toBeVisible({ timeout: 5000 });
   });
 });

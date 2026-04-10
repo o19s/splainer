@@ -2,6 +2,10 @@
 // The legacy Karma suite under test/spec/** continues to run via `npm test`
 // (grunt test) against the Angular code for as long as Angular exists.
 // See MIGRATION_OPTIONS.md for the rationale.
+//
+// Mutation testing (Stryker + this file): `yarn stryker` (incremental),
+// `yarn stryker:full` (--force, refresh reports/stryker-incremental.json), `yarn stryker:dry`.
+// See stryker.config.json. @stryker-mutator/core currently requires Node 20+.
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({

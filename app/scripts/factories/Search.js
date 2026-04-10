@@ -139,7 +139,6 @@ angular.module('splain-app').factory('Search', [
 
               if (normalDoc.score() > self.maxScore) {
                 self.maxScore = normalDoc.score();
-                console.log('new max score' + self.maxScore);
               }
 
               self.docs.push(normalDoc);

@@ -41,6 +41,7 @@ export const islands = [
   { name: 'modalRegistry', entry: resolve(islandsDir, 'modalRegistry.js') },
   { name: 'detailedDoc', entry: resolve(islandsDir, 'detailedDoc.jsx') },
   { name: 'docExplain', entry: resolve(islandsDir, 'docExplain.jsx') },
+  { name: 'searchResults', entry: resolve(islandsDir, 'searchResults.jsx') },
 ];
 
 export const distDir = resolve(islandsDir, 'dist');

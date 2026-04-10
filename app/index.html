@@ -84,7 +84,7 @@
         </header>
 
         <div class="container">
-          <div ng-include="'views/searchResults.html'"></div>
+          <search-results-island curr-search="currSearch"></search-results-island>
           <div ng-show="currSearch.state === currSearch.NO_SEARCH">
             <start-url-island search="search"></start-url-island>
           </div>
@@ -188,18 +188,16 @@
          window.SplainerIslands.<name> as a side effect. -->
     <script src="scripts/islands/dist/customHeaders.js"></script>
     <script src="scripts/islands/dist/settings.js"></script>
-    <script src="scripts/islands/dist/solrSettingsWarning.js"></script>
     <script src="scripts/islands/dist/startUrl.js"></script>
-    <script src="scripts/islands/dist/docRow.js"></script>
     <script src="scripts/islands/dist/modalRegistry.js"></script>
     <script src="scripts/islands/dist/detailedDoc.js"></script>
     <script src="scripts/islands/dist/docExplain.js"></script>
+    <script src="scripts/islands/dist/searchResults.js"></script>
     <script src="scripts/factories/Search.js"></script>
     <script src="scripts/directives/customHeaders.js"></script>
     <script src="scripts/directives/settings.js"></script>
     <script src="scripts/directives/dispatchOnClick.js"></script>
-    <script src="scripts/directives/docRow.js"></script>
-    <script src="scripts/directives/solrSettingsWarning.js"></script>
+    <script src="scripts/directives/searchResults.js"></script>
     <script src="scripts/directives/startUrl.js"></script>
     <script src="scripts/services/solrSettingsSvc.js"></script>
     <script src="scripts/services/esSettingsSvc.js"></script>

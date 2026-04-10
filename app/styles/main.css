@@ -221,3 +221,11 @@
 .black-label label {
   color: black;
 }
+
+/* Custom HTML elements default to display:inline — force block so
+   Preact-rendered content (Ace editors, forms) is properly contained. */
+search-results-island,
+settings-island,
+start-url-island {
+  display: block;
+}

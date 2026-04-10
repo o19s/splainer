@@ -32,35 +32,6 @@ import { render } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 // eslint-disable-next-line no-unused-vars -- JSX usage; eslint core doesn't see <CustomHeaders />
 import { CustomHeaders } from './customHeaders.jsx';
-import { useAceEditor } from './useAceEditor.js';
-
-// eslint-disable-next-line no-unused-vars -- JSX usage; rendered conditionally below
-function AceArgsEditor({ value, onChange, engine }) {
-  const containerRef = useAceEditor(value, onChange, {
-    mode: 'ace/mode/json',
-    useWrapMode: true,
-    tabSize: 2,
-  });
-  // app/scripts/ace-config.js polls #queryParams height and calls
-  // ace.edit('es-query-params-editor').resize() / 'os-query-params-editor'
-  // by ID, plus $('.es-query-params').height() / $('.os-query-params')
-  // by class, when the dev sidebar collapses or the window resizes.
-  // Both the ID and the class need to match the engine for the resize
-  // hack to work — without these the editor visually clips on resize.
-  // PR 11 will replace ace-config.js's jQuery height-poller with a
-  // ResizeObserver and these can become engine-agnostic.
-  const isOs = engine === 'os';
-  return (
-    <div
-      ref={containerRef}
-      id={isOs ? 'os-query-params-editor' : 'es-query-params-editor'}
-      data-role="search-args-editor"
-      class={isOs ? 'os-query-params' : 'es-query-params'}
-      style={{ height: '300px' }}
-    />
-  );
-}
-
 // eslint-disable-next-line no-unused-vars -- JSX usage; rendered conditionally below
 function TextareaArgsFallback({ value, onChange }) {
   return (
@@ -259,38 +230,22 @@ export function SettingsIsland({ settings, currSearch, onPublish }) {
       </div>
       {argsOpen && (
         <div class="dev-section">
-          {workingWhichEngine === 'solr' && (
-            <TextareaArgsFallback
-              value={ws.searchArgsStr}
-              onChange={(v) => updateField('searchArgsStr', v)}
-            />
-          )}
-          {(workingWhichEngine === 'es' || workingWhichEngine === 'os') && (
-            <>
-              {typeof window !== 'undefined' && window.ace ? (
-                <AceArgsEditor
-                  value={ws.searchArgsStr}
-                  onChange={(v) => updateField('searchArgsStr', v)}
-                  engine={workingWhichEngine}
-                />
-              ) : (
-                <TextareaArgsFallback
-                  value={ws.searchArgsStr}
-                  onChange={(v) => updateField('searchArgsStr', v)}
-                />
-              )}
-              <a
-                href=""
-                class="pull-right label"
-                data-role="indent-json"
-                onClick={(e) => {
-                  e.preventDefault();
-                  autoIndent();
-                }}
-              >
-                Indent JSON
-              </a>
-            </>
+          <TextareaArgsFallback
+            value={ws.searchArgsStr}
+            onChange={(v) => updateField('searchArgsStr', v)}
+          />
+          {workingWhichEngine !== 'solr' && (
+            <a
+              href=""
+              class="pull-right label"
+              data-role="indent-json"
+              onClick={(e) => {
+                e.preventDefault();
+                autoIndent();
+              }}
+            >
+              Indent JSON
+            </a>
           )}
         </div>
       )}
