@@ -1,24 +1,32 @@
 'use strict';
 
 /**
- * Angular shim around the Preact docRow island
- * (app/scripts/islands/docRow.jsx). Mounts the island, deep-watches the
- * doc, and opens the two modals via $uibModal until the dialog pattern
- * lands in 9c/9d.
+ * Angular shim for the Preact docRow island. Deep-watches the doc and
+ * opens explain / show-doc modals via openDocModal.
  *
- * Why scope.doc.showDetailed is mutated: existing Playwright tests
- * (`docSelector island: altQuery reaches the backend on the wire`,
- * `... backend error surfaces the error banner`, `detailed explain
- * modal renders the explain tree content`) drive the explain modal
- * via `scope.doc.showDetailed()` rather than clicking the chart link.
- * The doc-side handle has to keep working until 9d removes the
- * doc-mutation entirely along with the latent closure leak it carries
- * (the doc outlives the directive's isolate scope).
+ * Deep $watch — splainer-search mutates docs in place, so reference
+ * equality misses changes. Do not swap to $watchCollection without
+ * verifying the mutate-in-place assumption still holds.
+ *
+ * explainOther — builds a splainer-search searcher from current settings,
+ * runs searcher.explainOther, and normalizes results via the appropriate
+ * extractor. Returns { docs, maxScore } for the DocExplain island.
  */
 angular.module('splain-app').directive('docRow', [
-  '$uibModal',
+  'searchSvc',
+  'solrUrlSvc',
   'settingsStoreSvc',
-  function ($uibModal, settingsStoreSvc) {
+  'fieldSpecSvc',
+  'solrExplainExtractorSvc',
+  'esExplainExtractorSvc',
+  function (
+    searchSvc,
+    solrUrlSvc,
+    settingsStoreSvc,
+    fieldSpecSvc,
+    solrExplainExtractorSvc,
+    esExplainExtractorSvc,
+  ) {
     return {
       restrict: 'E',
       priority: 1000,
@@ -38,20 +46,56 @@ angular.module('splain-app').directive('docRow', [
           );
         }
 
+        function explainOther(altQuery) {
+          var settings = settingsStoreSvc.settings;
+          var fieldSpec = fieldSpecSvc.createFieldSpec(settings.fieldSpecStr());
+          var args;
+          if (settings.whichEngine === 'es' || settings.whichEngine === 'os') {
+            try {
+              args = angular.fromJson(settings.searchArgsStr());
+            } catch (_e) {
+              args = '';
+            }
+          } else {
+            args = solrUrlSvc.parseSolrArgs(settings.searchArgsStr());
+          }
+          var searcher = searchSvc.createSearcher(
+            fieldSpec,
+            settings.searchUrl(),
+            args,
+            '',
+            {},
+            settings.whichEngine,
+          );
+          return searcher.explainOther(altQuery, fieldSpec).then(function () {
+            var normalizedDocs = [];
+            if (searcher.type === 'solr') {
+              normalizedDocs = solrExplainExtractorSvc.docsWithExplainOther(
+                searcher.docs,
+                fieldSpec,
+                searcher.othersExplained,
+              );
+            } else if (searcher.type === 'es' || searcher.type === 'os') {
+              normalizedDocs = esExplainExtractorSvc.docsWithExplainOther(
+                searcher.docs,
+                fieldSpec,
+              );
+            }
+            var altMaxScore = 0;
+            normalizedDocs.forEach(function (d) {
+              if (d.score() > altMaxScore) altMaxScore = d.score();
+            });
+            return { docs: normalizedDocs, maxScore: altMaxScore };
+          });
+        }
+
         function openDetailed() {
-          $uibModal.open({
-            templateUrl: 'views/detailedExplain.html',
-            controller: 'DocExplainCtrl',
-            size: 'lg',
-            resolve: {
-              doc: function () {
-                return scope.doc;
-              },
-              canExplainOther: function () {
-                var allowed = ['es', 'os', 'solr'];
-                return allowed.includes(settingsStoreSvc.settings.whichEngine);
-              },
-            },
+          window.SplainerIslands.openDocModal('detailedExplain', scope.doc, {
+            canExplainOther: ['es', 'os', 'solr'].includes(
+              settingsStoreSvc.settings.whichEngine,
+            ),
+            explainOther: explainOther,
+            maxScore: scope.maxScore,
           });
         }
 
@@ -60,8 +104,6 @@ angular.module('splain-app').directive('docRow', [
         }
 
         function rerender() {
-          // See file header for why we mutate the doc object here.
-          scope.doc.showDetailed = openDetailed;
           island.mount(rootEl, scope.doc, {
             maxScore: scope.maxScore,
             onShowDoc: openShowDoc,
@@ -69,11 +111,6 @@ angular.module('splain-app').directive('docRow', [
           });
         }
 
-        // Deep watch on doc — splainer-search mutates docs in place
-        // (highlighted snippets, computed scores) so reference equality
-        // misses changes. Do not swap to $watchCollection without
-        // verifying the mutate-in-place assumption first
-        // (memory: feedback_deep_watch). 9d revisits this.
         scope.$watch('doc', rerender, true);
         scope.$watch('maxScore', rerender);
 

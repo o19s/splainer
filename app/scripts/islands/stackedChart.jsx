@@ -1,10 +1,7 @@
 /**
- * stackedChart island. Replaces app/scripts/directives/stackedChart.js +
- * app/views/stackedChart.html. The directive and template are still on
- * disk after 9b but unreachable; 9d deletes them.
- *
- * No directive shim — the only consumer is docRow.jsx, which renders
- * <StackedChart> as a JSX child directly.
+ * stackedChart island. Replaced the Angular directive + template
+ * (both deleted in 9d). No directive shim — the only consumer is
+ * docRow.jsx, which renders <StackedChart> as a JSX child directly.
  *
  * The data-testid="stacked-chart-detailed" attribute is load-bearing:
  * the PR 8.5 Playwright canary clicks via that exact selector. Don't
@@ -70,7 +67,7 @@ export function StackedChart({ doc, maxScore, onDetailed }) {
   }
 
   // > 3 hots: show first 3, then a collapse for the rest, then a
-  // Detailed link and a Show More/Less toggle. Mirrors stackedChart.html.
+  // Detailed link and a Show More/Less toggle.
   const firstThree = hots.slice(0, 3);
   const rest = hots.slice(3);
   return (
@@ -85,9 +82,8 @@ export function StackedChart({ doc, maxScore, onDetailed }) {
           ))}
         </div>
       )}
-      {/* Detailed is unconditional in the >3 branch — matches the old
-          stackedChart.html template, which has no ng-if on this anchor.
-          handleDetailed no-ops if onDetailed is undefined. */}
+      {/* Detailed is unconditional in the >3 branch; handleDetailed
+          no-ops if onDetailed is undefined. */}
       <a
         data-testid="stacked-chart-detailed"
         style={{ fontSize: '10px' }}

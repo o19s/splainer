@@ -470,95 +470,19 @@ test.describe('splainer smoke', () => {
     await expect(page.getByRole('dialog').getByText('Someone')).toBeVisible();
   });
 
-  test('detailed explain modal renders the explain tree content', async ({ page }) => {
-    // Precondition for PR 9 (docRow migration): the explain panel — one of
-    // the load-bearing user-visible features of splainer — has no direct
-    // coverage. Existing docSelector tests open the explain modal and
-    // interact with its altQuery form, but nothing asserts the explain tree
-    // itself rendered. A regression that broke the <pre>{{doc.explain().toStr()}}</pre>
-    // block (e.g. a breaking change in splainer-search's explain formatter)
-    // would slip through every current test.
-    //
-    // Asserts the Summarized tab's <pre> content contains the canned
-    // explain description. Doesn't pin on exact format — splainer-search's
-    // toStr() output may evolve — but requires the weight(title:canned)
-    // marker to appear somewhere in the explain view.
-    await page.route('http://fake-solr.test/**', async (route) => {
-      await fulfillSolr(route, {
-        responseHeader: { status: 0, QTime: 1 },
-        response: {
-          numFound: 1,
-          start: 0,
-          docs: [{ id: 'doc-1', title: 'canned title' }],
-        },
-        debug: {
-          explain: {
-            'doc-1': {
-              match: true,
-              value: 1.2345,
-              description: 'EXPLAIN_TREE_MARKER weight(title:canned)',
-              details: [],
-            },
-          },
-        },
-      });
-    });
-
-    const bookmarkedSolr = encodeURIComponent(
-      'http://fake-solr.test/solr/coll1/select?q=*:*',
-    );
-    await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title`);
-
-    await page.locator('doc-row').first().waitFor();
-
-    // Open the detailed explain modal via doc.showDetailed() — same entry
-    // path the existing docSelector tests use. Clicking the stacked-chart
-    // SVG is unreliable (coordinate-dependent), and showDetailed() is the
-    // app's own code path.
-    await page.evaluate(() => {
-      const docRow = document.querySelector('doc-row');
-      const scope = window.angular.element(docRow).scope();
-      scope.doc.showDetailed();
-      scope.$apply();
-    });
-
-    // Wait for the modal body — the detailedExplain.html template anchors
-    // on the "Explain for:" header.
-    await expect(page.getByText(/Explain for:/)).toBeVisible();
-
-    // The Summarized tab is the default-active uib-tab. Its <pre> should
-    // contain the canned marker from the explain description. Polled
-    // because splainer-search's explain parser may finish asynchronously
-    // after the modal opens.
-    await expect
-      .poll(async () =>
-        page.evaluate(() => {
-          const pres = Array.from(document.querySelectorAll('.explain-view pre'));
-          return pres.some((pre) => (pre.textContent || '').includes('EXPLAIN_TREE_MARKER'));
-        }),
-      )
-      .toBe(true);
-  });
-
   test('docSelector island: altQuery reaches the backend on the wire', async ({ page }) => {
-    // PR 8 merge gate. Intercepts the outbound Solr request triggered by
-    // the DocSelector's "Find Others" button and asserts that the altQuery
-    // the user typed made it onto the wire. Validates the full chain:
-    //   Preact island (docSelector.jsx)
-    //     → directive shim (directives/docSelector.js) onExplainOther
-    //     → searchSvc.createSearcher + searcher.explainOther
-    //     → splainer-search 3.0.0 wired services → JSONP
+    // Originally a PR 8 DocSelector merge gate. After PR 9d this test
+    // covers the *DocExplain* island's alt-query path: the form lives
+    // inside the new <dialog>, and the explainOther closure that
+    // dispatches the request is the one in directives/docRow.js (a
+    // copy-paste of docSelector.js's closure — both shims die in PR 11).
+    // The test name is preserved to keep test-result tracking stable;
+    // the coverage moved islands but the assertion shape didn't.
     //
     // Solr was chosen over ES because the bookmarked-URL path is already
     // proven hermetic for Solr (PR 3), and Solr's explainOther surfaces as
     // a query parameter on the URL — assertable without guessing at
     // engine-specific POST body shapes.
-    //
-    // The detailed-explain modal is opened programmatically via the first
-    // doc's showDetailed() rather than clicking through the stacked-chart's
-    // "Detailed" link: the click path couples to splainer-search's explain-
-    // tree parsing producing at least one hot match, and the DocSelector
-    // we're testing doesn't care *how* the modal opened.
     const captured = [];
     await page.route('http://fake-solr.test/**', async (route) => {
       captured.push(route.request().url());
@@ -589,18 +513,17 @@ test.describe('splainer smoke', () => {
 
     // Wait for the initial search to land and render the first doc-row.
     await expect.poll(() => captured.length).toBeGreaterThan(0);
-    await page.locator('doc-row').first().waitFor();
+    await page.locator('[data-testid="doc-row"]').first().waitFor();
 
-    // Open the detailed-explain modal via the first doc's showDetailed().
-    // This uses the app's own code path — $uibModal.open with
-    // views/detailedExplain.html — the same thing clicking "Detailed"
-    // would trigger.
-    await page.evaluate(() => {
-      const docRow = document.querySelector('doc-row');
-      const scope = window.angular.element(docRow).scope();
-      scope.doc.showDetailed();
-      scope.$apply();
-    });
+    // 9d: open the explain modal by clicking the chart-detailed link.
+    // The alt-query form lives inside the new docExplain Preact dialog;
+    // the alt-query path is now backed by the docRow shim's explainOther
+    // closure (copy-pasted from docSelector's shim).
+    await page
+      .locator('[data-testid="doc-row"]')
+      .first()
+      .locator('[data-testid="stacked-chart-detailed"]')
+      .click();
 
     // Wait for the DocSelector island inside the modal.
     await page.locator('[data-role="alt-query"]').waitFor();
@@ -622,10 +545,11 @@ test.describe('splainer smoke', () => {
   });
 
   test('docSelector island: backend error surfaces the error banner', async ({ page }) => {
-    // Closes PR 5's zero-coverage .catch: splainer-search 3.0.0 rejects on
-    // HTTP/parse errors, and PR 5 added a .catch on explainOther() to
-    // surface the rejection. Until this test, no suite exercised the
-    // rejection path end-to-end for the DocSelector flow.
+    // Originally PR 5's zero-coverage-.catch closer for the DocSelector
+    // flow. After PR 9d this exercises the *DocExplain* island's
+    // AltQueryForm rejection path: explainOther rejects, the form's
+    // .catch sets errorMsg, the [data-role="alt-query-error"] banner
+    // appears. Test name preserved for tracking stability.
     let searchCount = 0;
     await page.route('http://fake-solr.test/**', async (route) => {
       searchCount++;
@@ -666,14 +590,13 @@ test.describe('splainer smoke', () => {
     await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title`);
 
     await expect.poll(() => searchCount).toBeGreaterThan(0);
-    await page.locator('doc-row').first().waitFor();
+    await page.locator('[data-testid="doc-row"]').first().waitFor();
 
-    await page.evaluate(() => {
-      const docRow = document.querySelector('doc-row');
-      const scope = window.angular.element(docRow).scope();
-      scope.doc.showDetailed();
-      scope.$apply();
-    });
+    await page
+      .locator('[data-testid="doc-row"]')
+      .first()
+      .locator('[data-testid="stacked-chart-detailed"]')
+      .click();
     await page.locator('[data-role="alt-query"]').waitFor();
 
     await page.locator('[data-role="alt-query"]').fill('anything');

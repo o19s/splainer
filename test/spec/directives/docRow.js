@@ -1,28 +1,13 @@
 'use strict';
 
-// Unit test for the docRow Angular directive shim
-// (app/scripts/directives/docRow.js). The Preact island itself is covered
-// by Vitest in app/scripts/islands/docRow.spec.js, and the chart-click +
-// modal-open path is covered end-to-end by the PR 8.5 Playwright test.
-// This spec covers the *shim* — the cross-framework glue layer that owns:
-//
-//   - the doc.showDetailed mutation (preserved for the existing
-//     Playwright tests that call it programmatically — removed in 9d)
-//   - the two $uibModal.open call sites (Detailed explain modal and
-//     show-doc modal — both move to native <dialog> in 9c/9d)
-//   - the $watch lifecycle (deep on doc, shallow on maxScore)
-//   - the destroy hook (island unmount)
-//
-// **PR 9b changes:** the chart-host plumbing tests from 9a are gone —
-// the inversion bridge they validated no longer exists. <stacked-chart>
-// is now a Preact island rendered directly inside the docRow island as
-// a JSX child; there is no more $compile-into-host path to test. The
-// shim no longer injects $compile and no longer has a registerChartHost
-// callback.
+// Unit test for the docRow Angular directive shim. Covers the shim's
+// modal openers (openDocModal), $watch lifecycle, and destroy hook.
+// The Preact island is covered by Vitest; the modal-open path is
+// covered end-to-end by the Playwright suite.
 describe('docRow directive', function () {
   var $compile = null;
   var $rootScope = null;
-  var $uibModal = null;
+  var $q = null;
   var settingsStoreSvc = null;
   var savedIslandsGlobal = null;
   var mountCalls = null;
@@ -33,11 +18,7 @@ describe('docRow directive', function () {
 
   beforeEach(function () {
     // Stub the SplainerIslands global so the shim's link function finds
-    // a usable island without loading the Preact bundle. The mount stub
-    // captures the props the shim passes (maxScore, onShowDoc,
-    // onShowDetailed) so the test can invoke them directly. Same
-    // pattern as test/spec/directives/docSelector.js — see PR 8 spec
-    // for the rationale.
+    // a usable island without loading the Preact bundle.
     savedIslandsGlobal = window.SplainerIslands;
     mountCalls = [];
     unmountCalls = [];
@@ -52,8 +33,6 @@ describe('docRow directive', function () {
           unmountCalls.push(rootEl);
         },
       },
-      // 9c: openShowDoc now routes through the modal registry instead of
-      // $uibModal. Stub it the same way the docRow island stub is stubbed.
       openDocModal: jasmine.createSpy('openDocModal').and.returnValue({ close: function () {} }),
     };
   });
@@ -62,22 +41,44 @@ describe('docRow directive', function () {
     window.SplainerIslands = savedIslandsGlobal;
   });
 
+  beforeEach(module(function ($provide) {
+    // Stub splainer-search services for the explainOther closure.
+    // The closure itself is tested end-to-end by the Playwright
+    // "altQuery reaches the backend on the wire" test; unit-level
+    // coverage here just verifies openDetailed passes a callable
+    // explainOther through to openDocModal.
+    $provide.value('searchSvc', {
+      createSearcher: function () {
+        return {
+          type: 'solr',
+          docs: [],
+          othersExplained: {},
+          explainOther: function () {
+            return { then: function (cb) { cb(); return { then: function () {} }; } };
+          },
+        };
+      },
+    });
+    $provide.value('solrUrlSvc', { parseSolrArgs: function () { return {}; } });
+    $provide.value('fieldSpecSvc', { createFieldSpec: function () { return {}; } });
+    $provide.value('solrExplainExtractorSvc', { docsWithExplainOther: function () { return []; } });
+    $provide.value('esExplainExtractorSvc', { docsWithExplainOther: function () { return []; } });
+  }));
+
   beforeEach(inject(function (
     _$compile_,
     _$rootScope_,
-    _$uibModal_,
+    _$q_,
     _settingsStoreSvc_,
   ) {
     $compile = _$compile_;
     $rootScope = _$rootScope_;
-    $uibModal = _$uibModal_;
+    $q = _$q_;
     settingsStoreSvc = _settingsStoreSvc_;
   }));
 
-  // Build a minimal doc that satisfies the shim. The shim only reads
-  // doc.showDetailed (after assigning it) and passes the doc through to
-  // the island stub. It doesn't call any of splainer-search's doc methods
-  // directly — those run inside the Preact island, which is stubbed here.
+  // Minimal doc — the shim passes it through to the island stub without
+  // calling any splainer-search doc methods directly.
   function makeDoc(overrides) {
     return Object.assign(
       {
@@ -115,94 +116,48 @@ describe('docRow directive', function () {
     expect(typeof capturedProps.onShowDetailed).toBe('function');
   });
 
-  // ─── doc.showDetailed mutation (preserved until 9d) ─────────────────────
-
-  it('attaches doc.showDetailed for programmatic test access', function () {
-    // Existing Playwright tests call scope.doc.showDetailed() directly
-    // to open the explain modal. Until 9d removes the doc-mutation
-    // pattern entirely, the shim must continue attaching this handle.
-    var compiled = compileDirective();
-    expect(typeof compiled.scope.doc.showDetailed).toBe('function');
-  });
-
-  it('preserves doc.showDetailed across a doc mutation', function () {
-    // When the deep $watch fires (e.g. splainer-search mutates the doc
-    // object), the shim re-runs rerender, which re-attaches showDetailed.
-    var compiled = compileDirective();
-    var firstShowDetailed = compiled.scope.doc.showDetailed;
-    expect(typeof firstShowDetailed).toBe('function');
-
-    compiled.scope.doc.someNewField = 'updated';
-    compiled.scope.$digest();
-
-    expect(typeof compiled.scope.doc.showDetailed).toBe('function');
-  });
-
   // ─── Modal openers ──────────────────────────────────────────────────────
 
-  it('doc.showDetailed opens the explain modal with the correct resolve', function () {
-    spyOn($uibModal, 'open').and.returnValue({});
-    settingsStoreSvc.settings.whichEngine = 'solr';
-
-    var compiled = compileDirective();
-    compiled.scope.doc.showDetailed();
-
-    expect($uibModal.open).toHaveBeenCalled();
-    var args = $uibModal.open.calls.mostRecent().args[0];
-    expect(args.templateUrl).toBe('views/detailedExplain.html');
-    expect(args.controller).toBe('DocExplainCtrl');
-    expect(args.size).toBe('lg');
-    expect(args.resolve.doc()).toBe(compiled.scope.doc);
-    expect(args.resolve.canExplainOther()).toBe(true);
-  });
-
-  it('onShowDetailed (the island prop) also opens the explain modal', function () {
-    // The island calls props.onShowDetailed when the StackedChart
-    // Detailed link is clicked. This is the post-9b call path; the
-    // doc.showDetailed mutation above is the legacy path. Both must
-    // open the same modal.
-    spyOn($uibModal, 'open').and.returnValue({});
+  it('onShowDetailed opens the explain modal via openDocModal', function () {
     settingsStoreSvc.settings.whichEngine = 'solr';
 
     compileDirective();
     capturedProps.onShowDetailed();
 
-    expect($uibModal.open).toHaveBeenCalled();
-    var args = $uibModal.open.calls.mostRecent().args[0];
-    expect(args.templateUrl).toBe('views/detailedExplain.html');
+    expect(window.SplainerIslands.openDocModal).toHaveBeenCalled();
+    var args = window.SplainerIslands.openDocModal.calls.mostRecent().args;
+    expect(args[0]).toBe('detailedExplain');
+    expect(args[2].canExplainOther).toBe(true);
+    expect(typeof args[2].explainOther).toBe('function');
+    expect(args[2].maxScore).toBe(1);
   });
 
-  it('canExplainOther returns false for an unsupported engine', function () {
-    spyOn($uibModal, 'open').and.returnValue({});
+  it('canExplainOther is false for an unsupported engine', function () {
     settingsStoreSvc.settings.whichEngine = 'something-weird';
 
-    var compiled = compileDirective();
-    compiled.scope.doc.showDetailed();
-    var args = $uibModal.open.calls.mostRecent().args[0];
-    expect(args.resolve.canExplainOther()).toBe(false);
+    compileDirective();
+    capturedProps.onShowDetailed();
+    var args = window.SplainerIslands.openDocModal.calls.mostRecent().args;
+    expect(args[2].canExplainOther).toBe(false);
   });
 
-  it('canExplainOther returns true for es and os', function () {
-    spyOn($uibModal, 'open').and.returnValue({});
-
+  it('canExplainOther is true for es and os', function () {
     settingsStoreSvc.settings.whichEngine = 'es';
-    var compiledEs = compileDirective($rootScope.$new());
-    compiledEs.scope.doc.showDetailed();
-    expect($uibModal.open.calls.mostRecent().args[0].resolve.canExplainOther()).toBe(true);
+    compileDirective($rootScope.$new());
+    capturedProps.onShowDetailed();
+    expect(
+      window.SplainerIslands.openDocModal.calls.mostRecent().args[2].canExplainOther,
+    ).toBe(true);
 
     settingsStoreSvc.settings.whichEngine = 'os';
-    var compiledOs = compileDirective($rootScope.$new());
-    compiledOs.scope.doc.showDetailed();
-    expect($uibModal.open.calls.mostRecent().args[0].resolve.canExplainOther()).toBe(true);
+    compileDirective($rootScope.$new());
+    capturedProps.onShowDetailed();
+    expect(
+      window.SplainerIslands.openDocModal.calls.mostRecent().args[2].canExplainOther,
+    ).toBe(true);
   });
 
   it('onShowDoc opens the show-doc modal via the modal registry', function () {
-    // PR 9c: the show-doc path no longer uses $uibModal. The shim calls
-    // window.SplainerIslands.openDocModal('detailedDoc', doc, {}) which
-    // mounts the Preact island into #splainer-modal-root. PR 8.5 /
-    // Playwright still covers the Detailed (explain) modal path; the
-    // show-doc modal's only direct coverage is this stub assertion plus
-    // the existing Playwright test that asserts the dialog content.
     var compiled = compileDirective();
     var clickedDoc = compiled.scope.doc;
     capturedProps.onShowDoc(clickedDoc);
