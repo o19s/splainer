@@ -152,19 +152,17 @@ angular.module('splain-app').directive('startUrlIsland', [
           });
         }
 
-        // Deep watch on settings, matching the settings.jsx shim. Field
-        // updates flow through the island's own rerender tick, but
-        // external mutations (localStorage rehydrate on init,
-        // cross-island updates to custom headers) still need to reach us.
-        scope.$watch(
-          function () {
-            return settingsStoreSvc.settings;
-          },
-          rerender,
-          true,
-        );
+        // Subscribe to settings changes — replaces the deep $watch on
+        // settingsStoreSvc.settings. Fires only on explicit save(),
+        // not on every digest cycle. Uses $applyAsync (not $apply)
+        // because save() can be called from inside a .then() that
+        // fires within an existing $apply — nesting $apply throws.
+        var unsub = settingsStoreSvc.subscribe(function () {
+          scope.$applyAsync(rerender);
+        });
 
         scope.$on('$destroy', function () {
+          unsub();
           island.unmount(rootEl);
         });
 

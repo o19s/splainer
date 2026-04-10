@@ -10,7 +10,8 @@
  * (e.g. under test/mock/) are linted together with specs via the test/ config block.
  * Playwright specs under e2e/ are ESM with Node + browser globals (callbacks run in the page).
  * Pure-JS service modules under app/scripts/services/ (esSettings.js, osSettings.js,
- * splSearch.js) are ESM (Vite islands bundle); they override sourceType for those paths.
+ * solrSettings.js, splSearch.js, settingsStore.js) are ESM (Vite islands bundle); they
+ * override sourceType for those paths.
  * Co-located Vitest specs (*.spec.js) in that folder import from vitest and those modules,
  * so they use sourceType: module as well.
  * Preact islands under app/scripts/islands/ are ESM (Vitest specs + Vite-built .jsx); they
@@ -66,7 +67,9 @@ export default [
     files: [
       'app/scripts/services/esSettings.js',
       'app/scripts/services/osSettings.js',
+      'app/scripts/services/solrSettings.js',
       'app/scripts/services/splSearch.js',
+      'app/scripts/services/settingsStore.js',
     ],
     languageOptions: {
       ecmaVersion: 2022,
@@ -135,6 +138,8 @@ export default [
         ...globals.jasmine,
         angular: 'readonly',
         inject: 'readonly',
+        // ES2020; same as app/scripts block — wrapper specs assert SplainerServices on globalThis.
+        globalThis: 'readonly',
       },
     },
     rules: {

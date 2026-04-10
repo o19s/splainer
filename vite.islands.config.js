@@ -52,6 +52,7 @@ export const services = [
   { name: 'osSettings', entry: resolve(servicesDir, 'osSettings.js') },
   { name: 'solrSettings', entry: resolve(servicesDir, 'solrSettings.js') },
   { name: 'splSearch', entry: resolve(servicesDir, 'splSearch.js') },
+  { name: 'settingsStore', entry: resolve(servicesDir, 'settingsStore.js') },
 ];
 
 export const distDir = resolve(islandsDir, 'dist');

@@ -80,17 +80,15 @@ angular.module('splain-app').directive('settingsIsland', [
           );
         }
 
-        // Deep $watch on settingsStoreSvc.settings — the form fields read
-        // off nested engine slots, so any change anywhere in the tree
-        // needs to re-render. The currSearch watch is shallow (we only
-        // care about identity for the isTemplateCall() gate).
-        scope.$watch(
-          function () {
-            return settingsStoreSvc.settings;
-          },
-          rerender,
-          true,
-        );
+        // Subscribe to settings changes — replaces the deep $watch on
+        // settingsStoreSvc.settings. Fires only on explicit save(),
+        // not on every digest cycle. Uses $applyAsync (not $apply)
+        // because save() can be called from inside a .then() that
+        // fires within an existing $apply — nesting $apply throws.
+        var unsub = settingsStoreSvc.subscribe(function () {
+          scope.$applyAsync(rerender);
+        });
+
         // Watch only the searcher reference, not the whole currSearch
         // object. currSearch holds the search response (docs, explain
         // trees) — a deep watch would walk hundreds of nested objects
@@ -106,6 +104,7 @@ angular.module('splain-app').directive('settingsIsland', [
         );
 
         scope.$on('$destroy', function () {
+          unsub();
           island.unmount(rootEl);
         });
 
