@@ -9,6 +9,10 @@
  * classic scripts (not ESM), and tests use Jasmine + `inject`. Test-only helpers
  * (e.g. under test/mock/) are linted together with specs via the test/ config block.
  * Playwright specs under e2e/ are ESM with Node + browser globals (callbacks run in the page).
+ * Pure-JS service modules under app/scripts/services/ (esSettings.js, osSettings.js,
+ * splSearch.js) are ESM (Vite islands bundle); they override sourceType for those paths.
+ * Co-located Vitest specs (*.spec.js) in that folder import from vitest and those modules,
+ * so they use sourceType: module as well.
  * Preact islands under app/scripts/islands/ are ESM (Vitest specs + Vite-built .jsx); they
  * override the classic-script rule for the rest of app/scripts.
  *
@@ -49,7 +53,42 @@ export default [
       globals: {
         ...globals.browser,
         ...globals.node,
+        // ES2020; not always present in eslint `globals.browser` for ecmaVersion 2018.
+        globalThis: 'readonly',
         angular: 'readonly',
+      },
+    },
+    rules: {
+      'no-unused-vars': ['error', unusedVarsOptions],
+    },
+  },
+  {
+    files: [
+      'app/scripts/services/esSettings.js',
+      'app/scripts/services/osSettings.js',
+      'app/scripts/services/splSearch.js',
+    ],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        angular: 'readonly',
+      },
+    },
+    rules: {
+      'no-unused-vars': ['error', unusedVarsOptions],
+    },
+  },
+  {
+    files: ['app/scripts/services/*.spec.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: {
+        ...globals.browser,
+        ...globals.node,
       },
     },
     rules: {

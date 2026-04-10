@@ -199,6 +199,12 @@
     <script src="scripts/directives/dispatchOnClick.js"></script>
     <script src="scripts/directives/searchResults.js"></script>
     <script src="scripts/directives/startUrl.js"></script>
+    <!-- Phase 11a: pure-JS service modules (built from ESM by
+         `yarn build:islands`). Must load before the Angular wrappers
+         below so globalThis.SplainerServices.* is populated. -->
+    <script src="scripts/services/dist/esSettings.js"></script>
+    <script src="scripts/services/dist/osSettings.js"></script>
+    <script src="scripts/services/dist/splSearch.js"></script>
     <script src="scripts/services/solrSettingsSvc.js"></script>
     <script src="scripts/services/esSettingsSvc.js"></script>
     <script src="scripts/services/osSettingsSvc.js"></script>

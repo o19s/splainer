@@ -1,36 +1,31 @@
 'use strict';
 
+/**
+ * Angular shim for the pure splSearch module (splSearch.js).
+ *
+ * Phase 11a: constants (states, engines) and createSearch live in
+ * globalThis.SplainerServices.splSearch. This wrapper still injects the
+ * Angular `Search` factory and passes it through to createSearch — the
+ * Search factory itself is extracted in Phase 11d.
+ *
+ * Deleted in Phase 12 when the controller is removed.
+ */
 angular.module('splain-app').service('splSearchSvc', [
   'Search',
-  function splSearchSvc(Search) {
-    var thisSvc = this;
+  function (Search) {
+    var svc = globalThis.SplainerServices && globalThis.SplainerServices.splSearch;
+    if (!svc) {
+      throw new Error(
+        'splSearchSvc: SplainerServices.splSearch global is missing — ' +
+          'check that scripts/services/dist/splSearch.js is loaded before this script.',
+      );
+    }
 
-    thisSvc.states = {
-      NO_SEARCH: 0,
-      DID_SEARCH: 1,
-      WAITING_FOR_SEARCH: 2,
-      IN_ERROR: 3,
-    };
-
-    thisSvc.engines = {
-      SOLR: 'solr',
-      ELASTICSEARCH: 'es',
-      OPENSEARCH: 'os',
-    };
+    this.states = svc.states;
+    this.engines = svc.engines;
 
     this.createSearch = function (searchSettings, overridingExplains) {
-      var search = new Search(searchSettings, overridingExplains, thisSvc.states, thisSvc.engines);
-
-      search.NO_SEARCH = thisSvc.states.NO_SEARCH;
-      search.DID_SEARCH = thisSvc.states.DID_SEARCH;
-      search.WAITING_FOR_SEARCH = thisSvc.states.WAITING_FOR_SEARCH;
-      search.IN_ERROR = thisSvc.states.IN_ERROR;
-
-      if (!searchSettings.whichEngine) {
-        searchSettings.whichEngine = thisSvc.engines.SOLR;
-      }
-
-      return search;
+      return svc.createSearch(Search, searchSettings, overridingExplains);
     };
   },
 ]);

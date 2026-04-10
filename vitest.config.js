@@ -28,6 +28,8 @@ export default defineConfig({
       // tags without infra changes. They move to src/ in PR 10.5 once
       // Vite owns the build.
       'app/scripts/islands/**/*.spec.{js,jsx}',
+      // Phase 11a: pure service modules extracted from Angular
+      'app/scripts/services/**/*.spec.js',
     ],
     environment: 'jsdom',
   },

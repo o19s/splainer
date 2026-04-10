@@ -30,6 +30,7 @@ import { dirname, resolve } from 'node:path';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const islandsDir = resolve(here, 'app/scripts/islands');
+const servicesDir = resolve(here, 'app/scripts/services');
 
 // Each island is built as its own IIFE bundle. Add new islands here.
 export const islands = [
@@ -44,19 +45,42 @@ export const islands = [
   { name: 'searchResults', entry: resolve(islandsDir, 'searchResults.jsx') },
 ];
 
-export const distDir = resolve(islandsDir, 'dist');
+// Phase 11a: pure-JS service modules, built the same way as islands.
+// Each attaches to globalThis.SplainerServices.<name>.
+export const services = [
+  { name: 'esSettings', entry: resolve(servicesDir, 'esSettings.js') },
+  { name: 'osSettings', entry: resolve(servicesDir, 'osSettings.js') },
+  { name: 'splSearch', entry: resolve(servicesDir, 'splSearch.js') },
+];
 
-// Returns a Vite config object for a single island. Consumed by
-// scripts/build-islands.mjs (one call per island).
-export function configFor({ name, entry }, { watch = false } = {}) {
+export const distDir = resolve(islandsDir, 'dist');
+export const servicesDistDir = resolve(servicesDir, 'dist');
+
+// Preact externals — only needed by island builds (services don't use JSX).
+const preactExternals = {
+  external: ['preact', 'preact/hooks'],
+  output: {
+    globals: {
+      preact: 'preact',
+      'preact/hooks': 'preactHooks',
+    },
+  },
+};
+
+// Returns a Vite config object for a single island or service. Consumed by
+// scripts/build-islands.mjs (one call per entry).
+export function configFor(
+  { name, entry },
+  { watch = false, outDir = distDir, isService = false } = {},
+) {
   return {
     esbuild: {
       jsx: 'automatic',
       jsxImportSource: 'preact',
     },
     build: {
-      outDir: distDir,
-      // Don't wipe the dist between islands — we'd lose the previous one.
+      outDir,
+      // Don't wipe the dist between entries — we'd lose the previous one.
       // The build script empties the dir once before the loop.
       emptyOutDir: false,
       minify: false, // dev/test artifact; readable stack traces matter more than size
@@ -66,20 +90,12 @@ export function configFor({ name, entry }, { watch = false } = {}) {
         entry,
         formats: ['iife'],
         // Each IIFE needs a unique global name; we don't read it (the
-        // island attaches to window.SplainerIslands.* as a side effect)
-        // but Vite/Rollup require it for IIFE output.
-        name: `SplainerIsland_${name}`,
+        // module attaches to window.SplainerIslands/Services.* as a side
+        // effect) but Vite/Rollup require it for IIFE output.
+        name: isService ? `SplainerService_${name}` : `SplainerIsland_${name}`,
         fileName: () => `${name}.js`,
       },
-      rollupOptions: {
-        external: ['preact', 'preact/hooks'],
-        output: {
-          globals: {
-            preact: 'preact',
-            'preact/hooks': 'preactHooks',
-          },
-        },
-      },
+      rollupOptions: isService ? {} : preactExternals,
     },
   };
 }

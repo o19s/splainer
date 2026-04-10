@@ -57,6 +57,12 @@ module.exports = function (config) {
       // bundled into dist/ by Vite, not loadable as classic Karma scripts.
       // Single-level glob so dist/ subfiles are still picked up.
       'app/scripts/islands/*.js',
+      // Phase 11a: pure ESM service modules and their Vitest specs.
+      // The Angular wrappers (*Svc.js) load the built IIFEs from dist/.
+      'app/scripts/services/esSettings.js',
+      'app/scripts/services/osSettings.js',
+      'app/scripts/services/splSearch.js',
+      'app/scripts/services/*.spec.js',
     ],
 
     // web server port
