@@ -61,6 +61,7 @@ module.exports = function (config) {
       // The Angular wrappers (*Svc.js) load the built IIFEs from dist/.
       'app/scripts/services/esSettings.js',
       'app/scripts/services/osSettings.js',
+      'app/scripts/services/solrSettings.js',
       'app/scripts/services/splSearch.js',
       'app/scripts/services/*.spec.js',
     ],

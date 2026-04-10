@@ -50,6 +50,7 @@ export const islands = [
 export const services = [
   { name: 'esSettings', entry: resolve(servicesDir, 'esSettings.js') },
   { name: 'osSettings', entry: resolve(servicesDir, 'osSettings.js') },
+  { name: 'solrSettings', entry: resolve(servicesDir, 'solrSettings.js') },
   { name: 'splSearch', entry: resolve(servicesDir, 'splSearch.js') },
 ];
 
