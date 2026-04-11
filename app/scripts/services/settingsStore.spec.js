@@ -349,4 +349,72 @@ describe('settingsStore (pure module)', function () {
     expect(svc.ENGINES.ELASTICSEARCH).toBe('es');
     expect(svc.ENGINES.OPENSEARCH).toBe('os');
   });
+
+  // --- Full round-trip ---
+
+  it('round-trips every persisted field across all three engines', function () {
+    // Writes a distinctive value into every (engine, field) pair, calls
+    // save(), then loads a new store from the same backing storage and
+    // verifies the exact same values are restored. Pins both the write
+    // and read key-construction paths — a drift in either (e.g. the
+    // `engines` array at init vs. the `PERSIST_ENGINES` array at save)
+    // would fail at least one field.
+    setupMocks({});
+    var svc1 = createSettingsStore();
+    var fixtures = {
+      solr: {
+        customHeaders: '{"X-Solr":"1"}',
+        searchUrl: 'http://solr.example/select',
+        startUrl: 'http://solr.example/select?q=x',
+        fieldSpecStr: 'id solr_title',
+        searchArgsStr: 'q=*:*&fq=live:true',
+      },
+      es: {
+        customHeaders: '{"X-ES":"2"}',
+        searchUrl: 'http://es.example/idx/_search',
+        startUrl: 'http://es.example/idx/_search?pretty',
+        fieldSpecStr: 'id es_title',
+        searchArgsStr: '{"query":{"match_all":{}}}',
+      },
+      os: {
+        customHeaders: '{"X-OS":"3"}',
+        searchUrl: 'http://os.example/idx/_search',
+        startUrl: 'http://os.example/idx/_search?pretty',
+        fieldSpecStr: 'id os_title',
+        searchArgsStr: '{"query":{"term":{"k":"v"}}}',
+      },
+    };
+    ['solr', 'es', 'os'].forEach(function (engine) {
+      Object.keys(fixtures[engine]).forEach(function (field) {
+        svc1.settings[engine][field] = fixtures[engine][field];
+      });
+    });
+    svc1.settings.whichEngine = 'es';
+    svc1.save();
+
+    var svc2 = createSettingsStore();
+    expect(svc2.settings.whichEngine).toBe('es');
+    ['solr', 'es', 'os'].forEach(function (engine) {
+      Object.keys(fixtures[engine]).forEach(function (field) {
+        expect(svc2.settings[engine][field]).toBe(fixtures[engine][field]);
+      });
+    });
+  });
+
+  // --- buildHashString separator & leading `?` ---
+
+  it('joins multiple hash params with `&` and prefixes with `?`', function () {
+    // Two pinning assertions on buildHashString's output shape without
+    // hitting the encodeUriQuery special cases already covered elsewhere.
+    setupMocks({});
+    var svc = createSettingsStore();
+    svc.settings.whichEngine = 'solr';
+    svc.settings.solr.startUrl = 'http://a';
+    svc.settings.solr.fieldSpecStr = 'id';
+    svc.save();
+    // `?` is the literal leading char — not any other punctuation.
+    expect(window.location.hash.charAt(0)).toBe('?');
+    // With two params the single `&` separator is literally present.
+    expect(window.location.hash.split('&')).toHaveLength(2);
+  });
 });

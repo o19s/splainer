@@ -87,4 +87,40 @@ describe('customHeaders island', () => {
     unmount(el);
     expect(el.querySelector('select')).toBeNull();
   });
+
+  it('mount throws when rootEl is missing', () => {
+    // Pins the `if (!rootEl) throw new Error(...)` input guard in mount().
+    expect(() => mount(null, { headerType: 'None', customHeaders: '' }, () => {})).toThrow(
+      /rootEl is required/,
+    );
+  });
+
+  it('defaults headerType to None when settings.headerType is undefined', () => {
+    // Pins `const headerType = settings.headerType || 'None'`. Without this,
+    // a mutation to '' survives because every other test passes an explicit
+    // headerType.
+    const el = makeRoot();
+    mount(el, { customHeaders: '' }, () => {});
+    expect(el.querySelector('[data-role="header-type"]').value).toBe('None');
+    // And the editor is read-only in that default state.
+    expect(el.querySelector('[data-role="header-editor"]').readOnly).toBe(true);
+  });
+
+  it('roundtrips a typed header value back via onChange (data that leaves the browser)', () => {
+    // Strengthens the value-propagation contract: what the user types must
+    // be the exact string passed to onChange and sent to the backend.
+    // A regression here silently mangles the Authorization header.
+    const el = makeRoot();
+    const onChange = vi.fn();
+    mount(el, { headerType: 'API Key', customHeaders: '' }, onChange);
+    const ta = el.querySelector('[data-role="header-editor"]');
+    const typed = '{"Authorization": "ApiKey super-secret-token-12345"}';
+    ta.value = typed;
+    ta.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(onChange).toHaveBeenCalledTimes(1);
+    const payload = onChange.mock.calls[0][0];
+    expect(payload.headerType).toBe('API Key');
+    // Byte-exact round-trip — no quoting, escaping, or whitespace munging.
+    expect(payload.customHeaders).toBe(typed);
+  });
 });

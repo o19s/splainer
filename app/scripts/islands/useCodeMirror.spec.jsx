@@ -117,4 +117,37 @@ describe('useCodeMirror', () => {
     // its __cmView property should have been stripped by the effect cleanup.
     expect(container.__cmView).toBeUndefined();
   });
+
+  describe('defaults and empty values', () => {
+    // These pin the `readOnly = false` default (via destructuring at L28),
+    // the `value || ''` empty fallback on mount (L71), and the same
+    // fallback on external value sync (L91). Without these, the defaults
+    // get rewritten as "true" / the `|| ''` gets rewritten away and
+    // no other test notices.
+
+    function PlainEditor({ value, onChange }) {
+      // No readOnly prop at all — hook must default it to false.
+      const ref = useCodeMirror(value, onChange);
+      return <div ref={ref} data-testid="cm-root" style={{ height: '150px' }} />;
+    }
+
+    it('defaults readOnly to false when options are omitted', () => {
+      const { getByTestId } = render(<PlainEditor value="x" onChange={() => {}} />);
+      const view = getByTestId('cm-root').__cmView;
+      expect(view.state.readOnly).toBe(false);
+    });
+
+    it('mounts with an empty document when value is undefined', () => {
+      const { getByTestId } = render(<Editor value={undefined} onChange={() => {}} />);
+      const view = getByTestId('cm-root').__cmView;
+      expect(view.state.doc.toString()).toBe('');
+    });
+
+    it('syncs to an empty document when value is cleared to undefined', () => {
+      const { getByTestId, rerender } = render(<Editor value="hello" onChange={() => {}} />);
+      expect(getByTestId('cm-root').__cmView.state.doc.toString()).toBe('hello');
+      rerender(<Editor value={undefined} onChange={() => {}} />);
+      expect(getByTestId('cm-root').__cmView.state.doc.toString()).toBe('');
+    });
+  });
 });

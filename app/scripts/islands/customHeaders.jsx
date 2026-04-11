@@ -16,10 +16,12 @@ const HEADER_TEMPLATES = {
 };
 
 // jsdom detect: Vitest's jsdom env sets navigator.userAgent to include "jsdom".
+// Stryker disable all: jsdom path unreachable; real-browser path covered by e2e/smoke.spec.js.
 const CM6_AVAILABLE =
   typeof window !== 'undefined' &&
   typeof navigator !== 'undefined' &&
   !/jsdom/i.test(navigator.userAgent || '');
+// Stryker restore all
 
 function CodeMirrorEditor({ value, readOnly, onChange }) {
   const containerRef = useCodeMirror(value, onChange, { readOnly });

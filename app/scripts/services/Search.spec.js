@@ -324,5 +324,150 @@ describe('Search (pure constructor)', () => {
       var result = s.page();
       expect(result).toBeUndefined();
     });
+
+    it('sets IN_ERROR and errorMsg on paged searcher rejection', async () => {
+      // The pageFailure branch is separate from the first-search failure
+      // handler and had no unit coverage. `msg && msg.searchError ? ... : ''`
+      // is the exact shape to pin.
+      var page2Searcher = makeSearcher({
+        search: vi.fn().mockRejectedValue({ searchError: 'page timeout' }),
+      });
+      var searcher = makeSearcher({
+        docs: [],
+        grouped: {},
+        pager: vi.fn().mockReturnValue(page2Searcher),
+      });
+      deps.searchSvc.createSearcher.mockReturnValue(searcher);
+
+      var s = new Search(deps, settings, null, states, engines);
+      await s.search();
+      await s.page();
+
+      expect(s.state).toBe(states.IN_ERROR);
+      expect(s.errorMsg).toBe('page timeout');
+      expect(s.paging).toBe(false);
+    });
+
+    it('uses empty errorMsg when paged rejection has no searchError', async () => {
+      // Covers the `? : ''` fallback in the pageFailure handler.
+      var page2Searcher = makeSearcher({
+        search: vi.fn().mockRejectedValue(undefined),
+      });
+      var searcher = makeSearcher({
+        docs: [],
+        grouped: {},
+        pager: vi.fn().mockReturnValue(page2Searcher),
+      });
+      deps.searchSvc.createSearcher.mockReturnValue(searcher);
+
+      var s = new Search(deps, settings, null, states, engines);
+      await s.search();
+      await s.page();
+
+      expect(s.state).toBe(states.IN_ERROR);
+      expect(s.errorMsg).toBe('');
+    });
+  });
+
+  describe('grouped results', () => {
+    // Search supports Solr-style result grouping: searcher.grouped is a
+    // dict of group-by-key → array of { docs: [...] }. These cases
+    // pin the (a) normalization pass in search(), and (b) the append
+    // pass in page() that merges subsequent pages into self.grouped.
+
+    function groupedFixture(groups) {
+      return { category: groups.map((docs) => ({ docs })) };
+    }
+
+    it('search() normalizes grouped docs through createNormalDoc', async () => {
+      var searcher = makeSearcher({
+        docs: [],
+        grouped: groupedFixture([[{ id: 'g1' }, { id: 'g2' }], [{ id: 'g3' }]]),
+      });
+      deps.searchSvc.createSearcher.mockReturnValue(searcher);
+
+      var s = new Search(deps, settings, null, states, engines);
+      await s.search();
+
+      expect(s.hasGroup()).toBe(true);
+      // normalDocsSvc.createNormalDoc got called once per raw grouped doc
+      // plus any top-level docs (here 0 top-level).
+      expect(deps.normalDocsSvc.createNormalDoc).toHaveBeenCalledTimes(3);
+      // Every grouped doc is the normalized shape, not the raw input.
+      var normalized = s.grouped.category.flatMap(function (g) {
+        return g.docs;
+      });
+      expect(normalized).toHaveLength(3);
+      normalized.forEach(function (nd) {
+        expect(typeof nd.score).toBe('function');
+        expect(nd._doc).toBeDefined();
+      });
+    });
+
+    it('search() deep-clones searcher.grouped so later mutations do not leak', async () => {
+      // The service does JSON.parse(JSON.stringify(...)) specifically to
+      // isolate self.grouped from the searcher's internal state. Pinning
+      // this prevents someone "optimizing" the clone away.
+      var raw = groupedFixture([[{ id: 'g1' }]]);
+      var searcher = makeSearcher({ docs: [], grouped: raw });
+      deps.searchSvc.createSearcher.mockReturnValue(searcher);
+
+      var s = new Search(deps, settings, null, states, engines);
+      await s.search();
+
+      expect(s.grouped).not.toBe(raw);
+      expect(s.grouped.category).not.toBe(raw.category);
+    });
+
+    it('page() appends grouped docs under existing group-by keys', async () => {
+      var page2Searcher = makeSearcher({
+        docs: [],
+        grouped: groupedFixture([[{ id: 'g2' }]]),
+      });
+      var searcher = makeSearcher({
+        docs: [],
+        grouped: groupedFixture([[{ id: 'g1' }]]),
+        pager: vi.fn().mockReturnValue(page2Searcher),
+      });
+      deps.searchSvc.createSearcher.mockReturnValue(searcher);
+
+      var s = new Search(deps, settings, null, states, engines);
+      await s.search();
+      expect(s.grouped.category).toHaveLength(1);
+
+      await s.page();
+
+      // Second page's groups get pushed onto the same category array.
+      expect(s.grouped.category).toHaveLength(2);
+      expect(s.grouped.category[0].docs[0]._doc).toEqual({ id: 'g1' });
+      expect(s.grouped.category[1].docs[0]._doc).toEqual({ id: 'g2' });
+    });
+
+    it('page() skips groups whose group-by key was not in the first page', async () => {
+      // Pins the `hasOwnProperty.call(self.grouped, groupByKey)` guard:
+      // a new group-by key appearing in a paged response must not be
+      // silently spliced into self.grouped.
+      var page2Searcher = makeSearcher({
+        docs: [],
+        grouped: {
+          // A different top-level key than the first page's 'category'
+          unexpected: [{ docs: [{ id: 'g2' }] }],
+        },
+      });
+      var searcher = makeSearcher({
+        docs: [],
+        grouped: groupedFixture([[{ id: 'g1' }]]),
+        pager: vi.fn().mockReturnValue(page2Searcher),
+      });
+      deps.searchSvc.createSearcher.mockReturnValue(searcher);
+
+      var s = new Search(deps, settings, null, states, engines);
+      await s.search();
+      await s.page();
+
+      expect(s.grouped).toHaveProperty('category');
+      expect(s.grouped).not.toHaveProperty('unexpected');
+      expect(s.grouped.category).toHaveLength(1);
+    });
   });
 });

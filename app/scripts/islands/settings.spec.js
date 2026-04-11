@@ -301,4 +301,66 @@ describe('settings island', () => {
     unmount(el);
     expect(el.querySelector('form')).toBeNull();
   });
+
+  describe('engine radio checked state', () => {
+    // The existing round-trip tests click radios and observe side effects
+    // on other form fields; they don't verify that the `checked` attribute
+    // itself tracks workingWhichEngine. Pins the
+    // `checked={workingWhichEngine === '<x>'}` contract on all three radios.
+
+    async function openEngineSectionAndGetRadios(whichEngine) {
+      const el = makeRoot();
+      const settings = defaultSettings();
+      settings.whichEngine = whichEngine;
+      mount(el, { settings, currSearch: null }, () => {});
+      // First dev-header is the Search Engine selector (collapsed by default).
+      el.querySelector('.dev-header').click();
+      await flush();
+      const radios = {};
+      Array.from(el.querySelectorAll('input[type="radio"]')).forEach((r) => {
+        radios[r.value] = r;
+      });
+      return radios;
+    }
+
+    it('marks only the solr radio checked when whichEngine is solr', async () => {
+      const r = await openEngineSectionAndGetRadios('solr');
+      expect(r.solr.checked).toBe(true);
+      expect(r.es.checked).toBe(false);
+      expect(r.os.checked).toBe(false);
+    });
+
+    it('marks only the es radio checked when whichEngine is es', async () => {
+      const r = await openEngineSectionAndGetRadios('es');
+      expect(r.solr.checked).toBe(false);
+      expect(r.es.checked).toBe(true);
+      expect(r.os.checked).toBe(false);
+    });
+
+    it('marks only the os radio checked when whichEngine is os', async () => {
+      const r = await openEngineSectionAndGetRadios('os');
+      expect(r.solr.checked).toBe(false);
+      expect(r.es.checked).toBe(false);
+      expect(r.os.checked).toBe(true);
+    });
+
+    it('clicking a different radio flips the checked state', async () => {
+      const el = makeRoot();
+      mount(el, { settings: defaultSettings(), currSearch: null }, () => {});
+      el.querySelector('.dev-header').click();
+      await flush();
+      const radios = () => {
+        const out = {};
+        Array.from(el.querySelectorAll('input[type="radio"]')).forEach((r) => {
+          out[r.value] = r;
+        });
+        return out;
+      };
+      expect(radios().solr.checked).toBe(true);
+      radios().es.click();
+      await flush();
+      expect(radios().solr.checked).toBe(false);
+      expect(radios().es.checked).toBe(true);
+    });
+  });
 });

@@ -1,6 +1,14 @@
 // Smoke flows for splainer (Preact islands + pure ESM services).
 // Goal: catch regressions in user-visible behavior. Tests are
 // framework-agnostic — they interact via DOM selectors only.
+//
+// Stryker coupling: the `// Stryker disable all` annotations in
+// customHeaders.jsx, startUrl.jsx, and useDialogModal.js mark code paths
+// that are structurally unreachable under jsdom (CodeMirror 6 layout,
+// HTMLDialogElement.showModal). Those annotations are load-bearing
+// because this file provides the only automated coverage of those paths.
+// If you delete or skip the CodeMirror / dialog flows below, re-enable
+// the Stryker annotations so the mutation suite surfaces the new gaps.
 import { test, expect } from '@playwright/test';
 
 // All canned-backend responses need this so the browser doesn't block the

@@ -227,4 +227,95 @@ describe('startUrl island', () => {
     unmount(el);
     expect(el.querySelector('[data-role="solr-submit"]')).toBeNull();
   });
+
+  describe('nav tab active class', () => {
+    // Existing tests verify the *pane* class (#solr_, #es_, #os_) reflects
+    // activeTab, but not the nav *li* — which is where Bootstrap's tab
+    // highlight lives. Pins `class={activeTab === t.key ? 'active' : ''}`
+    // on the <li> wrapping each <a data-role="tab-*">.
+
+    function navLi(el, key) {
+      return el.querySelector(`[data-role="tab-${key}"]`).closest('li');
+    }
+
+    it('marks only the matching nav <li> active for each whichEngine', () => {
+      for (const engine of ['solr', 'es', 'os']) {
+        const el = makeRoot();
+        mount(el, { settings: makeSettings({ whichEngine: engine }) }, { onSearch: () => {} });
+        expect(navLi(el, engine).className).toBe('active');
+        ['solr', 'es', 'os']
+          .filter((k) => k !== engine)
+          .forEach((k) => expect(navLi(el, k).className).toBe(''));
+        document.body.innerHTML = '';
+      }
+    });
+
+    it('clicking a nav anchor updates which <li> has the active class', async () => {
+      const el = makeRoot();
+      mount(el, { settings: makeSettings() }, { onSearch: () => {} });
+      await flush();
+      expect(navLi(el, 'solr').className).toBe('active');
+      el.querySelector('[data-role="tab-os"]').dispatchEvent(
+        new MouseEvent('click', { bubbles: true, cancelable: true }),
+      );
+      await flush();
+      expect(navLi(el, 'solr').className).toBe('');
+      expect(navLi(el, 'es').className).toBe('');
+      expect(navLi(el, 'os').className).toBe('active');
+    });
+  });
+
+  describe('empty / missing searchArgsStr', () => {
+    // Pins `value={value || ''}` in TextareaArgsFallback. Without this test
+    // the `|| ''` fallback is unreachable (every existing test passes a
+    // string) and mutation to "" survives.
+
+    it('renders an empty textarea when searchArgsStr is undefined', () => {
+      const el = makeRoot();
+      const settings = makeSettings({
+        whichEngine: 'es',
+        es: {
+          startUrl: '',
+          // undefined, not ''
+          searchArgsStr: undefined,
+          fieldSpecStr: '',
+          headerType: 'Custom',
+          customHeaders: '',
+        },
+      });
+      expect(() => {
+        mount(el, { settings }, { onSearch: () => {} });
+      }).not.toThrow();
+      const textarea = el.querySelector('[data-role="es-search-args-editor"]');
+      // The `|| ''` fallback yields the empty string — no "undefined"
+      // leaks to the DOM and jsdom reports value === ''.
+      expect(textarea.value).toBe('');
+    });
+  });
+
+  describe('EngineAdvanced gate', () => {
+    // Pins `(t.key === 'es' || t.key === 'os') && <EngineAdvanced ...>`:
+    // advanced settings exist on ES and OS panes but NEVER on solr.
+
+    it('renders EngineAdvanced inside the es pane', () => {
+      const el = makeRoot();
+      mount(el, { settings: makeSettings({ whichEngine: 'es' }) }, { onSearch: () => {} });
+      const esPane = el.querySelector('#es_');
+      expect(esPane.querySelector('[data-role="es-advanced-toggle"]')).not.toBeNull();
+    });
+
+    it('renders EngineAdvanced inside the os pane', () => {
+      const el = makeRoot();
+      mount(el, { settings: makeSettings({ whichEngine: 'os' }) }, { onSearch: () => {} });
+      const osPane = el.querySelector('#os_');
+      expect(osPane.querySelector('[data-role="os-advanced-toggle"]')).not.toBeNull();
+    });
+
+    it('does NOT render EngineAdvanced inside the solr pane', () => {
+      const el = makeRoot();
+      mount(el, { settings: makeSettings() }, { onSearch: () => {} });
+      const solrPane = el.querySelector('#solr_');
+      expect(solrPane.querySelector('[data-role="solr-advanced-toggle"]')).toBeNull();
+    });
+  });
 });

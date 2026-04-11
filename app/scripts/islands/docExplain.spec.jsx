@@ -203,4 +203,157 @@ describe('docExplain island', () => {
     unmount(el);
     expect(el.querySelector('dialog')).toBeNull();
   });
+
+  describe('tab switching', () => {
+    // All three <pre> panes live in the DOM simultaneously; the active tab
+    // is selected by toggling inline `display: block|none` rather than by
+    // conditional rendering. These tests pin that contract: clicking a tab
+    // must (a) show only its own <pre>, and (b) mark only its <li> active.
+
+    function mountWithAllTabs() {
+      const el = makeRoot();
+      render(
+        <DocExplain
+          doc={makeDoc({
+            explainToStr: 'SUM_PANE',
+            hotStr: 'HOT_PANE',
+            explainRaw: { description: 'FULL_PANE', value: 1 },
+          })}
+          onClose={() => {}}
+        />,
+        el,
+      );
+      return el;
+    }
+
+    function panes(el) {
+      // Preact renders TABS in order: [summarized, hot, full]. The three
+      // top-level panes inside the primary .explain-view are at .explain-view
+      // > div > pre (order-matched to TABS).
+      const all = el.querySelectorAll('.explain-view pre');
+      return { summarized: all[0], hot: all[1], full: all[2] };
+    }
+
+    function navItems(el) {
+      return {
+        summarized: el.querySelector('[data-role="tab-summarized"]').closest('li'),
+        hot: el.querySelector('[data-role="tab-hot"]').closest('li'),
+        full: el.querySelector('[data-role="tab-full"]').closest('li'),
+      };
+    }
+
+    it('defaults to the summarized tab with only its pane visible', () => {
+      const el = mountWithAllTabs();
+      const p = panes(el);
+      expect(p.summarized.style.display).toBe('block');
+      expect(p.hot.style.display).toBe('none');
+      expect(p.full.style.display).toBe('none');
+    });
+
+    it('defaults to the summarized nav item being active', () => {
+      const el = mountWithAllTabs();
+      const n = navItems(el);
+      expect(n.summarized.className).toBe('active');
+      expect(n.hot.className).toBe('');
+      expect(n.full.className).toBe('');
+    });
+
+    it('clicking the Hot Matches tab shows only the hot pane', async () => {
+      const el = mountWithAllTabs();
+      el.querySelector('[data-role="tab-hot"]').dispatchEvent(
+        new Event('click', { bubbles: true, cancelable: true }),
+      );
+      await new Promise((r) => setTimeout(r, 0));
+      const p = panes(el);
+      expect(p.summarized.style.display).toBe('none');
+      expect(p.hot.style.display).toBe('block');
+      expect(p.full.style.display).toBe('none');
+      const n = navItems(el);
+      expect(n.summarized.className).toBe('');
+      expect(n.hot.className).toBe('active');
+      expect(n.full.className).toBe('');
+    });
+
+    it('clicking the Full Explain tab shows only the full pane', async () => {
+      const el = mountWithAllTabs();
+      el.querySelector('[data-role="tab-full"]').dispatchEvent(
+        new Event('click', { bubbles: true, cancelable: true }),
+      );
+      await new Promise((r) => setTimeout(r, 0));
+      const p = panes(el);
+      expect(p.summarized.style.display).toBe('none');
+      expect(p.hot.style.display).toBe('none');
+      expect(p.full.style.display).toBe('block');
+      const n = navItems(el);
+      expect(n.full.className).toBe('active');
+      expect(n.summarized.className).toBe('');
+      expect(n.hot.className).toBe('');
+    });
+
+    it('tab-switching click is preventDefault so the page does not scroll', () => {
+      const el = mountWithAllTabs();
+      const evt = new Event('click', { bubbles: true, cancelable: true });
+      el.querySelector('[data-role="tab-hot"]').dispatchEvent(evt);
+      expect(evt.defaultPrevented).toBe(true);
+    });
+  });
+
+  describe('empty / missing data', () => {
+    // Pins the defaults inside handleResults:
+    //   docs:     (result && result.docs)     || []
+    //   maxScore: (result && result.maxScore) || 0
+    // and the `doc && doc.title` header guard.
+
+    it('does not crash when mounted without a doc prop', () => {
+      const el = makeRoot();
+      expect(() => {
+        render(<DocExplain doc={null} onClose={() => {}} />, el);
+      }).not.toThrow();
+      // Header still renders, just with no title text after "Explain for:".
+      const header = el.querySelector('[data-role="detailed-explain-modal"]');
+      expect(header).not.toBeNull();
+    });
+
+    it('handles explainOther resolving with undefined (no docs, no crash)', async () => {
+      const el = makeRoot();
+      const explainOther = vi.fn().mockResolvedValue(undefined);
+      render(
+        <DocExplain
+          doc={makeDoc()}
+          canExplainOther={true}
+          explainOther={explainOther}
+          onClose={() => {}}
+        />,
+        el,
+      );
+      el.querySelector('form').dispatchEvent(
+        new Event('submit', { bubbles: true, cancelable: true }),
+      );
+      await new Promise((r) => setTimeout(r, 0));
+      // docs falls back to [] — no rows rendered, no error banner.
+      expect(el.querySelectorAll('[data-role="doc-row"]')).toHaveLength(0);
+      expect(el.querySelector('[data-role="alt-query-error"]')).toBeNull();
+    });
+
+    it('handles explainOther resolving with a partial object (missing docs/maxScore)', async () => {
+      // `result && result.docs` is falsy → [], and `result && result.maxScore`
+      // is falsy → 0. Neither fallback should throw.
+      const el = makeRoot();
+      const explainOther = vi.fn().mockResolvedValue({});
+      render(
+        <DocExplain
+          doc={makeDoc()}
+          canExplainOther={true}
+          explainOther={explainOther}
+          onClose={() => {}}
+        />,
+        el,
+      );
+      el.querySelector('form').dispatchEvent(
+        new Event('submit', { bubbles: true, cancelable: true }),
+      );
+      await new Promise((r) => setTimeout(r, 0));
+      expect(el.querySelectorAll('[data-role="doc-row"]')).toHaveLength(0);
+    });
+  });
 });

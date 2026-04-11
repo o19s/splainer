@@ -21,7 +21,9 @@ export function useDialogModal(onClose) {
 
     closedRef.current = false;
 
+    // Stryker disable next-line all: jsdom lacks HTMLDialogElement.showModal; real-browser path in e2e/smoke.spec.js.
     if (typeof dlg.showModal === 'function') {
+      // Stryker disable next-line all: unreachable under jsdom (see above).
       dlg.showModal();
     } else {
       // jsdom path.

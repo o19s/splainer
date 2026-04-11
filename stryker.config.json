@@ -13,6 +13,7 @@
     "!app/scripts/services/**/*.spec.js"
   ],
   "reporters": ["html", "clear-text", "progress"],
+  "thresholds": { "high": 80, "low": 60, "break": 70 },
   "incremental": true,
   "incrementalFile": "reports/stryker-incremental.json",
   "ignorePatterns": ["dist", "coverage", "test-results", "playwright-report", ".playwright", "e2e"]

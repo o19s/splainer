@@ -15,10 +15,12 @@ import { useCodeMirror } from './useCodeMirror.js';
 import { formatJson } from './formatJson.js';
 
 // jsdom detect: Vitest's jsdom env sets navigator.userAgent to include "jsdom".
+// Stryker disable all: jsdom path unreachable; real-browser path covered by e2e/smoke.spec.js.
 const CM6_AVAILABLE =
   typeof window !== 'undefined' &&
   typeof navigator !== 'undefined' &&
   !/jsdom/i.test(navigator.userAgent || '');
+// Stryker restore all
 
 // Default start URLs — seeded on first mount only when empty, so
 // returning users keep their last-used URL from localStorage.
