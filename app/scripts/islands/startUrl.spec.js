@@ -42,6 +42,14 @@ function makeSettings(overrides = {}) {
 describe('startUrl island', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
+    // Reset window.location.hash between tests. startUrl.jsx now writes
+    // `#/<tab>_` via history.replaceState when a tab is clicked, and jsdom
+    // shares one window across tests in the same file — without this
+    // reset, a later test would pick up the hash written by an earlier
+    // test and initialize its activeTab from the leaked state.
+    if (typeof window !== 'undefined') {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
   });
 
   it('seeds default start URLs on mount when unset', async () => {
@@ -90,6 +98,40 @@ describe('startUrl island', () => {
     await flush();
     expect(el.querySelector('#es_').className).toContain('active');
     expect(el.querySelector('#solr_').className).not.toContain('active');
+  });
+
+  it('writes #/<tab>_ to window.location.hash when a tab is clicked (parity with 2024 Angular build)', async () => {
+    // Regression guard for the bookmarkable-tab-state parity fix.
+    // Matches the exact hash shape the 2024 splainer.io emits — the
+    // audit's es-custom-headers-panel scenario asserts on this.
+    const el = makeRoot();
+    mount(el, { settings: makeSettings() }, { onSearch: () => {} });
+    await flush();
+    expect(window.location.hash).toBe('');
+    el.querySelector('[data-role="tab-es"]').dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true }),
+    );
+    await flush();
+    expect(window.location.hash).toBe('#/es_');
+    el.querySelector('[data-role="tab-os"]').dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true }),
+    );
+    await flush();
+    expect(window.location.hash).toBe('#/os_');
+  });
+
+  it('initializes the active tab from #/<tab>_ in the URL on mount', async () => {
+    // Reverse direction of the test above: a user navigating to a
+    // bookmarked URL with #/es_ should land on the ES tab regardless
+    // of what whichEngine says in settings.
+    window.history.replaceState(null, '', '#/os_');
+    const el = makeRoot();
+    // whichEngine is 'solr', but the hash wins.
+    mount(el, { settings: makeSettings() }, { onSearch: () => {} });
+    await flush();
+    expect(el.querySelector('#os_').className).toContain('active');
+    expect(el.querySelector('#solr_').className).not.toContain('active');
+    expect(el.querySelector('#es_').className).not.toContain('active');
   });
 
   it('typing in the Solr URL input mutates settings.solr.startUrl', () => {

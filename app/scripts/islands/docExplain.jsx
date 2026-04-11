@@ -139,7 +139,7 @@ export function DocExplain({
             style={{ float: 'right' }}
             onClick={close}
           >
-            ×
+            <span aria-hidden="true">×</span>
           </button>
         </p>
         <div class="modal-body" data-role="detailed-explain-body">

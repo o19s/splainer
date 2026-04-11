@@ -20,7 +20,7 @@
  */
 import { useEffect, useRef } from 'preact/hooks';
 import { EditorState, Compartment } from '@codemirror/state';
-import { EditorView, keymap } from '@codemirror/view';
+import { EditorView, keymap, lineNumbers } from '@codemirror/view';
 import { json } from '@codemirror/lang-json';
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
 
@@ -46,6 +46,7 @@ export function useCodeMirror(value, onChange, options = {}) {
     readOnlyCompartmentRef.current = readOnlyCompartment;
 
     const extensions = [
+      lineNumbers(),
       history(),
       json(),
       keymap.of([indentWithTab, ...defaultKeymap, ...historyKeymap]),

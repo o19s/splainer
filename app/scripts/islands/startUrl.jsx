@@ -28,6 +28,23 @@ const DEFAULT_URLS = {
   os: 'https://reader:reader@quepid-opensearch.dev.o19s.com:9000/tmdb/_search',
 };
 
+const TAB_HASH_RE = /^#\/(solr|es|os)_$/;
+
+function parseTabHash() {
+  if (typeof window === 'undefined') return null;
+  const m = TAB_HASH_RE.exec(window.location.hash || '');
+  return m ? m[1] : null;
+}
+
+function writeTabHash(tab) {
+  if (typeof window === 'undefined') return;
+  // replaceState rather than assigning to location.hash: the latter
+  // creates a history entry per tab click, so the back button would
+  // have to step through every tab the user touched before leaving
+  // the page. replaceState keeps the URL updated without the bloat.
+  window.history.replaceState(null, '', `#/${tab}_`);
+}
+
 function CodeMirrorArgsEditor({ value, onChange, engine }) {
   const containerRef = useCodeMirror(value, onChange, {
     useWrapMode: false,
@@ -129,8 +146,14 @@ export function StartUrl({ settings, onSearch }) {
   if (!settings.es.startUrl) settings.es.startUrl = DEFAULT_URLS.es;
   if (!settings.os.startUrl) settings.os.startUrl = DEFAULT_URLS.os;
 
+  // Initial tab precedence: URL hash (e.g. `#/es_` bookmark) → settings
+  // whichEngine (last-used engine from localStorage) → 'solr' default.
+  // Hash wins so a shared URL lands on the intended tab regardless of
+  // what the browser had cached from a prior visit.
+  const hashTab = parseTabHash();
   const initialTab =
-    settings.whichEngine === 'es' ? 'es' : settings.whichEngine === 'os' ? 'os' : 'solr';
+    hashTab ||
+    (settings.whichEngine === 'es' ? 'es' : settings.whichEngine === 'os' ? 'os' : 'solr');
   const [activeTab, setActiveTab] = useState(initialTab);
   // Re-render trigger after in-place mutation of settings.
   const [, setTick] = useState(0);
@@ -168,6 +191,7 @@ export function StartUrl({ settings, onSearch }) {
                     onClick={(e) => {
                       e.preventDefault();
                       setActiveTab(t.key);
+                      writeTabHash(t.key);
                     }}
                   >
                     {t.label}
