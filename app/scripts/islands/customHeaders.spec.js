@@ -1,17 +1,12 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from 'vitest';
 import { mount, unmount } from './customHeaders.jsx';
+import { makeRoot } from '../test-helpers/factories.js';
 
 // jsdom does not load Ace, so the island falls back to the textarea
 // renderer (see TextareaFallback in customHeaders.jsx). The fallback uses
 // the same data-role attribute as the Ace path so this spec exercises the
 // same locators that Playwright + browser code will see.
-
-function makeRoot() {
-  const el = document.createElement('div');
-  document.body.appendChild(el);
-  return el;
-}
 
 describe('customHeaders island', () => {
   it('renders the three header-type options', () => {

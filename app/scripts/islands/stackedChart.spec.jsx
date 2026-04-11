@@ -3,12 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from 'preact';
  
 import { StackedChart } from './stackedChart.jsx';
-
-function makeRoot() {
-  const el = document.createElement('div');
-  document.body.appendChild(el);
-  return el;
-}
+import { makeRoot } from '../test-helpers/factories.js';
 
 function makeDoc(hots) {
   return {

@@ -1,17 +1,12 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from 'vitest';
 import { mount, unmount } from './settings.jsx';
+import { makeRoot } from '../test-helpers/factories.js';
 
 // jsdom has no window.ace, so the search-args editor falls back to a
 // textarea (TextareaArgsFallback) for both ES and OS. Section toggles
 // follow the original ng-show defaults: Engine + Headers collapsed,
 // URL + Fields + Args expanded.
-
-function makeRoot() {
-  const el = document.createElement('div');
-  document.body.appendChild(el);
-  return el;
-}
 
 // Preact flushes hook state updates on a microtask, so any test that
 // asserts on DOM produced by a state change (toggle click → conditional

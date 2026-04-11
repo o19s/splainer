@@ -7,6 +7,26 @@ executors:
     docker:
       - image: circleci/python
 jobs:
+  test:
+    docker:
+      - image: cimg/node:20.18
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - yarn-deps-v1-{{ checksum "yarn.lock" }}
+            - yarn-deps-v1-
+      - run:
+          name: Install dependencies
+          command: yarn install --frozen-lockfile
+      - save_cache:
+          key: yarn-deps-v1-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+            - ~/.cache/yarn
+      - run:
+          name: Run unit and component tests
+          command: yarn test
   build:
     executor: docker-publisher
     steps:
@@ -77,10 +97,10 @@ workflows:
   version: 2
   build-main:
     jobs:
-      - build
-        #filters:
-        #  branches:
-        #    only: circleci2.0
+      - test
+      - build:
+          requires:
+            - test
       - publish-latest:
           requires:
             - build

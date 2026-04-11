@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect } from 'vitest';
 import { mount, unmount } from './solrSettingsWarning.jsx';
+import { makeRoot } from '../test-helpers/factories.js';
 
 // Fake solrUrlSvc: mirrors the real splainer-search API surface the
 // island touches. parseSolrArgs returns an object; removeUnsupported
@@ -12,12 +13,6 @@ function fakeSvc(warningsByArg) {
     parseSolrArgs: (s) => ({ _raw: s }),
     removeUnsupported: () => warningsByArg,
   };
-}
-
-function makeRoot() {
-  const el = document.createElement('div');
-  document.body.appendChild(el);
-  return el;
 }
 
 describe('solrSettingsWarning island', () => {

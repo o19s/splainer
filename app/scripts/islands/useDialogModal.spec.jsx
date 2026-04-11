@@ -2,33 +2,9 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render } from 'preact';
 import { useDialogModal } from './useDialogModal.js';
+import { makeRoot } from '../test-helpers/factories.js';
 
-function makeRoot() {
-  const el = document.createElement('div');
-  document.body.appendChild(el);
-  return el;
-}
-
-// jsdom does not implement HTMLDialogElement.showModal/close. Polyfill the
-// minimum surface the hook touches so the tests exercise the real branch
-// instead of the attribute-only fallback.
-function installDialogPolyfill() {
-  const proto = window.HTMLDialogElement && window.HTMLDialogElement.prototype;
-  if (!proto) return;
-  if (typeof proto.showModal !== 'function') {
-    proto.showModal = function () {
-      this.setAttribute('open', '');
-      this.open = true;
-    };
-  }
-  if (typeof proto.close !== 'function') {
-    proto.close = function () {
-      this.removeAttribute('open');
-      this.open = false;
-    };
-  }
-}
-installDialogPolyfill();
+// jsdom dialog polyfill (showModal/close) loaded via vitest setupFiles.
 
 function Harness({ onClose, label = 'body' }) {
   const { ref, close } = useDialogModal(onClose);

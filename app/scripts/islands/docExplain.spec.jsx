@@ -3,59 +3,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from 'preact';
 import { DocExplain, renderInto, unmount } from './docExplain.jsx';
 
-// Polyfill jsdom HTMLDialogElement.showModal/close so the useDialogModal
-// hook exercises the real branch. Same pattern as detailedDoc.spec.jsx.
-function installDialogPolyfill() {
-  const proto = window.HTMLDialogElement && window.HTMLDialogElement.prototype;
-  if (!proto) return;
-  if (typeof proto.showModal !== 'function') {
-    proto.showModal = function () {
-      this.setAttribute('open', '');
-      this.open = true;
-    };
-  }
-  if (typeof proto.close !== 'function') {
-    proto.close = function () {
-      this.removeAttribute('open');
-      this.open = false;
-    };
-  }
-}
-installDialogPolyfill();
-
-function makeRoot() {
-  const el = document.createElement('div');
-  document.body.appendChild(el);
-  return el;
-}
-
-// Minimal doc fake. splainer-search docs expose .title, .explain(),
-// .hotMatches(), .getHighlightedTitle(), .subSnippets(), .score(),
-// .hasThumb(), .hasImage(). DocExplain calls the first three directly;
-// nested DocRow children (rendered when explainOther returns results)
-// use the rest, so any doc passed to the alt-query pathway needs them.
-function makeDoc(overrides = {}) {
-  const explainToStr = overrides.explainToStr || '1.0 weight(title:canned in 0)';
-  const explainRawObj = overrides.explainRaw || {
-    description: 'weight(title:canned in 0)',
-    value: 1.0,
-  };
-  const hotStr = overrides.hotStr || '1.0 hot: title:canned';
-  return {
-    id: overrides.id || 'doc-1',
-    title: overrides.title || 'canned title',
-    explain: () => ({
-      toStr: () => explainToStr,
-      rawStr: () => JSON.stringify(explainRawObj),
-    }),
-    hotMatches: () => ({ toStr: () => hotStr }),
-    getHighlightedTitle: () => overrides.title || 'canned title',
-    subSnippets: () => ({}),
-    score: () => 1.0,
-    hasThumb: () => false,
-    hasImage: () => false,
-  };
-}
+// Dialog polyfill (showModal/close) loaded via vitest setupFiles.
+import { makeRoot, makeSearchDoc as makeDoc } from '../test-helpers/factories.js';
 
 describe('docExplain island', () => {
   beforeEach(() => {

@@ -2,11 +2,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render } from 'preact';
 import { SearchResults, mount, unmount } from './searchResults.jsx';
+import { makeRoot as _makeRoot, makeSearchDoc } from '../test-helpers/factories.js';
 
 const roots = [];
 function makeRoot() {
-  const el = document.createElement('div');
-  document.body.appendChild(el);
+  const el = _makeRoot();
   roots.push(el);
   return el;
 }
@@ -27,20 +27,7 @@ const STATES = {
 };
 
 function makeDoc(overrides = {}) {
-  return {
-    id: overrides.id || 'doc-1',
-    title: overrides.title || 'canned title',
-    getHighlightedTitle: () => overrides.title || 'canned title',
-    subSnippets: () => ({}),
-    score: () => overrides.score || 1.0,
-    hasThumb: () => false,
-    hasImage: () => false,
-    explain: () => ({
-      toStr: () => '1.0 weight(title:canned)',
-      rawStr: () => '{}',
-    }),
-    hotMatches: () => ({ toStr: () => '1.0 hot' }),
-  };
+  return makeSearchDoc(overrides);
 }
 
 function makeCurrSearch(overrides = {}) {

@@ -2,33 +2,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount, unmount } from './docRow.jsx';
 
-// Helpers ────────────────────────────────────────────────────────────────────
-function makeRoot() {
-  const el = document.createElement('div');
-  document.body.appendChild(el);
-  return el;
-}
+import { makeRoot, makeSearchDoc } from '../test-helpers/factories.js';
 
-// Minimal doc fake matching the splainer-search doc shape that
-// app/views/docRow.html relied on. The island calls these methods at
-// render time; the fake just returns whatever the test wants to display.
-//
-// Intentionally omits `hotMatchesOutOf` — the StackedChart child renders
-// null defensively when it's missing, so chart-agnostic tests stay
-// uncoupled from the chart's render shape. The two chart-aware tests
-// below override the doc with a `hotMatchesOutOf` that returns canned
-// hot matches.
+// Helpers ────────────────────────────────────────────────────────────────────
+
+// DocRow-specific doc factory — overrides the shared factory with
+// a default score of 1.5 and a snippet, matching the original shape.
 function makeDoc(overrides = {}) {
-  return {
-    score: () => 1.5,
-    getHighlightedTitle: (open, close) => `${open}canned${close} title`,
+  return makeSearchDoc({
+    score: 1.5,
     subSnippets: () => ({ body: 'matched <em>term</em>' }),
-    hasThumb: () => false,
-    hasImage: () => false,
-    thumb: null,
-    image: null,
     ...overrides,
-  };
+  });
 }
 
 // For the chart-aware tests only — adds a single canned hot match.
@@ -169,7 +154,7 @@ describe('docRow island', () => {
     expect(el.querySelector('[data-testid="doc-row"]')).not.toBeNull();
     unmount(el);
     expect(el.querySelector('[data-testid="doc-row"]')).toBeNull();
-    mount(el, makeDoc({ score: () => 7 }), { maxScore: 1 });
+    mount(el, makeDoc({ score: 7 }), { maxScore: 1 });
     expect(el.querySelector('[data-testid="doc-row"]')).not.toBeNull();
     expect(el.textContent).toContain('7');
   });

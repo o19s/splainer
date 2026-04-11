@@ -21,14 +21,10 @@ export default defineConfig({
     include: [
       'src/**/*.test.js',
       'src/**/*.spec.js',
-      // Islands live under app/scripts/islands/ during the migration so
-      // Grunt's existing connect middleware can serve them via <script>
-      // tags without infra changes. They move to src/ in PR 10.5 once
-      // Vite owns the build.
       'app/scripts/islands/**/*.spec.{js,jsx}',
-      // Phase 11a: pure service modules extracted from Angular
       'app/scripts/services/**/*.spec.js',
     ],
     environment: 'jsdom',
+    setupFiles: ['./app/scripts/test-helpers/jsdom-dialog-polyfill.js'],
   },
 });

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount, unmount } from './startUrl.jsx';
+import { makeRoot } from '../test-helpers/factories.js';
 
 // Preact batches state updates and defers useEffect to a microtask. Two
 // flushes cover both: one for the effect queue, one for any follow-up
@@ -36,12 +37,6 @@ function makeSettings(overrides = {}) {
     },
     ...overrides,
   };
-}
-
-function makeRoot() {
-  const el = document.createElement('div');
-  document.body.appendChild(el);
-  return el;
 }
 
 describe('startUrl island', () => {

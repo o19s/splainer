@@ -3,31 +3,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from 'preact';
 import { DetailedDoc, renderInto, unmount } from './detailedDoc.jsx';
 
-// Polyfill jsdom HTMLDialogElement.showModal/close so the hook exercises
-// the real branch.
-function installDialogPolyfill() {
-  const proto = window.HTMLDialogElement && window.HTMLDialogElement.prototype;
-  if (!proto) return;
-  if (typeof proto.showModal !== 'function') {
-    proto.showModal = function () {
-      this.setAttribute('open', '');
-      this.open = true;
-    };
-  }
-  if (typeof proto.close !== 'function') {
-    proto.close = function () {
-      this.removeAttribute('open');
-      this.open = false;
-    };
-  }
-}
-installDialogPolyfill();
-
-function makeRoot() {
-  const el = document.createElement('div');
-  document.body.appendChild(el);
-  return el;
-}
+// Dialog polyfill (showModal/close) loaded via vitest setupFiles.
+import { makeRoot } from '../test-helpers/factories.js';
 
 function makeDoc(overrides) {
   return Object.assign(
