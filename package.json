@@ -13,7 +13,7 @@
     "bootstrap": "~3.4.1",
     "dompurify": "^3.3.3",
     "preact": "^10.29.1",
-    "splainer-search": "https://github.com/o19s/splainer-search.git#975cd98655bde57f29ae780e016218672476bfed",
+    "splainer-search": "https://github.com/o19s/splainer-search.git#45bfd2f0fef83e520871c4aacf7358f3d091c732",
     "urijs": "^1.19.7"
   },
   "devDependencies": {
@@ -48,7 +48,7 @@
     "stryker:dry": "stryker run --dryRunOnly",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:audit": "playwright test --project=audit-prod --project=audit-local && node scripts/audit-diff.js",
+    "test:e2e:audit": "playwright test --project=audit-prod --project=audit-local --project=audit-local-mobile && node scripts/audit-diff.js",
     "test:e2e:audit:diff": "node scripts/audit-diff.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

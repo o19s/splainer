@@ -30,17 +30,55 @@ export default defineConfig({
     {
       name: 'smoke-local',
       testMatch: /smoke\.spec\.js/,
-      use: { ...devices['Desktop Chrome'], baseURL: localURL },
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: localURL,
+        viewport: { width: 1400, height: 900 },
+      },
     },
+    // Desktop audit: 1400×900 pinned explicitly so the viewport doesn't
+    // drift if devices['Desktop Chrome'] changes defaults. Matches the
+    // shape a typical splainer user has in their browser.
     {
       name: 'audit-prod',
       testMatch: /audit\.spec\.js/,
-      use: { ...devices['Desktop Chrome'], baseURL: prodURL },
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: prodURL,
+        viewport: { width: 1400, height: 900 },
+      },
     },
     {
       name: 'audit-local',
       testMatch: /audit\.spec\.js/,
-      use: { ...devices['Desktop Chrome'], baseURL: localURL },
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: localURL,
+        viewport: { width: 1400, height: 900 },
+      },
+    },
+    // Mobile audit — Pixel 5 preset (Chromium-based, ~393×851 viewport,
+    // isMobile, hasTouch). Local-only, deliberately not paired with a
+    // prod variant:
+    //   - The goal is to catch responsive-layout regressions the desktop
+    //     audit can't see (e.g. flex layouts breaking at narrow widths).
+    //   - Prod is a frozen 2024 build with no ongoing development, so its
+    //     mobile layout is whatever it is; there's no regression risk on
+    //     that side of the comparison.
+    //   - The diff script's DIR_RE regex (/^audit-audit-(.+)-audit-(prod|local)$/)
+    //     won't match `-audit-local-mobile`, so mobile runs are silently
+    //     excluded from the cross-version diff. Review mobile screenshots
+    //     via `npx playwright show-report` instead.
+    //   - Using Pixel 5 (Chromium) rather than iPhone 12 (WebKit) so we
+    //     don't pull in a second browser engine for the audit and so
+    //     layout differences isolate to viewport/isMobile, not engine.
+    {
+      name: 'audit-local-mobile',
+      testMatch: /audit\.spec\.js/,
+      use: {
+        ...devices['Pixel 5'],
+        baseURL: localURL,
+      },
     },
   ],
   // Global webServer — starts `yarn dev:vite` for local projects. Running

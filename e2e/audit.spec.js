@@ -26,7 +26,9 @@
 import { test, expect } from '@playwright/test';
 import { writeFile } from 'node:fs/promises';
 
-test.use({ viewport: { width: 1400, height: 900 } });
+// Viewport is pinned per-project in playwright.config.js, not here, so the
+// same scenarios can run at different viewports (desktop audit-prod /
+// audit-local at 1400×900, audit-local-mobile at iPhone 12 preset).
 
 // Give each audit case generous headroom. Live splainer.io pulls remote
 // images / analytics that can stall, and cold page loads against prod
@@ -39,11 +41,22 @@ test.setTimeout(90_000);
 //   name:             filesystem-safe id, used for attachment filenames
 //   description:      human-readable one-liner (surfaced as an annotation)
 //   hash:             URL hash fragment driving the scenario ('' = clean boot)
+//   afterLoad:        optional async (page) => void that runs AFTER the
+//                     initial load waits but BEFORE the anchor-text wait
+//                     and state capture. Used for scenarios that require
+//                     an interactive step (click a link, open a modal,
+//                     expand a panel) that can't be driven via hash alone.
+//                     Must do its own waiting for the interaction to
+//                     settle — typically via text-based locators that
+//                     work cross-framework.
 //   expectBodyText:   array of substrings that MUST appear in body.innerText.
 //                     Checked case-sensitively. These are the cross-version
 //                     invariants — they must hold on both Angular prod and
 //                     Preact local. If you can't find text that holds on
 //                     both, the scenario is a design regression candidate.
+//                     The FIRST entry is used as the pre-capture anchor
+//                     wait — pick it so its presence signals "the scenario
+//                     has reached its final rendered state."
 //   expectAbsentText: array of substrings that MUST NOT appear. Used to
 //                     assert state transitions (e.g., after a search, the
 //                     "Splain This!" button goes away).
@@ -191,6 +204,61 @@ const SCENARIOS = [
     expectMinDocRows: 1,
     expectMaxDocRows: null,
   },
+  {
+    name: 'solr-detailed-explain-modal',
+    description:
+      'Load Solr results, then click the first "Detailed" link on the stacked chart to open the explain modal. Covers the DocExplain island path that hash-driven scenarios skip entirely.',
+    hash: solrHash('*:*'),
+    afterLoad: async (page) => {
+      // Text-based locator because the Detailed link is a <stacked-chart>
+      // Angular directive on prod and a StackedChart Preact island on
+      // local — no shared selector, but both render an `<a>` with the
+      // literal text "Detailed". `exact: true` avoids matches like
+      // "Detailed Query Details" if that text ever appears elsewhere.
+      await page.getByText('Detailed', { exact: true }).first().click();
+      // The explain modal header reads "Explain for: <doc title>" on both
+      // versions. Local emits it from docExplain.jsx's <p class="modal-header">;
+      // prod from views/detailedExplain.html. Wait until it's visible —
+      // the modal mount is async (Preact dialog `showModal()` or Angular
+      // $uibModal's template fetch), so the click doesn't synchronously
+      // produce the text.
+      await page.getByText('Explain for').first().waitFor({ timeout: 15_000 });
+    },
+    // The anchor is 'Explain for' — present once the modal has rendered.
+    // 'Splainer' stays visible behind the modal (modal is an overlay, not
+    // a full-page replacement).
+    expectBodyText: ['Explain for', 'Splainer'],
+    expectAbsentText: [],
+    expectMinDocRows: 1,
+    expectMaxDocRows: null,
+  },
+  {
+    name: 'es-custom-headers-panel',
+    description:
+      'Boot → click ES tab → expand Advanced Settings. Covers the customHeaders panel reachability + tab-switching behavior on both versions. See audit.spec.js header for why this is a thin scenario vs. the hermetic smoke test.',
+    hash: '',
+    afterLoad: async (page) => {
+      // Bootstrap 3 tab navigation — prod and local both use `<a href="#es_">`
+      // (matches `a[href="#es_"]` selector precedent from smoke.spec.js).
+      await page.locator('a[href="#es_"]').click();
+      // "Advanced Settings" is a text button inside the ES pane on both
+      // versions. getByRole('button', { name: ... }) is framework-agnostic:
+      // it matches ARIA roles and accessible names, not CSS selectors.
+      // Scoping to #es_ avoids matching an Advanced Settings button in
+      // the Solr or OS tabs if those ever grow one.
+      await page
+        .locator('#es_')
+        .getByRole('button', { name: 'Advanced Settings' })
+        .click();
+      // "Custom Headers" is the panel section header that appears once
+      // Advanced Settings is expanded. Present on both versions.
+      await page.getByText('Custom Headers').first().waitFor({ timeout: 10_000 });
+    },
+    expectBodyText: ['Custom Headers', 'Splainer', 'Elasticsearch'],
+    expectAbsentText: [],
+    expectMinDocRows: 0,
+    expectMaxDocRows: 0,
+  },
 ];
 
 // --- Structural capture helper -------------------------------------------
@@ -257,12 +325,28 @@ async function captureStructuralState(page) {
 
 // --- Wait helpers --------------------------------------------------------
 //
-// Waiting strategies differ by scenario shape:
-//   - Zero-row scenarios can't wait for doc rows; wait for any content.
-//   - Results scenarios should wait until at least one doc row exists.
-// Both use expect.poll so failures are diagnostic rather than opaque timeouts.
+// Two phases so `afterLoad` fits between them:
+//
+//   waitForScenarioLoad  — runs AFTER page.goto and BEFORE scenario.afterLoad.
+//                          Waits for the hash-driven initial state to
+//                          actually mount (body text, doc rows if expected,
+//                          empty-results view if that shape). This is the
+//                          "the page rendered the hash" gate.
+//
+//   waitForScenarioAnchor — runs AFTER scenario.afterLoad (if any) and
+//                           BEFORE state capture. Waits for the scenario's
+//                           first expectBodyText entry to appear. This is
+//                           the "the scenario reached its final state"
+//                           gate and eliminates the "assertion fires a
+//                           tick before the DOM settles" failure mode.
+//
+// For non-interactive scenarios (no afterLoad) the two phases run
+// back-to-back and produce the same behavior as the original single-phase
+// helper. For interactive scenarios (modal click-through, tab switch),
+// the anchor wait correctly checks post-interaction text instead of
+// pre-interaction text.
 
-async function waitForScenario(page, scenario) {
+async function waitForScenarioLoad(page, scenario) {
   // Every scenario: wait for *some* text to render. This catches "page
   // didn't mount at all" which is the fastest-to-diagnose failure.
   //
@@ -321,32 +405,43 @@ async function waitForScenario(page, scenario) {
   }
   // Boot scenario (empty hash): no extra wait needed, the initial text-
   // length poll above is sufficient.
+}
 
-  // Final guard: before capture, wait for the scenario's first declared
-  // expectBodyText anchor to actually appear in body.innerText. The generic
-  // length-based polls above catch "body has any text" but don't catch
-  // "prod is slow to render the Search Controls radio labels" — we saw
-  // both shapes during development. Pinning a known-good anchor here
-  // eliminates the "assertion fires a tick before the DOM settles"
-  // failure mode that was producing sporadic red runs on audit-prod.
-  if (scenario.expectBodyText && scenario.expectBodyText.length > 0) {
-    const anchor = scenario.expectBodyText[0];
-    await expect
-      .poll(
-        async () => {
-          return page.evaluate(
-            (needle) => (document.body ? document.body.innerText.includes(needle) : false),
-            anchor,
-          );
-        },
-        {
-          timeout: 30_000,
-          intervals: [500],
-          message: `scenario anchor "${anchor}" never appeared in body.innerText`,
-        },
-      )
-      .toBe(true);
-  }
+async function waitForScenarioAnchor(page, scenario) {
+  // Final guard: before capture, wait for EVERY declared expectBodyText
+  // entry to actually appear in body.innerText. Pinning on just the first
+  // item was insufficient — on prod, 'Splainer' renders immediately but
+  // 'Elasticsearch' (the Search Controls radio label) takes another ~500ms,
+  // so a single-anchor poll would pass and capture would fire before the
+  // page had fully settled, producing a sporadic "assertion fires a tick
+  // before the DOM settles" flake on audit-prod's boot scenario. Waiting
+  // for every expected item closes that gap.
+  //
+  // This is also the *only* reliable wait for interactive scenarios where
+  // the post-afterLoad state is the thing we actually want to capture —
+  // the afterLoad itself does its own wait for the interaction, and this
+  // wait confirms the resulting text landed.
+  const needles = scenario.expectBodyText;
+  if (!needles || needles.length === 0) return;
+  await expect
+    .poll(
+      async () => {
+        return page.evaluate(
+          (items) => {
+            if (!document.body) return false;
+            const text = document.body.innerText;
+            return items.every((needle) => text.includes(needle));
+          },
+          needles,
+        );
+      },
+      {
+        timeout: 30_000,
+        intervals: [500],
+        message: `one or more scenario anchors never appeared in body.innerText: ${JSON.stringify(needles)}`,
+      },
+    )
+    .toBe(true);
 }
 
 // --- The test loop --------------------------------------------------------
@@ -382,9 +477,22 @@ for (const scenario of SCENARIOS) {
       // wait below is what actually tells us when the scenario is ready.
       await page.goto('/' + scenario.hash, { waitUntil: 'domcontentloaded' });
 
-      // Application-specific settling: wait for the scenario to reach its
-      // expected rendered state (see helper for per-shape logic).
-      await waitForScenario(page, scenario);
+      // Three-phase settling:
+      //   1. Load-phase wait — hash rendered, body has text, doc rows
+      //      are present if the scenario expects them.
+      //   2. afterLoad — optional interactive step (click a link, open
+      //      a modal, expand a panel). Runs only for scenarios that
+      //      declare it. Does its own waiting for the interaction to
+      //      reach a stable state.
+      //   3. Anchor wait — confirms the scenario's first expectBodyText
+      //      entry is in the DOM. Runs after afterLoad so interactive
+      //      scenarios check their *post-interaction* text, not the
+      //      pre-interaction state.
+      await waitForScenarioLoad(page, scenario);
+      if (typeof scenario.afterLoad === 'function') {
+        await scenario.afterLoad(page);
+      }
+      await waitForScenarioAnchor(page, scenario);
     } finally {
       // Capture state EVEN IF the wait above threw — that's precisely when
       // we need to see the DOM, console, and network state. The screenshot
