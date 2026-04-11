@@ -473,7 +473,7 @@ for (const scenario of SCENARIOS) {
 
     try {
       // waitUntil: 'domcontentloaded' stops blocking on long-tail subresources
-      // (prod pulls images from github.com/s3 that can stall). The app-mount
+      // (prod may still pull other third-party assets that can stall). The app-mount
       // wait below is what actually tells us when the scenario is ready.
       await page.goto('/' + scenario.hash, { waitUntil: 'domcontentloaded' });
 

@@ -2,8 +2,15 @@
 <html class="no-js">
   <head>
     <meta charset="utf-8" />
-    <title></title>
-    <meta name="description" content="" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' http: https:; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src http: https:; object-src 'none'; base-uri 'self'; form-action 'self'"
+    />
+    <title>Splainer — the open-source search sandbox</title>
+    <meta
+      name="description"
+      content="Paste your Solr or Elasticsearch query URL and Splainer shows you parsed, summarized explain output alongside your documents — so you can tune relevance without digging through raw explain debug."
+    />
     <meta name="viewport" content="width=device-width" />
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css" />
@@ -16,15 +23,15 @@
     <div class="pane_container">
       <div class="pane_main">
         <header class="navbar-inverse navbar-secondary clearfix">
+          <!-- Vendored: classic "Fork me on GitHub" ribbon (was camo.githubusercontent.com → s3.amazonaws.com/github/ribbons/; hotlinks often break). -->
           <a
             id="fork-ribbon"
             style="z-index: 10000"
             href="https://github.com/o19s/splainer"
             ><img
               style="position: absolute; top: 0; right: 0; border: 0"
-              src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67"
+              src="images/forkme_right_darkblue_121621.png"
               alt="Fork me on GitHub"
-              data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"
           /></a>
           <div class="navbar-header">
             <h3
