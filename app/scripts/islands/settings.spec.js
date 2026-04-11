@@ -4,9 +4,7 @@ import { mount, unmount } from './settings.jsx';
 import { makeRoot } from '../test-helpers/factories.js';
 
 // jsdom has no window.ace, so the search-args editor falls back to a
-// textarea (TextareaArgsFallback) for both ES and OS. Section toggles
-// follow the original ng-show defaults: Engine + Headers collapsed,
-// URL + Fields + Args expanded.
+// textarea. Section toggles: Engine + Headers collapsed, rest expanded.
 
 // Preact flushes hook state updates on a microtask, so any test that
 // asserts on DOM produced by a state change (toggle click → conditional
@@ -115,9 +113,7 @@ describe('settings island', () => {
   });
 
   it('round-trip also preserves os unsaved tweaks across engine switches', async () => {
-    // OS has its own headerType default ('None' vs es's 'Custom') and its
-    // own onPublish branch in the directive shim, so it needs its own
-    // round-trip assertion rather than parameterizing the es test.
+    // OS has different defaults ('None' vs es's 'Custom') — needs its own test.
     const el = makeRoot();
     const settings = defaultSettings();
     mount(el, { settings, currSearch: null }, () => {});
@@ -275,13 +271,8 @@ describe('settings island', () => {
   });
 
   it('re-syncs workingWhichEngine when settings.whichEngine changes externally', async () => {
-    // Regression lock for the bug found during PR 7 execution: the original
-    // useState(settings.whichEngine || 'solr') was initial-only and never
-    // followed external mutations to settings.whichEngine. The dev sidebar
-    // would stay on solr even after StartUrl's ES Splain This! flow had
-    // flipped the store to es, causing the user's typing to mutate the
-    // wrong engine's settings slot. Fixed via a useEffect that mirrors the
-    // original Angular controller's $watch('settings.whichEngine', ...).
+    // Regression: workingWhichEngine must follow external mutations to
+    // settings.whichEngine (e.g. StartUrl's Splain This! flipping to ES).
     const el = makeRoot();
     const settings = defaultSettings(); // whichEngine: 'solr'
     mount(el, { settings, currSearch: null }, () => {});
@@ -291,9 +282,7 @@ describe('settings island', () => {
       'http://localhost:8983/solr/c/select',
     );
 
-    // External code mutates whichEngine (simulating StartUrl Splain This!).
-    // The directive shim re-mounts on every digest tick; we simulate that
-    // by re-calling mount() with the same settings reference.
+    // External code mutates whichEngine; re-mount simulates renderAll().
     settings.whichEngine = 'es';
     mount(el, { settings, currSearch: null }, () => {});
     await flush();

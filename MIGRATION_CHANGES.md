@@ -305,38 +305,89 @@
    - **Playwright e2e tests:** 2 tests that accessed Angular internals via `window.angular.element(...).injector().get('settingsStoreSvc')` were updated to use the public `window.SplainerServices.settingsStore` API. Stale Angular references in test comments (`$apply`, `$digest`, `settingsStoreSvc`, `directive shim`, `ng-repeat`) updated throughout. All 14 tests pass.
    - **Vitest specs pass unchanged** — they test pure ESM modules and Preact islands directly, no Angular dependency.
 
-### **Phase 13a — Vite production build + retire Grunt + remove jQuery.**
-   - **Roundtable review** (2026-04-10) revised the original Phase 13 plan. Key adjustments: (1) "single Vite entry point" downscoped — the IIFE/globals architecture stays; Vite replaces Grunt's concat/minify pipeline without converting to ESM imports; (2) jQuery removal confirmed — audit found only 26 calls across 3 files (`panes.js`, `ace-config.js`, `bootstrap.js`), all low-complexity native DOM replacements, so jQuery is deleted in this phase rather than deferred; (3) Phase split into 13a (build swap) and 13b (optional ESM conversion).
-   - **jQuery removal.** Rewrite `panes.js` (~8 calls: `.show()`/`.hide()` → `.style.display`, `$(document).on()` → `addEventListener`), `ace-config.js` (~15 calls: selectors → `getElementById`/`querySelectorAll`, `.height()` → `.offsetHeight`/`.style.height`, `$(function(){})` → `DOMContentLoaded`), `bootstrap.js` (3 conditional `jQuery(document).trigger()` → `document.dispatchEvent(new CustomEvent(...))`). Remove `jquery ~3.6.1` from `dependencies`.
-   - **Vite production config.** Extend `vite.config.js` with a `build` section:
-      - MPA mode: `index.html` + `help.html` as entry pages (Grunt's `useminPrepare` processed both; the Vite build must too).
-      - Vendor chunk: ace, bootstrap, URI, splainer-search, preact, preact/hooks.
-      - App chunk: panes.js + island dists + service dists + bootstrap.js + ace-config.js.
-      - CSS bundling: Bootstrap vendor CSS + 3 app stylesheets (main.css, panes.css, stackedChart.css). Autoprefixer via PostCSS config (Vite supports this natively, replaces `grunt-postcss`).
-      - Asset hashing replaces `grunt-filerev` (Vite built-in).
-      - `vite-plugin-static-copy` (or equivalent) for Bootstrap fonts (`node_modules/bootstrap/dist/fonts/*`), Ace worker files (`worker-json.js`, `mode-json.js` from `ace-builds/src-min-noconflict/`), and static files (`*.ico`, `*.png`, `.htaccess`, `docs/*`).
-      - **Skip image optimization plugins** — the project has exactly 2 images (a GIF loader and a small PNG logo). `vite-plugin-imagemin` is over-engineering; just copy them.
-   - **Remove `<!-- build:js -->` / `<!-- build:css -->` comment blocks** from both HTML files — these are Grunt/usemin-specific syntax that Vite does not use.
-   - **Clean up `help.html`** — remove stale `ng-json-explorer` CSS reference (the library was deleted in Phase 12).
-   - **Delete legacy dependencies:**
-      - Polyfills: `es5-shim ~4.6.7`, `json3 ~3.3.3` (IE9 shims; browserslist already excludes dead browsers). Remove the `oldieshim.js` build block.
-      - Grunt ecosystem (16 packages): `grunt`, `grunt-concurrent`, `grunt-contrib-clean`, `grunt-contrib-concat`, `grunt-contrib-connect`, `grunt-contrib-copy`, `grunt-contrib-cssmin`, `grunt-contrib-htmlmin`, `grunt-contrib-imagemin`, `grunt-contrib-uglify`, `grunt-contrib-watch`, `grunt-filerev`, `grunt-newer`, `grunt-postcss`, `grunt-svgmin`, `grunt-usemin`.
-      - Grunt helpers: `load-grunt-tasks`, `time-grunt`, `serve-static`.
-   - **Delete `Gruntfile.js`.**
-   - **Update `playwright.config.js`** — change default `serverCommand` from `'grunt serve'` to `'yarn dev:vite'` (port 9000 → 5173). Must land in the same PR as Gruntfile deletion or e2e tests break.
-   - **Update `Dockerfile`** — replace `npm install -g grunt-cli`, `RUN grunt test`, and `CMD [ "grunt", "serve" ]` with `vite build` + a static file server. **This is the highest-risk change** — the Dockerfile is the production deploy path (CI builds Docker image → extracts `app/` → syncs to S3/splainer.io). Mitigation: diff `dist/` output against current Grunt build before merging.
-   - **Risk summary:**
-      - Dockerfile rewrite: **High** — production deploy path. Test with `docker build` locally; verify S3 sync output matches current.
-      - jQuery removal: **Low** — Playwright e2e tests cover all affected UI paths.
-      - Grunt deletion: **Low** — all tests already run without Grunt (Vitest + Playwright w/ Vite via `SPLAINER_DEV=vite`).
-      - Vite prod build parity: **Medium** — diff `dist/` output against Grunt build before merging.
-      - `help.html` handling: **Low** — static docs page with minimal JS.
+### **Phase 13a — Vite production build + retire Grunt + remove jQuery.** ✅ *Done.*
+   - **Roundtable review** (2026-04-10) revised the original Phase 13 plan. Key adjustments: (1) "single Vite entry point" downscoped — the IIFE/globals architecture stays; a copy-based build script replaces Grunt's pipeline without converting to ESM imports; (2) jQuery removal confirmed — audit found only 26 calls across 3 files, all low-complexity native DOM replacements; (3) Phase split into 13a (build swap) and 13b (optional ESM conversion).
+   - **jQuery removal.** Rewrote `panes.js` (~8 calls: `$(el).show()`/`.hide()` → `el.style.display = 'block'`/`'none'`, `$(document).on()` → `document.addEventListener()`), `ace-config.js` (~15 calls: `$('#id')` → `getElementById`, `$('.class')` → `querySelectorAll`, `.height()` → `.offsetHeight`/`.style.height`, `$(function(){})` → self-executing IIFE), `bootstrap.js` (3 conditional `jQuery(document).trigger()` → `document.dispatchEvent(new CustomEvent(...))`). Removed `jquery ~3.6.1` from `dependencies`.
+      - **Gotcha:** jQuery's `.show()` detects the element's natural display value; naively replacing with `el.style.display = ''` (clearing inline style) falls back to the CSS stylesheet's `display: none` for `.pane_east` and `.east-slider`. Fix: use `'block'` explicitly.
+   - **Bootstrap JS removed.** Bootstrap 3.x's JavaScript is a jQuery plugin system (`$.fn.tooltip`, `$.fn.modal`, etc.) — it throws immediately if jQuery is absent. Audit confirmed the only usage was `data-toggle="tooltip"` on the help link (converted to plain `title` attribute). All modals migrated to native `<dialog>` in Phase 9c, tabs managed by Preact state in startUrl island. Only Bootstrap CSS is retained.
+   - **Production build script** (`scripts/build.mjs`). The app uses plain `<script>` tags (IIFE globals, not ES modules), so Vite's module-aware `vite build` can't process it directly — it skips non-`type="module"` script tags and leaves broken path references. Instead, a straightforward Node script does what Grunt's `copy:app` + `copy:dist` did:
+      1. Runs `yarn build:islands` (pre-builds island/service IIFEs).
+      2. Copies `app/` to `dist/`.
+      3. Cherry-picks vendor files from `node_modules/` into `dist/node_modules/` (ace, Bootstrap CSS + fonts, URI.js, splainer-search, Preact UMD). Only files actually referenced by HTML `<script>`/`<link>` tags are copied — no wholesale `node_modules/` dump.
+      - `--quick` flag skips island rebuild (assumes already built).
+      - Image optimization skipped — the project has exactly 2 images (a GIF loader and a small PNG logo).
+   - **Removed `<!-- build:js -->` / `<!-- build:css -->` comment blocks** from both HTML files — Grunt/usemin-specific syntax.
+   - **Cleaned up `help.html`** — removed stale `ng-json-explorer` CSS reference (library deleted in Phase 12), removed `ng-scope` class from header (added by Angular at runtime, never in source).
+   - **Removed IE cruft** from `index.html`: `<!--[if lt IE 7]>` browsehappy message, `oldieshim.js` build block (es5-shim + json3 conditional scripts).
+   - **Deleted legacy dependencies (21 packages):**
+      - From `dependencies`: `jquery ~3.6.1`, `es5-shim ~4.6.7`, `json3 ~3.3.3`.
+      - From `devDependencies`: `grunt`, `grunt-concurrent`, `grunt-contrib-clean`, `grunt-contrib-concat`, `grunt-contrib-connect`, `grunt-contrib-copy`, `grunt-contrib-cssmin`, `grunt-contrib-htmlmin`, `grunt-contrib-imagemin`, `grunt-contrib-uglify`, `grunt-contrib-watch`, `grunt-filerev`, `grunt-newer`, `grunt-postcss`, `grunt-svgmin`, `grunt-usemin`, `load-grunt-tasks`, `time-grunt`, `serve-static`. Also removed orphaned `autoprefixer` (no postcss.config.js existed).
+   - **Deleted `Gruntfile.js`** (325 lines).
+   - **Updated `playwright.config.js`** — default server command changed from `'grunt serve'` (port 9000) to `'yarn dev:vite'` (port 5173). Removed the `SPLAINER_DEV=vite` override toggle (Vite is now the only server).
+   - **Updated `Dockerfile`** — removed `grunt-cli` install, Puppeteer/Chromium dependencies (were for Karma browser tests, deleted in Phase 12). New flow: `yarn install` → `yarn build` → `yarn test`. CMD runs `yarn dev:vite --host 0.0.0.0` for local/Docker usage; production deploy is static files via S3.
+   - **Updated `.circleci/config.yml`** — `publish-splainerio` job now extracts `dist/` from the Docker container (`docker cp $id:/home/splainer/dist ./app`) instead of raw `app/` + wholesale `node_modules/`. The S3 sync (`aws s3 sync ./app s3://splainer.io/ --delete`) is unchanged.
+   - **Updated `package.json` scripts** — added `"build": "node scripts/build.mjs"` and `"dev": "vite"` (alias for `dev:vite`).
+   - **Updated comments** in `vite.config.js` and `vite.islands.config.js` — removed stale Grunt/Angular references.
+   - **Files (1 new, 10 modified, 1 deleted):**
+      - new `scripts/build.mjs`
+      - modified `app/scripts/panes.js`, `app/scripts/ace-config.js`, `app/scripts/bootstrap.js`, `app/index.html`, `app/help.html`, `package.json`, `playwright.config.js`, `Dockerfile`, `.circleci/config.yml`, `vite.config.js`, `vite.islands.config.js`
+      - deleted `Gruntfile.js`
+   - **Net reduction:** ~5,800 lines (mostly yarn.lock shrinkage from 21 removed dependencies).
+   - **Test coverage:** 183 Vitest specs pass, 14 Playwright e2e tests pass. The 3 sidebar-interaction e2e tests (settings rerun, engine switch, search args layout) caught the `.show()` → `display: ''` bug during implementation.
 
-### **Phase 13b — (optional) ESM module conversion.**
-   - Convert islands/services from IIFE globals (`window.SplainerIslands.*`, `window.SplainerServices.*`) to ESM imports.
-   - Create a single `main.js` entry point that imports all modules; replace 15+ `<script>` tags with one `<script type="module">`.
-   - Enables tree-shaking and code-splitting.
-   - **Not a prerequisite** for Phase 14 or any downstream work — the IIFE architecture is functional and tested. Pursue only when the payoff (smaller bundles, faster loads, cleaner module graph) justifies the touch count.
+### **Phase 13a cleanup — Dead code removal, DRY, and bug fixes.** ✅ *Done.*
+   - **DRY: merged `esSettings.js` / `osSettings.js`** — the two files were 97% identical (same `parseUrl`, `fromStartUrl`, `fromTweakedSettings` with only `whichEngine` differing). Extracted shared logic into `jsonEngineSettings.js` with a `createJsonEngineSettings(engine)` factory. Both files are now thin wrappers (~19 lines each, down from ~70). Since each service is built as a separate IIFE, the shared module is inlined at build time — no new runtime dependency ordering.
+   - **Dead CSS removed from `main.css`** — removed 9 unused selectors left over from the Angular migration: `.header`, `.marketing`, `.container-narrow`, `.jumbotron`, `.jumbotron .btn`, `.starter-URL`, `.popover`, `.modal-content`, `.selectableDoc:hover`, `.tweak-button small`, `.tweak-button small a`. Merged the duplicate `.footer` blocks that resulted from the cleanup.
+   - **Bug fix: `useDialogModal` double-fire `onClose`** — the `close()` function could fire the `onClose` callback twice (once via the dialog's event, once explicitly). Added a `closedRef` idempotency guard inside the hook so callers don't need their own.
+   - **Bug fix: sidebar chevron desync** — `sidebarOpen` (bootstrap.js, controls chevron icons) and `toggled` (panes.js, controls pane visibility) would desync when "Splain This!" opened the sidebar via `openEast`. After that, every Tweak click showed reversed chevrons. Fix: set `sidebarOpen = true` and update chevrons in `onSearch` before dispatching `openEast`.
+   - **Removed dead Universal Analytics snippet** from `index.html` — the `analytics.js` / `UA-` property was sunset by Google in July 2023; the script loaded on every page for zero value.
+   - **Added `rel="noopener"` to `target="_blank"` links** across `index.html`, `help.html`, and `searchResults.jsx` — defense-in-depth for the user-URL-sourced `currSearch.linkUrl` links.
+   - **DRY: `persistToLocalStorage` loop** (`settingsStore.js`) — replaced 15 hand-written `lsSet` calls with a loop over `PERSIST_ENGINES` × `PERSIST_FIELDS`, matching the load side's existing iteration pattern. Eliminates the risk of adding a field to load but forgetting save (or vice versa).
+   - **DRY: `formatJson` utility** — extracted the `JSON.stringify(JSON.parse(str), null, 2)` + try/catch pattern (repeated in `docExplain.jsx`, `settings.jsx`, `startUrl.jsx`) into a shared `formatJson.js` module. Each island IIFE inlines it at build time.
+   - **DRY: ES/OS `JSON.parse` collapse** (`Search.js`) — merged two identical try/catch branches (differing only by `es`/`os`) into a single `if (engine === 'es' || engine === 'os')` using the already-resolved `activeSettings.searchArgsStr`.
+   - **Files (2 new, 10 modified):**
+      - new `app/scripts/services/jsonEngineSettings.js`, `app/scripts/islands/formatJson.js`
+      - modified `app/scripts/services/esSettings.js`, `app/scripts/services/osSettings.js`, `app/scripts/services/settingsStore.js`, `app/scripts/services/Search.js`, `app/styles/main.css`, `app/scripts/islands/useDialogModal.js`, `app/scripts/islands/docExplain.jsx`, `app/scripts/islands/settings.jsx`, `app/scripts/islands/startUrl.jsx`, `app/scripts/bootstrap.js`, `app/scripts/islands/searchResults.jsx`, `app/index.html`, `app/help.html`
+   - **Test coverage:** 183 Vitest specs pass (no test changes required). Expanded to 201 in Phase 13a test hardening (below).
 
-### **Phase 14 — Security follow-up.** DOMPurify already covers all former `ng-bind-html` sites (landed in 9a). 
-   - Remaining: namespace `localStorage` keys to `splainer:v3:*`; add a strict CSP without `'unsafe-eval'`.
+### **Phase 13a test hardening — CI gate, new specs, shared test infrastructure.** ✅ *Done.*
+   - **CI test gate.** The CircleCI pipeline built Docker images and deployed to splainer.io without ever running `yarn test`. Added a `test` job (`cimg/node:20.18`, `yarn install --frozen-lockfile`, `yarn test`) as a prerequisite of `build` — merges to `main` are now gated on passing tests. Added `restore_cache`/`save_cache` keyed on `yarn.lock` checksum for `node_modules/` and `~/.cache/yarn`.
+   - **Deleted dead test artifacts.** Removed empty `test/vitest/` and `test/e2e/` directories (leftover from the Karma era). Removed `src/smoke.test.js` (proof-of-life spec whose own comment said "delete this once a real module under src/ has its own tests" — 18 real spec files now exist). Preserved `test/splainer_test_links.html` (manual QA cheat-sheet with bookmarkable Solr/ES demo URLs).
+   - **New `formatJson.spec.js`** (4 tests) — direct unit coverage for the `formatJson` pure function: valid JSON → pretty-printed, invalid JSON → returned unchanged, empty string → unchanged, nested objects with nulls. Previously only exercised implicitly through `searchResults.spec.jsx`.
+   - **New `jsonEngineSettings.spec.js`** (15 tests) — direct unit coverage for `parseUrl()` (protocol/host/pathname extraction, query-string parameters, percent-decoding, no-query-string edge case) and `createJsonEngineSettings()` (`fromStartUrl`: engine assignment, searchUrl extraction, match_all default, searchArgsStr preservation, stored_fields extraction, fieldSpec defaulting, startUrl reconstruction, existing fieldSpec preservation; `fromTweakedSettings`: searchUrl→startUrl, stored_fields append/omit). Previously tested only indirectly through `esSettings.spec.js` and `osSettings.spec.js`.
+   - **Shared dialog polyfill** — extracted the identical `installDialogPolyfill()` function (patching `HTMLDialogElement.prototype.showModal/close` for jsdom) from `docExplain.spec.jsx`, `detailedDoc.spec.jsx`, and `useDialogModal.spec.jsx` into `app/scripts/test-helpers/jsdom-dialog-polyfill.js`, loaded via `vitest.config.js` `setupFiles`. Runs before every spec file — no per-file boilerplate needed.
+   - **Shared test factories** (`app/scripts/test-helpers/factories.js`) — centralized two patterns duplicated across 9+ spec files:
+      - `makeRoot()` — creates a `<div>` appended to `document.body` for island mounting. Replaced inline copies in `docExplain.spec.jsx`, `detailedDoc.spec.jsx`, `docRow.spec.js`, `searchResults.spec.jsx`, `settings.spec.js`, `customHeaders.spec.js`, `stackedChart.spec.jsx`, `useDialogModal.spec.jsx`, `solrSettingsWarning.spec.js`, `startUrl.spec.js`.
+      - `makeSearchDoc(overrides)` — creates a minimal splainer-search doc fake covering the full interface (`score()`, `getHighlightedTitle()`, `subSnippets()`, `hasThumb()`, `hasImage()`, `explain()`, `hotMatches()`). Config keys (`explainToStr`, `explainRaw`, `hotStr`, `score`) are destructured out and used to build closures — they don't leak onto the result object via spread. `score` accepts both functions (`score: () => 1.5`) and scalars (`score: 1.5`) — scalars are auto-wrapped. Adopted by `docExplain.spec.jsx`, `docRow.spec.js`, `searchResults.spec.jsx`. `detailedDoc.spec.jsx` keeps its own `makeDoc` (different shape — simple `{id, title, subs}` object, not the splainer-search interface).
+   - **Stale comments removed** from `vitest.config.js` — references to "PR 10.5" and Grunt (both completed/deleted in earlier phases).
+   - **Files (4 new, 13 modified):**
+      - new `app/scripts/test-helpers/jsdom-dialog-polyfill.js`, `app/scripts/test-helpers/factories.js`, `app/scripts/islands/formatJson.spec.js`, `app/scripts/services/jsonEngineSettings.spec.js`
+      - modified `.circleci/config.yml`, `vitest.config.js`, `app/scripts/islands/docExplain.spec.jsx`, `app/scripts/islands/detailedDoc.spec.jsx`, `app/scripts/islands/useDialogModal.spec.jsx`, `app/scripts/islands/docRow.spec.js`, `app/scripts/islands/searchResults.spec.jsx`, `app/scripts/islands/settings.spec.js`, `app/scripts/islands/customHeaders.spec.js`, `app/scripts/islands/stackedChart.spec.jsx`, `app/scripts/islands/solrSettingsWarning.spec.js`, `app/scripts/islands/startUrl.spec.js`
+      - deleted `src/smoke.test.js`, `test/vitest/` (empty), `test/e2e/` (empty)
+   - **Test count:** 183 → 201 (−1 deleted smoke spec, +4 formatJson, +15 jsonEngineSettings). All 201 pass. 14 Playwright e2e tests unaffected.
+
+### **Phase 13b — ESM module conversion.** ✅ *Done.*
+   - Converted from IIFE globals (`window.SplainerIslands.*`, `window.SplainerServices.*`) to ES module imports with a single entry point (`app/scripts/main.js`).
+   - **`main.js`** absorbs all of `bootstrap.js`'s orchestration logic, importing islands, services, panes, and ace-config as ESM. Replaces 15 `<script>` tags with one `<script type="module" src="scripts/main.js">`.
+   - **`panes.js`** converted from IIFE to ESM — exports `openEast`, `closeEast`, `toggleEast` so `main.js` calls them directly instead of going through `CustomEvent` dispatch.
+   - **`ace-config.js`** converted from IIFE to ESM side-effect module (imported by `main.js`, runs on import).
+   - **`modalRegistry.js`** rewritten from IIFE + `window.SplainerIslands.openDocModal` to ESM — imports `detailedDoc` and `docExplain` directly, exports `openDocModal`. `searchResults.jsx` imports it instead of reading from window global.
+   - **Removed `globalThis` assignments** from all 14 island/service source files.
+   - **`vite.config.js`** converted from `appType: 'mpa'` (IIFE mode) to standard Vite ESM dev+build with Preact JSX support and `resolve.alias` for `react/jsx-*-runtime` → Preact equivalents.
+   - **`scripts/build.js`** rewritten to use `vite build` + selective vendor copy for IIFE scripts (ace, urijs, splainer-search).
+   - **Vendor scripts** (ace, urijs, splainer-search) remain as plain `<script>` tags — they have no ESM exports. Preact UMD tags removed (Vite bundles Preact from ESM imports).
+   - **`index.html`** reduced from 143 lines / 18 script tags to 120 lines / 5 script tags (4 vendor + 1 module).
+   - **`package.json`** — added `"type": "module"` so all `.js` files are ESM by default. Renamed `.mjs` files to `.js` (`scripts/build.js`, `scripts/ensure-splainer-search-dist.js`, `eslint.config.js`). Removed `build:islands` / `build:islands:watch` scripts (no longer needed — Vite processes ESM imports directly). Simplified `test` and `test:e2e` scripts (no pre-build step).
+   - **`eslint.config.js`** (renamed from `.mjs`) — updated base rule from `sourceType: 'script'` to `sourceType: 'module'` for all `app/scripts/**/*.js`. Removed redundant per-directory overrides, stale `test/**/*.js` block, `Gruntfile.js` glob, and `islands/dist/**` ignore.
+   - **Removed `'use strict'`** from all ESM files (redundant — ES modules are always strict).
+   - **Comment cleanup** — removed stale Angular/directive/Phase/PR references from file headers, inline comments, and test descriptions across 22 files. Rewrote `app/scripts/islands/README.md` to describe the current ESM architecture.
+   - **`modalRegistry.spec.js`** rewritten with `vi.mock` for island modules — restores full unmount/renderInto assertion coverage (7 tests, up from the interim 5). Handles module-level `current` state leaking between tests via `lastHandle` cleanup.
+   - **`searchResults.spec.jsx`** mocks `modalRegistry.js` module via `vi.mock` instead of stubbing `globalThis.SplainerIslands.openDocModal`.
+   - **Test-only global retained:** `window.SplainerServices.settingsStore` is set in `main.js` for Playwright e2e access.
+   - **Deleted files (5):** `vite.islands.config.js`, `scripts/build-islands.mjs`, `app/scripts/bootstrap.js`, `app/scripts/islands/dist/` (directory), `app/scripts/services/dist/` (directory).
+   - **Test count:** 202 Vitest (+1 net: 7 restored modalRegistry tests − 6 in interim), 14 Playwright e2e — all pass.
+   - **Build output:** single `main-*.js` bundle (69 KB, 24 KB gzip) + vendor scripts. Vite bundles all CSS into one file.
+
+### **Phase 14 — Security follow-up.** DOMPurify already covers all former `ng-bind-html` sites (landed in 9a).
+   - **Phase 14a — Replace Ace with CodeMirror 6** (unblocks strict CSP). Ace uses `new Function()` internally, requiring `'unsafe-eval'` in any CSP. CodeMirror 6 is CSP-clean. Scope: one new `useCodeMirror` hook, three island updates (`customHeaders.jsx`, `startUrl.jsx`, `settings.jsx`), delete `ace-config.js`, update e2e tests. CM6 is ESM-first — bundle as part of `main.js` via Vite (no separate IIFE build needed post-13b).
+   - **Phase 14b — Add strict CSP + optional localStorage key namespace.** With Ace gone, `script-src 'self'` CSP becomes possible via a `<meta>` tag (no server-side nonce needed for static S3 hosting). `localStorage` key namespace (`ls.*` → `splainer:v3:*`) is low-value — optional, requires migration path for existing users.

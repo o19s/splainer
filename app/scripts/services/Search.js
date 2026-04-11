@@ -1,16 +1,6 @@
-'use strict';
-
 /**
- * Pure-JS Search constructor — no Angular dependency.
- *
- * Extracted from the Angular Search factory (Phase 11d). The Angular
- * factory file (factories/Search.js) is now a thin wrapper that injects
- * the four splainer-search services via DI and packs them into `deps`.
- *
- * deps = { solrUrlSvc, fieldSpecSvc, searchSvc, normalDocsSvc }
- *
- * The constructor is passed to splSearch.createSearch(), which attaches
- * state constants and handles whichEngine defaulting.
+ * Search constructor. Receives deps = { solrUrlSvc, fieldSpecSvc,
+ * searchSvc, normalDocsSvc } and is passed to splSearch.createSearch().
  */
 
 function Search(deps, searchSettings, overridingExplains, states, engines) {
@@ -121,12 +111,8 @@ function Search(deps, searchSettings, overridingExplains, states, engines) {
     self.reset();
     self.state = states.WAITING_FOR_SEARCH;
     self.errorMsg = '';
-    // Snapshot searchSettings so the island sees what was searched, not
-    // what the user edited after the search started. Object.assign
-    // preserves the top-level methods (searchUrl, fieldSpecStr,
-    // searchArgsStr) that angular.copy also preserved; nested engine
-    // sub-objects are cloned individually so in-place mutations to the
-    // live store don't leak into the snapshot.
+    // Snapshot settings so the island sees what was searched, not what
+    // the user edited after the search started.
     self.settings = Object.assign({}, searchSettings, {
       solr: Object.assign({}, searchSettings.solr),
       es: Object.assign({}, searchSettings.es),
@@ -218,8 +204,3 @@ function Search(deps, searchSettings, overridingExplains, states, engines) {
 }
 
 export { Search };
-
-if (typeof globalThis !== 'undefined') {
-  globalThis.SplainerServices = globalThis.SplainerServices || {};
-  globalThis.SplainerServices.Search = Search;
-}

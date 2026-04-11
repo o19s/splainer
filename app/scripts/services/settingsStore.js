@@ -1,18 +1,6 @@
-'use strict';
-
 /**
- * Pure-JS settings store — no Angular dependency.
- *
- * Extracted from the Angular settingsStoreSvc (Phase 11c). The Angular
- * service file (settingsStoreSvc.js) is now a thin wrapper that delegates
- * to globalThis.SplainerServices.settingsStore.
- *
- * Key design decisions:
- *   - Native localStorage (replaces angular-local-storage wrapper).
- *   - window.location.hash for URL sync (replaces $location.search).
- *   - subscribe(fn) → unsubscribe for reactivity (replaces $watch).
- *   - Mutate-in-place + explicit save() — same contract as before.
- *   - No key prefix change (deferred to Phase 14 with migration path).
+ * Settings store — owns localStorage persistence, URL hash sync, and
+ * subscribe/unsubscribe reactivity for settings changes.
  */
 
 var ENGINES = {
@@ -25,18 +13,13 @@ var defaultEsArgs = '!{\n  "query": {\n    "match_all": {}\n  }\n}    ';
 
 // --- localStorage helpers ---
 
-// angular-local-storage 0.7.1 with default config prefixes every key
-// with 'ls.' (prefix 'ls' + separator '.'). The app never called
-// setPrefix(), so all existing user data sits under 'ls.*' keys.
-// We must use the same prefix for back-compat.
+// 'ls.' prefix for back-compat with existing user data.
 var LS_PREFIX = 'ls.';
 
 function lsGet(key) {
   try {
     var val = localStorage.getItem(LS_PREFIX + key);
-    // angular-local-storage stored JSON-encoded values. For back-compat,
-    // try JSON.parse; fall back to raw string if it fails (e.g. plain
-    // strings that were stored without encoding by older versions).
+    // Values are JSON-encoded; fall back to raw string for legacy data.
     if (val === null) return null;
     try {
       return JSON.parse(val);
@@ -68,19 +51,15 @@ var _lsSupported = (function () {
   }
 })();
 
-// --- URL hash helpers ($location.search with hashPrefix('') → #?key=val) ---
-// Manual encodeURIComponent serialization — Angular's $location.search()
-// uses decodeURIComponent which does NOT decode '+' as space (unlike the
-// application/x-www-form-urlencoded spec that URLSearchParams follows).
-// Using encodeURIComponent keeps spaces as %20, matching Angular exactly.
+// URL hash helpers — uses encodeURIComponent (spaces as %20) instead of
+// URLSearchParams (spaces as +) for back-compat with existing bookmarks.
 
 function buildHashString(paramsObj) {
   var parts = [];
   var keys = Object.keys(paramsObj);
   for (var i = 0; i < keys.length; i++) {
     var val = paramsObj[keys[i]];
-    // Angular's $location.search(obj) omits keys with undefined/null values.
-    // Match that behavior to avoid encoding undefined as literal "undefined".
+    // Skip null/undefined to avoid encoding as literal "undefined".
     if (val == null) continue;
     parts.push(encodeURIComponent(keys[i]) + '=' + encodeURIComponent(val));
   }
@@ -229,7 +208,3 @@ export function createSettingsStore() {
   };
 }
 
-if (typeof globalThis !== 'undefined') {
-  globalThis.SplainerServices = globalThis.SplainerServices || {};
-  globalThis.SplainerServices.settingsStore = createSettingsStore();
-}

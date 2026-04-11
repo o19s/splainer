@@ -1,9 +1,4 @@
-// Vitest config — the sole unit/component test runner (Angular + Karma
-// removed in Phase 12). Covers Preact islands and pure ESM service modules.
-//
-// Mutation testing (Stryker + this file): `yarn stryker` (incremental),
-// `yarn stryker:full` (--force, refresh reports/stryker-incremental.json), `yarn stryker:dry`.
-// See stryker.config.json. @stryker-mutator/core currently requires Node 20+.
+// Vitest config — covers Preact islands and service modules.
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
@@ -19,8 +14,6 @@ export default defineConfig({
   },
   test: {
     include: [
-      'src/**/*.test.js',
-      'src/**/*.spec.js',
       'app/scripts/islands/**/*.spec.{js,jsx}',
       'app/scripts/services/**/*.spec.js',
     ],

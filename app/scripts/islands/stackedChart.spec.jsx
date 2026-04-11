@@ -28,10 +28,8 @@ describe('stackedChart island', () => {
     expect(el.textContent).toContain('body:foo');
   });
 
-  it('preserves data-testid="stacked-chart-detailed" on the Detailed link (PR 8.5 contract)', () => {
-    // Load-bearing: the PR 8.5 Playwright test clicks via this exact
-    // testid. Renaming or removing this attribute will break the only
-    // browser-level regression detector for the chart-click → modal flow.
+  it('preserves data-testid="stacked-chart-detailed" on the Detailed link', () => {
+    // Load-bearing: Playwright e2e test clicks via this exact testid.
     const el = makeRoot();
     render(
       <StackedChart
@@ -45,7 +43,6 @@ describe('stackedChart island', () => {
   });
 
   it('omits the Detailed link when no onDetailed handler is provided', () => {
-    // Mirrors the old directive's `ng-if="detailed"` branch.
     const el = makeRoot();
     render(
       <StackedChart doc={makeDoc([{ description: 'x', percentage: 50 }])} maxScore={1} />,

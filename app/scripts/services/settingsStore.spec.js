@@ -214,7 +214,7 @@ describe('settingsStore (pure module)', function () {
 
     expect(window.location.hash).toContain('solr=');
     expect(window.location.hash).toContain('fieldSpec=');
-    // Must use %20 (not +) for Angular $location.search() compat
+    // Must use %20 (not +) for back-compat with existing bookmarked URLs
     expect(window.location.hash).toContain('id%20title');
     expect(window.location.hash).not.toContain('id+title');
   });

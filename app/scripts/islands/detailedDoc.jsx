@@ -33,8 +33,3 @@ export function renderInto(rootEl, doc, opts = {}) {
 export function unmount(rootEl) {
   render(null, rootEl);
 }
-
-if (typeof globalThis !== 'undefined') {
-  globalThis.SplainerIslands = globalThis.SplainerIslands || {};
-  globalThis.SplainerIslands.detailedDoc = { renderInto, unmount };
-}

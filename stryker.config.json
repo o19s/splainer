@@ -9,8 +9,8 @@
   "mutate": [
     "app/scripts/islands/**/*.{js,jsx}",
     "!app/scripts/islands/**/*.spec.{js,jsx}",
-    "src/**/*.js",
-    "!src/**/*.test.js"
+    "app/scripts/services/**/*.js",
+    "!app/scripts/services/**/*.spec.js"
   ],
   "reporters": ["html", "clear-text", "progress"],
   "incremental": true,

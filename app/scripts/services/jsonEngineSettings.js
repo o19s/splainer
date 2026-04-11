@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Shared settings logic for JSON-based search engines (Elasticsearch, OpenSearch).
  *

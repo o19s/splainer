@@ -1,31 +1,11 @@
 /**
- * startUrl island — Preact replacement for
- * app/scripts/controllers/startUrl.js + app/views/startUrl.html (PR 8).
+ * startUrl island — landing form (NO_SEARCH state) with three tabs
+ * (Solr / Elasticsearch / OpenSearch), each with a start URL input,
+ * a "Splain This!" button, and ES/OS advanced settings.
  *
- * This is the landing form shown in the NO_SEARCH state: three tabs
- * (Solr / Elasticsearch / OpenSearch), each with a start URL input, a
- * "Splain This!" button, and — for ES/OS — advanced settings (custom
- * headers + an Ace JSON search-args editor).
- *
- * Integration surface (props from the directive shim):
- *   - settings:  settingsStoreSvc.settings (the full {whichEngine, solr, es, os} object).
- *                Mutated in place, like settings.jsx, so the deep $watch in the
- *                shim sees changes without breaking prop identity.
+ * Props:
+ *   - settings:  the {whichEngine, solr, es, os} object (mutated in place)
  *   - onSearch:  (engine: 'solr' | 'es' | 'os') => void
- *                The shim calls the matching {solr,es,os}SettingsSvc.fromStartUrl
- *                with the current settings and kicks the parent's search().
- *
- * The $location.search() hash-URL handling (`?solr=...` / `?esUrl=...` /
- * `?osUrl=...` for shared-link bookmarks) stays in the directive shim — it
- * depends on Angular's $location and must run before the first mount so the
- * parent's ng-show="NO_SEARCH" gate can swallow this entire island on a
- * bookmarked-URL load.
- *
- * Tabs: the original template used Bootstrap jQuery tabs via
- * data-toggle="tab". Preact reconciliation would fight Bootstrap's in-place
- * class mutations, so the island owns tab state in Preact and skips
- * data-toggle. Markup classes (nav-tabs, tab-pane, active) are preserved
- * so the existing CSS still applies.
  */
 import { render } from 'preact';
 import { useState } from 'preact/hooks';
@@ -34,18 +14,8 @@ import { CustomHeaders } from './customHeaders.jsx';
 import { useAceEditor } from './useAceEditor.js';
 import { formatJson } from './formatJson.js';
 
-// Default start URLs — match the original ng-init values in startUrl.html.
-// These are written into the settings object on first mount only when the
-// corresponding startUrl is empty.
-//
-// INTENTIONAL DIVERGENCE from legacy behavior: the original `ng-init` on the
-// <input> elements unconditionally overwrote startUrl on every link, which
-// in practice meant every page load wiped any URL that settingsStoreSvc
-// had rehydrated from localStorage — returning users always saw the demo
-// URL, never the one they last used. That is a latent UX bug, not a load-
-// bearing contract, and this island preserves user state instead. If any
-// downstream behavior turns out to rely on the reset, switch the guards
-// below to unconditional assignments and revisit.
+// Default start URLs — seeded on first mount only when empty, so
+// returning users keep their last-used URL from localStorage.
 const DEFAULT_URLS = {
   solr: 'http://quepid-solr.dev.o19s.com:8985/solr/tmdb/select?q=*:*',
   es: 'http://quepid-elasticsearch.dev.o19s.com:9206/tmdb/_search',
@@ -158,8 +128,7 @@ export function StartUrl({ settings, onSearch }) {
   const initialTab =
     settings.whichEngine === 'es' ? 'es' : settings.whichEngine === 'os' ? 'os' : 'solr';
   const [activeTab, setActiveTab] = useState(initialTab);
-  // Re-render trigger after in-place mutation of settings — same pattern
-  // as settings.jsx. Prop identity stays stable for the shim's deep $watch.
+  // Re-render trigger after in-place mutation of settings.
   const [, setTick] = useState(0);
   const rerender = () => setTick((t) => t + 1);
 
@@ -168,10 +137,7 @@ export function StartUrl({ settings, onSearch }) {
     rerender();
   }
 
-  // Single submit path — fired by both button clicks (type="submit") and
-  // Enter-in-input. Angular's form directive auto-prevented default
-  // submission in the original; Preact does not, so without this
-  // handler an Enter keypress in any URL input would reload the page.
+  // Prevent default form submission (Enter key would reload the page).
   function handleFormSubmit(e) {
     e.preventDefault();
     onSearch(activeTab);
@@ -291,9 +257,4 @@ export function mount(rootEl, props, callbacks) {
 
 export function unmount(rootEl) {
   render(null, rootEl);
-}
-
-if (typeof globalThis !== 'undefined') {
-  globalThis.SplainerIslands = globalThis.SplainerIslands || {};
-  globalThis.SplainerIslands.startUrl = { mount, unmount };
 }

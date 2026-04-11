@@ -102,42 +102,18 @@
          first modal open. -->
     <div id="splainer-modal-root"></div>
 
-    <!-- Vendor scripts -->
+    <!-- Vendor scripts — these are IIFEs/UMDs with no ESM exports.
+         They must load (and execute) before main.js imports run. -->
     <script src="node_modules/ace-builds/src-min-noconflict/ace.js"></script>
     <script src="node_modules/ace-builds/src-min-noconflict/ext-language_tools.js"></script>
     <!-- urijs MUST load before the wired IIFE: splainer-search 3.0.0 expects
          globalThis.URI at call time. -->
     <script src="node_modules/urijs/src/URI.js"></script>
     <script src="node_modules/splainer-search/dist/splainer-search-wired.js"></script>
-    <!-- Preact (+ hooks) for the view islands.
-         UMD builds attach to window.preact and window.preactHooks. The .jsx
-         island sources are pre-built into IIFEs by `yarn build:islands`
-         (vite.islands.config.js) which references these as externals. -->
-    <script src="node_modules/preact/dist/preact.umd.js"></script>
-    <script src="node_modules/preact/hooks/dist/hooks.umd.js"></script>
 
-    <!-- App scripts -->
-    <script src="scripts/panes.js"></script>
-    <!-- Preact islands — built from .jsx sources by `yarn build:islands`
-         (see vite.islands.config.js). Each file attaches itself to
-         window.SplainerIslands.<name> as a side effect. -->
-    <script src="scripts/islands/dist/customHeaders.js"></script>
-    <script src="scripts/islands/dist/settings.js"></script>
-    <script src="scripts/islands/dist/startUrl.js"></script>
-    <script src="scripts/islands/dist/modalRegistry.js"></script>
-    <script src="scripts/islands/dist/detailedDoc.js"></script>
-    <script src="scripts/islands/dist/docExplain.js"></script>
-    <script src="scripts/islands/dist/searchResults.js"></script>
-    <!-- Pure-JS service modules (built from ESM by `yarn build:islands`).
-         Must load before bootstrap.js so globalThis.SplainerServices.* is populated. -->
-    <script src="scripts/services/dist/esSettings.js"></script>
-    <script src="scripts/services/dist/osSettings.js"></script>
-    <script src="scripts/services/dist/solrSettings.js"></script>
-    <script src="scripts/services/dist/splSearch.js"></script>
-    <script src="scripts/services/dist/settingsStore.js"></script>
-    <script src="scripts/services/dist/Search.js"></script>
-    <!-- Bootstrap script — wires services and islands together. -->
-    <script src="scripts/bootstrap.js"></script>
-    <script src="scripts/ace-config.js"></script>
+    <!-- Application entry point — imports all islands, services, panes, and
+         ace-config as ES modules. Replaces the 15+ individual script tags
+         from the IIFE architecture. -->
+    <script type="module" src="scripts/main.js"></script>
   </body>
 </html>

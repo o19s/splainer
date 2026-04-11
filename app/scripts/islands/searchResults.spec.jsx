@@ -1,6 +1,13 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render } from 'preact';
+
+// Mock modalRegistry before importing searchResults (which imports it).
+vi.mock('./modalRegistry.js', () => ({
+  openDocModal: vi.fn(),
+}));
+import { openDocModal } from './modalRegistry.js';
+
 import { SearchResults, mount, unmount } from './searchResults.jsx';
 import { makeRoot as _makeRoot, makeSearchDoc } from '../test-helpers/factories.js';
 
@@ -67,10 +74,9 @@ function makeSolrUrlSvc() {
   };
 }
 
-// Stub the global openDocModal so DocRow callbacks work
+// Reset the openDocModal mock between tests
 beforeEach(() => {
-  globalThis.SplainerIslands = globalThis.SplainerIslands || {};
-  globalThis.SplainerIslands.openDocModal = vi.fn();
+  openDocModal.mockClear();
 });
 
 describe('SearchResults island', () => {
@@ -142,7 +148,7 @@ describe('SearchResults island', () => {
     titleLink.click();
     await new Promise((r) => setTimeout(r, 0));
 
-    expect(globalThis.SplainerIslands.openDocModal).toHaveBeenCalledWith(
+    expect(openDocModal).toHaveBeenCalledWith(
       'detailedDoc',
       doc,
       {},

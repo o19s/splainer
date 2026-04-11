@@ -1,11 +1,6 @@
 /**
- * stackedChart island. Replaced the Angular directive + template
- * (both deleted in 9d). No directive shim — the only consumer is
- * docRow.jsx, which renders <StackedChart> as a JSX child directly.
- *
- * The data-testid="stacked-chart-detailed" attribute is load-bearing:
- * the PR 8.5 Playwright canary clicks via that exact selector. Don't
- * rename it without rewriting that test.
+ * stackedChart island — rendered as a JSX child of DocRow.
+ * data-testid="stacked-chart-detailed" is used by Playwright e2e tests.
  */
 import { useState } from 'preact/hooks';
 

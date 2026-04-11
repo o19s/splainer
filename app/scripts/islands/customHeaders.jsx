@@ -1,17 +1,10 @@
 /**
- * customHeaders island — first Preact JSX replacement for an Angular view.
- *
- * Built via vite.islands.config.js into app/scripts/islands/dist/customHeaders.js
- * (an IIFE that references window.preact.* as externals). The Angular
- * customHeaders directive (app/scripts/directives/customHeaders.js) is now
- * a thin shim that mounts this component on every $watch tick.
+ * customHeaders island — Preact component for editing custom HTTP headers.
  *
  * Ace editor lifecycle uses useEffect + useRef — the canonical Preact
  * pattern for wrapping imperative third-party libraries. The fallback to
  * a textarea (when window.ace is missing) keeps the spec runnable under
  * jsdom without loading Ace.
- *
- * JSX uses Preact automatic runtime (see vite.islands.config.js); no `h` import.
  */
 import { render } from 'preact';
 import { useAceEditor } from './useAceEditor.js';
@@ -54,8 +47,7 @@ export function CustomHeaders({ settings, onChange }) {
     const next = e.target.value;
     onChange({
       headerType: next,
-      // Replicate the original Angular controller's updateHeaders side
-      // effect: changing the type resets the body to a template.
+      // Changing the type resets the body to the matching template.
       customHeaders: HEADER_TEMPLATES[next],
     });
   }
@@ -94,11 +86,6 @@ export function CustomHeaders({ settings, onChange }) {
   );
 }
 
-// Public API consumed by the Angular directive shim
-// (app/scripts/directives/customHeaders.js). The Vite library build wraps
-// this whole module in an IIFE; the side-effect attachment runs once at
-// load time and survives the re-renders triggered by the directive's
-// $watch loop.
 export function mount(rootEl, settings, onChange) {
   if (!rootEl) throw new Error('customHeaders island: rootEl is required');
   render(<CustomHeaders settings={settings} onChange={onChange} />, rootEl);
@@ -106,9 +93,4 @@ export function mount(rootEl, settings, onChange) {
 
 export function unmount(rootEl) {
   render(null, rootEl);
-}
-
-if (typeof globalThis !== 'undefined') {
-  globalThis.SplainerIslands = globalThis.SplainerIslands || {};
-  globalThis.SplainerIslands.customHeaders = { mount, unmount };
 }

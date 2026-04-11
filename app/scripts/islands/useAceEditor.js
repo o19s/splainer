@@ -1,25 +1,13 @@
 /**
- * useAceEditor — Preact hook that wraps an Ace editor instance with the
- * three-ref pattern PR 6 established for imperative third-party libraries:
+ * useAceEditor — Preact hook wrapping an Ace editor instance.
  *
- *   1. instanceRef  — the live Ace editor, owned by the hook
- *   2. onChangeRef  — always points at the *latest* onChange prop, so the
- *                     Ace 'change' handler doesn't capture a stale closure
- *                     across re-renders (the directive shim passes a fresh
- *                     onChange on every $watch tick)
- *   3. suppressRef  — breaks the echo loop: when the value-sync effect calls
- *                     editor.setValue(), Ace fires its 'change' event
- *                     synchronously; without suppression that re-enters
- *                     onChange and re-triggers the digest. Wrapped in
- *                     try/finally so a setValue throw can't strand the flag
- *                     in the suppressed state and silently drop user input.
+ * Three-ref pattern for imperative third-party libraries:
+ *   1. instanceRef  — the live Ace editor
+ *   2. onChangeRef  — latest onChange prop (avoids stale-closure bugs)
+ *   3. suppressRef  — breaks the echo loop when setValue() fires 'change'
  *
- * Skip any of the three and you get one of: stale-closure bugs, infinite
- * loops, or silently dropped input. PR 6's third audit round caught all
- * three failure modes; this hook is the canonical encapsulation.
- *
- * Caller still owns the Ace-vs-textarea-fallback decision (jsdom has no
- * window.ace, so specs render a <textarea> instead of calling this hook).
+ * Caller owns the Ace-vs-textarea-fallback decision (jsdom has no
+ * window.ace, so specs render a <textarea> instead).
  * The hook does one thing — wrap Ace — and trusts the caller to gate it
  * on `typeof window.ace !== 'undefined'`.
  */

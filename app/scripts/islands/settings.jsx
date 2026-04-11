@@ -1,32 +1,14 @@
 /**
- * settings island — Preact replacement for app/scripts/controllers/settings.js
- * and the inline form previously at app/index.html:115-255 (PR 7).
+ * settings island — dev sidebar form for tweaking search settings.
  *
- * The island is mounted by app/scripts/directives/settings.js. The directive
- * shim is the integration boundary: it injects the 4 Angular settings
- * services + currSearch + the parent's `search` callback, and proxies them
- * into the island via props.
- *
- * Props (the entire integration surface — the island knows nothing about
- * Angular, $scope, or settingsStoreSvc):
- *   - settings:    settingsStoreSvc.settings (the whole {whichEngine, solr, es, os} object)
+ * Props:
+ *   - settings:    the {whichEngine, solr, es, os} object (mutated in place)
  *   - currSearch:  for currSearch.searcher.isTemplateCall() — gates fieldSpec input
  *   - onPublish:   (whichEngine, workingSettings) => void
- *                  shim dispatches to {solr,es,os}SettingsSvc.fromTweakedSettings,
- *                  then triggers $scope.search.search().then(save)
  *
- * Form-state mutation strategy: the original Angular controller mutated
- * settings[engine] in place on every keystroke (Angular two-way binding
- * via ng-model). We preserve that semantics — switching engines mid-typing
- * without submitting must not lose unsaved tweaks to the other engine.
- * Implementation: a `tick` counter forces re-renders after in-place
- * mutation of the prop object. This keeps prop *identity* stable, which
- * the directive shim's deep $watch relies on, while still triggering
- * Preact reconciliation for the visible form fields.
- *
- * The Ace editor for the es/os Search Args case is a sub-component because
- * useAceEditor is a hook — it can only be called at the top of a component,
- * not conditionally inside a render branch. Same pattern as customHeaders.jsx.
+ * Settings are mutated in place so switching engines mid-typing doesn't
+ * lose unsaved tweaks. A `tick` counter forces Preact re-renders after
+ * in-place mutation.
  */
 import { render } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
@@ -47,23 +29,10 @@ function TextareaArgsFallback({ value, onChange }) {
 }
 
 export function SettingsIsland({ settings, currSearch, onPublish }) {
-  // Local state mirrors the original $scope state. Only the engine selector
-  // and the section toggles are useState; the form fields read straight off
-  // the settings prop (mutated in place + tick re-render).
   const [workingWhichEngine, setWorkingWhichEngine] = useState(settings.whichEngine || 'solr');
-  // Re-render trigger after in-place mutation of `ws` (which is a prop
-  // object, mutated to preserve identity for the directive shim's deep
-  // $watch). The value is unused; only setTick matters.
-  const [, setTick] = useState(0);
+  const [, setTick] = useState(0); // force re-render after in-place mutation
 
-  // Sync workingWhichEngine from the store when external code mutates
-  // settings.whichEngine (e.g. the StartUrl ES tab's Splain This! button
-  // which kicks settingsStoreSvc.settings.whichEngine to 'es' before the
-  // dev sidebar gets focus). Mirrors the original Angular controller's
-  // `$scope.$watch('settings.whichEngine', ...)` which did the same thing.
-  // The user's radio click goes through setWorkingWhichEngine but does NOT
-  // touch settings.whichEngine until submit, so this effect won't overwrite
-  // an in-progress edit.
+  // Sync when external code (e.g. StartUrl's Splain This!) changes the engine.
   useEffect(() => {
     if (settings.whichEngine && settings.whichEngine !== workingWhichEngine) {
       setWorkingWhichEngine(settings.whichEngine);
@@ -71,10 +40,7 @@ export function SettingsIsland({ settings, currSearch, onPublish }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.whichEngine]);
 
-  // Section toggle defaults match the original ng-show conventions:
-  //   Search Engine: collapsed (ng-show="...toggle")
-  //   URL / Fields / Args: expanded (ng-show="!...toggle")
-  //   Headers: collapsed (ng-show="...toggle")
+  // Section toggle defaults: Engine and Headers collapsed, rest expanded.
   const [engineOpen, setEngineOpen] = useState(false);
   const [urlOpen, setUrlOpen] = useState(true);
   const [fieldsOpen, setFieldsOpen] = useState(true);
@@ -108,9 +74,7 @@ export function SettingsIsland({ settings, currSearch, onPublish }) {
     onPublish(workingWhichEngine, ws);
   }
 
-  // ng-show="!currSearch.searcher.isTemplateCall()" — show fieldSpec only
-  // when the searcher is not a template call. Defensive about undefineds:
-  // currSearch may be undefined before the first search runs.
+  // Show fieldSpec only when the searcher is not a template call.
   const isTemplateCall =
     currSearch && currSearch.searcher && typeof currSearch.searcher.isTemplateCall === 'function'
       ? currSearch.searcher.isTemplateCall()
@@ -244,13 +208,9 @@ export function SettingsIsland({ settings, currSearch, onPublish }) {
         </div>
       )}
 
-      {/* Custom Headers — es/os only, collapsed by default. JSX child of the
-          existing CustomHeaders island, NOT a remount via Angular.
-          NOTE: data-role="header-type" / "header-editor" inside CustomHeaders
-          is no longer unique on the page — there's now one mount in the
-          dev sidebar (here) and one in startUrl.html for each of ES/OS.
-          Scope your selectors (e.g. `#es_ [data-role="header-type"]`) when
-          writing tests; an unscoped query returns the first match. */}
+      {/* Custom Headers — es/os only, collapsed by default.
+          Test selectors: scope with `#es_` since header-type/header-editor
+          appear in both the sidebar and startUrl. */}
       {workingWhichEngine !== 'solr' && (
         <>
           <div class="dev-header" onClick={() => setHeadersOpen((v) => !v)}>
@@ -283,7 +243,6 @@ export function SettingsIsland({ settings, currSearch, onPublish }) {
   );
 }
 
-// Public API consumed by the Angular directive shim.
 export function mount(rootEl, props, onPublish) {
   if (!rootEl) throw new Error('settings island: rootEl is required');
   render(
@@ -298,9 +257,4 @@ export function mount(rootEl, props, onPublish) {
 
 export function unmount(rootEl) {
   render(null, rootEl);
-}
-
-if (typeof globalThis !== 'undefined') {
-  globalThis.SplainerIslands = globalThis.SplainerIslands || {};
-  globalThis.SplainerIslands.settings = { mount, unmount };
 }

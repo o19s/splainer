@@ -1,11 +1,7 @@
 /**
- * docRow island. Replaces the old DocRowCtrl + docRow.html template.
- * Mounted by the Angular directive shim at app/scripts/directives/docRow.js.
- *
- * DOMPurify is required because Preact's dangerouslySetInnerHTML has no
- * implicit sanitizer — the old template relied on Angular's $sce/ngSanitize.
- * Every former ng-bind-html site routes through SanitizedSpan/SanitizedAnchor
- * below; the Vitest XSS regression specs are the merge gate.
+ * docRow island — renders a single search result (title, snippets,
+ * thumbnail, stacked chart). All HTML from splainer-search is sanitized
+ * via DOMPurify; XSS regression specs are the merge gate.
  */
 import { render } from 'preact';
 import DOMPurify from 'dompurify';
@@ -80,8 +76,6 @@ export function DocRow({ doc, maxScore, onShowDoc, onShowDetailed }) {
   );
 }
 
-// Public API consumed by the Angular directive shim
-// (app/scripts/directives/docRow.js).
 export function mount(rootEl, doc, props = {}) {
   if (!rootEl) throw new Error('docRow island: rootEl is required');
   render(<DocRow doc={doc} {...props} />, rootEl);
@@ -89,9 +83,4 @@ export function mount(rootEl, doc, props = {}) {
 
 export function unmount(rootEl) {
   render(null, rootEl);
-}
-
-if (typeof globalThis !== 'undefined') {
-  globalThis.SplainerIslands = globalThis.SplainerIslands || {};
-  globalThis.SplainerIslands.docRow = { mount, unmount };
 }

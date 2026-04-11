@@ -1,19 +1,6 @@
-'use strict';
-
 /**
- * Pure-JS Solr settings logic — no Angular dependency.
- *
- * Extracted from the Angular solrSettingsSvc (Phase 11b). The Angular
- * service file (solrSettingsSvc.js) is now a thin wrapper that delegates
- * to globalThis.SplainerServices.solrSettings.
- *
- * Both `fromStartUrl` and `fromTweakedSettings` accept `solrUrlSvc` and
- * `fieldSpecSvc` as leading parameters so this module has no dependency
- * on the Angular DI container. The Angular wrapper injects them and
- * passes them through.
- *
- * Exported functions mutate the `settings` object in place — same
- * contract as the original Angular service.
+ * Solr settings logic. fromStartUrl/fromTweakedSettings accept solrUrlSvc
+ * and fieldSpecSvc as leading params. Mutates the settings object in place.
  */
 
 function reconstructFullUrl(solrUrlSvc, fieldSpecSvc, userSettings) {
@@ -79,9 +66,4 @@ export function fromTweakedSettings(solrUrlSvc, fieldSpecSvc, searchSettings) {
   }
   searchSettings.startUrl = reconstructFullUrl(solrUrlSvc, fieldSpecSvc, searchSettings);
   return searchSettings;
-}
-
-if (typeof globalThis !== 'undefined') {
-  globalThis.SplainerServices = globalThis.SplainerServices || {};
-  globalThis.SplainerServices.solrSettings = { fromStartUrl, fromTweakedSettings };
 }

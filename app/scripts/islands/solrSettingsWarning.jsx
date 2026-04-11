@@ -1,20 +1,8 @@
 /**
- * solrSettingsWarning island — Preact replacement for
- * app/scripts/controllers/solrSettingsWarning.js (PR 8).
+ * solrSettingsWarning island — shows warnings for Solr args that
+ * splainer-search's removeUnsupported() stripped from the query.
  *
- * Rendered inside app/views/searchResults.html when the current search is
- * in the DID_SEARCH state. Shows an `alert alert-warning` panel listing
- * Solr arguments that splainer-search's `removeUnsupported()` stripped from
- * the query, grouped by the reason they were removed.
- *
- * Props (set by the directive shim):
- *   - argsStr:     the current Solr args string (currSearch.settings.searchArgsStr())
- *   - solrUrlSvc:  parseSolrArgs + removeUnsupported from splainer-search
- *
- * The old controller memoized the last-seen argsStr to avoid re-parsing on
- * every digest. Preact's useMemo gives us the same behavior without the
- * closure-state dance, and the shim's shallow $watch on the string already
- * gates mounts to actual changes.
+ * Props: argsStr, solrUrlSvc.
  */
 import { render } from 'preact';
 import { useMemo } from 'preact/hooks';
@@ -71,9 +59,4 @@ export function mount(rootEl, props) {
 
 export function unmount(rootEl) {
   render(null, rootEl);
-}
-
-if (typeof globalThis !== 'undefined') {
-  globalThis.SplainerIslands = globalThis.SplainerIslands || {};
-  globalThis.SplainerIslands.solrSettingsWarning = { mount, unmount };
 }

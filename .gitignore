@@ -14,10 +14,6 @@ stryker.log
 test-results/
 playwright-report/
 .playwright/
-# Built island bundles — output of `yarn build:islands`
-app/scripts/islands/dist/
-# Built service bundles — output of `yarn build:islands` (Phase 11a)
-app/scripts/services/dist/
 yarn-error.log
 
 deploy.sh

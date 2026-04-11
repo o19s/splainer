@@ -1,16 +1,8 @@
 /**
- * searchResults island — Preact replacement for app/views/searchResults.html.
+ * searchResults island — renders search states, doc rows, query details,
+ * and pagination.
  *
- * Renders the three search states (WAITING_FOR_SEARCH, IN_ERROR, DID_SEARCH),
- * doc rows, grouped results, query details, and pagination. Imports DocRow
- * and SolrSettingsWarning as direct JSX children — no Angular directive shims
- * in between.
- *
- * Props (from the directive shim):
- *   - currSearch:    the Search instance from splSearchSvc.createSearch()
- *   - explainOther:  (altQuery) => Promise<{ docs, maxScore }>
- *   - solrUrlSvc:    for SolrSettingsWarning
- *   - onPage:        () => void — wraps currSearch.page() in $apply
+ * Props: currSearch, explainOther, solrUrlSvc, onPage.
  */
 import { render } from 'preact';
 import { useState, useRef } from 'preact/hooks';
@@ -18,6 +10,7 @@ import { useState, useRef } from 'preact/hooks';
 import { DocRow } from './docRow.jsx';
  
 import { SolrSettingsWarning } from './solrSettingsWarning.jsx';
+import { openDocModal } from './modalRegistry.js';
 
 function currentArgsStr(currSearch) {
   try {
@@ -94,22 +87,17 @@ export function SearchResults({ currSearch, explainOther, solrUrlSvc, onPage }) 
   // --- DID_SEARCH ---
   if (currSearch.state !== currSearch.DID_SEARCH) return null;
 
-  const openDocModal = typeof window !== 'undefined' &&
-    window.SplainerIslands && window.SplainerIslands.openDocModal;
-
   function makeDocCallbacks(doc) {
     return {
       onShowDoc: (d) => {
-        if (openDocModal) openDocModal('detailedDoc', d, {});
+        openDocModal('detailedDoc', d, {});
       },
       onShowDetailed: () => {
-        if (openDocModal) {
-          openDocModal('detailedExplain', doc, {
-            canExplainOther: true,
-            explainOther: explainOther,
-            maxScore: currSearch.maxScore,
-          });
-        }
+        openDocModal('detailedExplain', doc, {
+          canExplainOther: true,
+          explainOther: explainOther,
+          maxScore: currSearch.maxScore,
+        });
       },
     };
   }
@@ -235,9 +223,4 @@ export function mount(rootEl, props) {
 
 export function unmount(rootEl) {
   render(null, rootEl);
-}
-
-if (typeof globalThis !== 'undefined') {
-  globalThis.SplainerIslands = globalThis.SplainerIslands || {};
-  globalThis.SplainerIslands.searchResults = { mount, unmount };
 }

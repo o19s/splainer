@@ -1,13 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Search } from './Search.js';
 
-/**
- * Phase 11d: Vitest specs for the pure Search constructor.
- *
- * The Search constructor accepts a deps bag + searchSettings +
- * overridingExplains + states + engines. These tests verify the
- * constructor's behavior without Angular DI.
- */
 
 var states = {
   NO_SEARCH: 0,

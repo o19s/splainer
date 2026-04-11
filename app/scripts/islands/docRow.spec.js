@@ -107,11 +107,7 @@ describe('docRow island', () => {
     expect(onShowDoc).toHaveBeenCalledWith(doc);
   });
 
-  // ─── PR 9b: StackedChart child rendering ──────────────────────────────
-  // Replaces the three chart-host tests from 9a, which validated the
-  // Preact-parent / Angular-child inversion bridge. That bridge is gone;
-  // StackedChart is a JSX child now and the assertions move to behaviors
-  // observable in the rendered DOM tree.
+  // StackedChart child rendering
 
   it('renders the StackedChart child with the doc hot matches', () => {
     const el = makeRoot();
@@ -134,7 +130,7 @@ describe('docRow island', () => {
   });
 
   it('omits the Detailed link in the <=3 branch when no onShowDetailed callback is provided', () => {
-    // The <=3 branch matches the old template's `ng-if="detailed"`.
+    // The <=3 branch omits the Detailed link when no callback is provided.
     // (The >3 branch always renders the Detailed link — see the
     // stackedChart spec for that case.)
     const el = makeRoot();
@@ -143,12 +139,7 @@ describe('docRow island', () => {
   });
 
   it('re-mounts cleanly after an unmount', () => {
-    // ng-repeat with track by changes, modal close-and-reopen, and
-    // similar Angular lifecycles can destroy then re-link the same
-    // directive instance. The shim's $on('$destroy') unmounts the
-    // island; the next link() call will mount() into the (now empty)
-    // root again. Verify the second mount produces a fresh, valid
-    // tree — not a stale-state ghost from the first mount.
+    // Verify remount after unmount produces a valid tree.
     const el = makeRoot();
     mount(el, makeDoc(), { maxScore: 1 });
     expect(el.querySelector('[data-testid="doc-row"]')).not.toBeNull();

@@ -1,15 +1,6 @@
-'use strict';
-
 /**
- * Pure-JS search service constants and factory — no Angular dependency.
- *
- * Extracted from the Angular splSearchSvc (Phase 11a). The Angular
- * service file (splSearchSvc.js) is now a thin wrapper that delegates
- * to globalThis.SplainerServices.splSearch.
- *
- * `createSearch` accepts the Search constructor as its first argument
- * so this module has no dependency on the Angular `Search` factory.
- * The Angular wrapper passes the injected factory through.
+ * Search state constants and factory. createSearch(SearchCtor, settings)
+ * produces a Search instance with state constants attached.
  */
 
 export var states = {
@@ -38,9 +29,4 @@ export function createSearch(Search, searchSettings, overridingExplains) {
   }
 
   return search;
-}
-
-if (typeof globalThis !== 'undefined') {
-  globalThis.SplainerServices = globalThis.SplainerServices || {};
-  globalThis.SplainerServices.splSearch = { states, engines, createSearch };
 }

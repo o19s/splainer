@@ -154,7 +154,7 @@ test.describe('splainer smoke', () => {
     // covers the textarea-fallback path under jsdom. This test opens the
     // ES tab in a real browser (where window.ace is loaded), expands the
     // Advanced Settings section, and exercises the island end-to-end —
-    // verifying that (a) the island mounts via bootstrap.js,
+    // verifying that (a) the island mounts via main.js,
     // (b) the Ace `useEffect` lifecycle works (no pageerror), and
     // (c) picking a header type populates the editor body via the
     // template side effect.
@@ -280,7 +280,7 @@ test.describe('splainer smoke', () => {
     // PR 7 merge gate. Intercepts the outbound ES request and asserts that a
     // unique marker the user typed into the dev-sidebar Search Args editor
     // landed in the request body. This is the only test that proves the full
-    // chain from Settings island → bootstrap.js onPublish → esSettings
+    // chain from Settings island → main.js onPublish → esSettings
     // .fromTweakedSettings → splainer-search 3.0.0 wired services → fetch
     // is wired correctly. Internal-contract tests catch
     // refactor regressions; this one catches silent integration breaks.
@@ -345,12 +345,12 @@ test.describe('splainer smoke', () => {
       var store = window.SplainerServices.settingsStore;
       store.settings.es.searchArgsStr = value;
       // save() fires subscribe callbacks, which triggers renderAll() in
-      // bootstrap.js so the Settings island re-renders with the new value.
+      // main.js so the Settings island re-renders with the new value.
       store.save();
     }, newArgs);
 
     // Click the new Settings island's Rerun Query button — uses the
-    // post-island data-role selector, NOT the legacy Angular ng-click.
+    // post-island data-role selector, NOT a legacy ng-click.
     // This selector existing at all is the test's red→green signal.
     await page.locator('[data-role="rerun-query"]').click();
 

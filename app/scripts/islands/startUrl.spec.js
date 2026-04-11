@@ -49,7 +49,7 @@ describe('startUrl island', () => {
     const settings = makeSettings();
     mount(el, { settings }, { onSearch: () => {} });
     await flush();
-    // Default URLs mirror the legacy ng-init values in startUrl.html.
+    // Default URLs are seeded on first mount.
     expect(settings.solr.startUrl).toContain('quepid-solr.dev.o19s.com');
     expect(settings.es.startUrl).toContain('quepid-elasticsearch.dev.o19s.com');
     expect(settings.os.startUrl).toContain('quepid-opensearch.dev.o19s.com');
@@ -113,10 +113,8 @@ describe('startUrl island', () => {
   });
 
   it('Enter-key form submission fires onSearch(activeTab) with preventDefault', async () => {
-    // Regression guard for the form's onSubmit handler. Angular's `form`
-    // directive auto-preventDefault'd submission; Preact does not. Without
-    // handleFormSubmit, pressing Enter in a URL input would reload the
-    // page. We dispatch a raw 'submit' event on the form (jsdom's
+    // Without handleFormSubmit, pressing Enter in a URL input would reload
+    // the page. We dispatch a raw 'submit' event on the form (jsdom's
     // equivalent of the browser's implicit submit on Enter-in-input) and
     // verify (a) preventDefault was called (dispatchEvent returns false)
     // and (b) onSearch was invoked with the active tab.
