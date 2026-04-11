@@ -241,6 +241,14 @@ tweakBtn.addEventListener('click', function (e) {
 store.subscribe(renderAll);
 
 // Hash-URL bootstrap
+//
+// Form-encoded parsing: `+` in values decodes to space. This matches the
+// 2024 Angular $location.search() behavior that existing user bookmarks
+// rely on — e.g., `fieldSpec=id+title` must parse to `"id title"`, not the
+// literal `"id+title"`. decodeURIComponent alone does NOT do this (it
+// leaves `+` untouched), so we normalize `+` → ` ` on the value side
+// before decoding. Keys are decoded strictly because splainer keys are
+// always the fixed names `solr`/`esUrl`/`fieldSpec`/... with no `+` in them.
 function parseHash() {
   var hash = window.location.hash;
   var qIndex = hash.indexOf('?');
@@ -253,7 +261,7 @@ function parseHash() {
       params[decodeURIComponent(pair)] = '';
     } else {
       params[decodeURIComponent(pair.slice(0, eqIndex))] =
-        decodeURIComponent(pair.slice(eqIndex + 1));
+        decodeURIComponent(pair.slice(eqIndex + 1).replace(/\+/g, ' '));
     }
   });
   return params;

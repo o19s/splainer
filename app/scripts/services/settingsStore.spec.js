@@ -219,6 +219,51 @@ describe('settingsStore (pure module)', function () {
     expect(window.location.hash).not.toContain('id+title');
   });
 
+  it('save() preserves `:` `@` `$` `,` `;` literal in the hash (matches Angular encodeUriQuery)', function () {
+    // Freezes the encoding shape that the legacy Angular build emits and
+    // that the audit expects to see (see e2e/audit.spec.js and its
+    // test:e2e:audit run). Any change to buildHashString that reverts to
+    // plain encodeURIComponent will break this test deliberately.
+    setupMocks({});
+    var svc = createSettingsStore();
+    var s = svc.settings;
+
+    s.solr.startUrl = 'http://quepid-solr.dev.o19s.com:8985/solr/tmdb/select?q=*:*';
+    s.solr.fieldSpecStr = 'id title';
+    s.whichEngine = 'solr';
+    svc.save();
+
+    // The scheme colon stays literal.
+    expect(window.location.hash).toContain('http:');
+    expect(window.location.hash).not.toContain('http%3A');
+    // Port colons stay literal.
+    expect(window.location.hash).toContain(':8985');
+    expect(window.location.hash).not.toContain('%3A8985');
+    // `@` stays literal (relevant for the `reader:reader@host` OS default).
+    s.os.searchUrl = 'https://reader:reader@quepid-opensearch.dev.o19s.com:9000/tmdb/_search';
+    s.os.searchArgsStr = '{"query":{"match_all":{}}}';
+    s.whichEngine = 'os';
+    svc.save();
+    expect(window.location.hash).toContain('reader:reader@');
+    expect(window.location.hash).not.toContain('reader%3Areader%40');
+    // Slashes are still percent-encoded (matches Angular's behavior —
+    // encodeUriQuery unescapes `:@$,;` but not `/`).
+    expect(window.location.hash).toContain('%2F');
+    // `&` is still encoded within values — if it weren't, `&` in a query
+    // body would break the outer hash param parsing.
+    s.solr.startUrl = 'http://solr?q=a&b=c';
+    s.whichEngine = 'solr';
+    svc.save();
+    // The outer `&` between hash params stays literal (as a separator),
+    // but the `&` inside the solr= value must be encoded.
+    var hash = window.location.hash;
+    var solrIdx = hash.indexOf('solr=');
+    var nextAmpIdx = hash.indexOf('&fieldSpec', solrIdx);
+    var solrValue = hash.slice(solrIdx + 'solr='.length, nextAmpIdx);
+    expect(solrValue).toContain('%26');
+    expect(solrValue).not.toContain('q=a&b=c');
+  });
+
   it('save() writes ES params to location.hash', function () {
     setupMocks({});
     var svc = createSettingsStore();

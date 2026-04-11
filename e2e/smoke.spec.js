@@ -109,6 +109,23 @@ test.describe('splainer smoke', () => {
       )
       .toBe(true);
     expect(solrHits, 'splainer should fire at least one Solr request').toBeGreaterThan(0);
+
+    // fieldSpec `+` must decode to space (form-encoded convention), matching
+    // the 2024 Angular $location.search() behavior. Regression guard for
+    // parseHash: historically `id+title` in a bookmark parsed to `"id title"`;
+    // if parseHash ever reverts to plain decodeURIComponent, this catches it.
+    // The parsed fieldSpec lives in localStorage at ls.solr_fieldSpecStr.
+    await expect
+      .poll(async () =>
+        page.evaluate(() => {
+          try {
+            return JSON.parse(window.localStorage.getItem('ls.solr_fieldSpecStr'));
+          } catch {
+            return null;
+          }
+        }),
+      )
+      .toBe('id title');
   });
 
   test('settings persist across reload via localStorage', async ({ page }) => {

@@ -52,8 +52,28 @@ function detectLocalStorage() {
 }
 var _lsSupported = detectLocalStorage();
 
-// URL hash helpers — uses encodeURIComponent (spaces as %20) instead of
-// URLSearchParams (spaces as +) for back-compat with existing bookmarks.
+// URL hash helpers — preserve visual parity with the legacy Angular build
+// (see audit.spec.js). Two distinct back-compat decisions live here:
+//
+//   1. Spaces as %20, not + — matches encodeURIComponent, not URLSearchParams.
+//   2. `:` `@` `$` `,` `;` kept literal — matches Angular's encodeUriQuery
+//      helper, which runs encodeURIComponent then selectively unescapes
+//      those reserved characters. This keeps hash URLs human-readable
+//      (`solr=http://host:8983/...` instead of `solr=http%3A%2F%2Fhost%3A8983`),
+//      which matters here because splainer's whole UX is shareable URLs
+//      in the address bar.
+//
+// Both encodings decode identically under decodeURIComponent, so old
+// bookmarks and new ones remain interchangeable.
+
+function encodeUriQuery(val) {
+  return encodeURIComponent(val)
+    .replace(/%40/gi, '@')
+    .replace(/%3A/gi, ':')
+    .replace(/%24/g, '$')
+    .replace(/%2C/gi, ',')
+    .replace(/%3B/gi, ';');
+}
 
 function buildHashString(paramsObj) {
   var parts = [];
@@ -62,7 +82,7 @@ function buildHashString(paramsObj) {
     var val = paramsObj[keys[i]];
     // Skip null/undefined to avoid encoding as literal "undefined".
     if (val == null) continue;
-    parts.push(encodeURIComponent(keys[i]) + '=' + encodeURIComponent(val));
+    parts.push(encodeURIComponent(keys[i]) + '=' + encodeUriQuery(val));
   }
   return parts.length ? '?' + parts.join('&') : '';
 }
