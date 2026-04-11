@@ -171,6 +171,8 @@
   }
 
   function onSearch(engine) {
+    sidebarOpen = true;
+    updateChevrons();
     document.dispatchEvent(new CustomEvent('openEast'));
     if (engine === 'solr') runSolr();
     else if (engine === 'es') runEs();

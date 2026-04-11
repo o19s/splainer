@@ -80,7 +80,7 @@ export function SearchResults({ currSearch, explainOther, solrUrlSvc, onPage }) 
         {currSearch.engine === 'solr' && (
           <div>
             Try accessing{' '}
-            <a target="_blank" href={currSearch.linkUrl}>Solr</a>{' '}
+            <a target="_blank" rel="noopener" href={currSearch.linkUrl}>Solr</a>{' '}
             to troubleshoot the error.
           </div>
         )}
@@ -120,7 +120,7 @@ export function SearchResults({ currSearch, explainOther, solrUrlSvc, onPage }) 
 
       <small>
         {currSearch.linkUrl && currSearch.linkUrl.length > 0 ? (
-          <a href={currSearch.linkUrl} target="_blank">
+          <a href={currSearch.linkUrl} target="_blank" rel="noopener">
             {currSearch.numFound} Total Results
           </a>
         ) : (

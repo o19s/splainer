@@ -9,6 +9,7 @@ import { useEffect, useLayoutEffect, useRef } from 'preact/hooks';
 export function useDialogModal(onClose) {
   const ref = useRef(null);
   const onCloseRef = useRef(onClose);
+  const closedRef = useRef(false);
 
   useEffect(() => {
     onCloseRef.current = onClose;
@@ -18,6 +19,8 @@ export function useDialogModal(onClose) {
     const dlg = ref.current;
     if (!dlg) return undefined;
 
+    closedRef.current = false;
+
     if (typeof dlg.showModal === 'function') {
       dlg.showModal();
     } else {
@@ -26,6 +29,8 @@ export function useDialogModal(onClose) {
     }
 
     function fireClose() {
+      if (closedRef.current) return;
+      closedRef.current = true;
       const cb = onCloseRef.current;
       if (cb) cb();
     }
@@ -47,12 +52,13 @@ export function useDialogModal(onClose) {
       dlg.removeEventListener('click', handleClick);
       if (dlg.open) dlg.close();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function close() {
     const dlg = ref.current;
     if (dlg && dlg.open) dlg.close();
+    if (closedRef.current) return;
+    closedRef.current = true;
     const cb = onCloseRef.current;
     if (cb) cb();
   }

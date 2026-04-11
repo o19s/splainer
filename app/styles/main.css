@@ -1,26 +1,8 @@
-/* Everything but the jumbotron gets side spacing for mobile first views */
-.header,
-.marketing,
+/* Custom page footer */
 .footer {
   text-align: center;
   padding-left: 15px;
   padding-right: 15px;
-}
-
-/* Custom page header */
-.header {
-  border-bottom: 1px solid #e5e5e5;
-}
-/* Make the masthead heading the same height as the navigation */
-.header h3 {
-  margin-top: 0;
-  margin-bottom: 0;
-  line-height: 40px;
-  padding-bottom: 19px;
-}
-
-/* Custom page footer */
-.footer {
   margin-top: 100px;
   margin-bottom: 10px;
   padding-top: 19px;
@@ -35,44 +17,12 @@
     width: 100%;
   }
 }
-.container-narrow > hr {
-  margin: 30px 0;
-}
-
-/* Main marketing message and sign up button */
-.jumbotron {
-  text-align: center;
-  border-bottom: 1px solid #e5e5e5;
-}
-.jumbotron .btn {
-  font-size: 21px;
-  padding: 14px 24px;
-}
-
-/* Supporting marketing content */
-.marketing {
-  margin: 40px 0;
-}
-.marketing p + h4 {
-  margin-top: 28px;
-}
 
 /* Responsive: Portrait tablets and up */
 @media screen and (min-width: 768px) {
-  /* Remove the padding we set earlier */
-  .header,
-  .marketing,
   .footer {
     padding-left: 0;
     padding-right: 0;
-  }
-  /* Space out the masthead */
-  .header {
-    margin-bottom: 30px;
-  }
-  /* Remove the bottom border on the jumbotron for visual effect */
-  .jumbotron {
-    border-bottom: 0;
   }
 }
 
@@ -121,17 +71,6 @@
   margin: 3px 0 0 25px;
 }
 
-.tweak-button small {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.5);
-  display: block;
-  margin: 3px 0 10px 25px;
-}
-
-.tweak-button small a {
-  color: rgba(255, 255, 255, 0.75);
-}
-
 .navbar-header small a {
   color: rgba(255, 255, 255, 0.75);
 }
@@ -144,10 +83,6 @@
 .pane_east label {
   font-weight: normal;
   color: #999;
-}
-
-.starter-URL {
-  margin: 0 0 0px 0;
 }
 
 .dev-header {
@@ -181,17 +116,6 @@
   margin-left: 0.5em;
 }
 
-/*dont style inspector-* tags, style the corresponding bootstrap
- *   classes (or your own)*/
-.popover {
-  max-width: 800px;
-  width: auto;
-}
-
-.modal-content {
-  overflow-x: auto;
-}
-
 .navbar-secondary .navbar-nav {
   color: white;
 }
@@ -206,11 +130,6 @@
 
 .navbar-inverse .navbar-nav > li > a {
   color: rgb(205, 221, 235);
-}
-
-.selectableDoc:hover {
-  background-color: #eee;
-  cursor: pointer;
 }
 
 .explain-view {
