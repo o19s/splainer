@@ -422,13 +422,13 @@ test.describe('splainer smoke', () => {
     await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title+director+release_year`);
 
     // Wait for the initial search to render at least one doc-row.
-    await page.locator('[data-testid="doc-row"]').first().waitFor();
+    await page.locator('[data-role="doc-row"]').first().waitFor();
 
     // The title link inside the first doc-row. Scoped to doc-row because
     // other <a> elements on the page (tour, footer links) would match a
     // bare locator. The anchor text comes from the highlighted title,
     // so we locate structurally and then assert the modal that results.
-    const titleLink = page.locator('[data-testid="doc-row"]').first().locator('h4 a').first();
+    const titleLink = page.locator('[data-role="doc-row"]').first().locator('h4 a').first();
     await titleLink.click();
 
     // The detailedDoc modal's only stable string is the template heading
@@ -487,16 +487,16 @@ test.describe('splainer smoke', () => {
 
     // Wait for the initial search to land and render the first doc-row.
     await expect.poll(() => captured.length).toBeGreaterThan(0);
-    await page.locator('[data-testid="doc-row"]').first().waitFor();
+    await page.locator('[data-role="doc-row"]').first().waitFor();
 
     // 9d: open the explain modal by clicking the chart-detailed link.
     // The alt-query form lives inside the new docExplain Preact dialog;
     // the alt-query path is now backed by the docRow shim's explainOther
     // closure (copy-pasted from docSelector's shim).
     await page
-      .locator('[data-testid="doc-row"]')
+      .locator('[data-role="doc-row"]')
       .first()
-      .locator('[data-testid="stacked-chart-detailed"]')
+      .locator('[data-role="stacked-chart-detailed"]')
       .click();
 
     // Wait for the DocSelector island inside the modal.
@@ -564,12 +564,12 @@ test.describe('splainer smoke', () => {
     await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title`);
 
     await expect.poll(() => searchCount).toBeGreaterThan(0);
-    await page.locator('[data-testid="doc-row"]').first().waitFor();
+    await page.locator('[data-role="doc-row"]').first().waitFor();
 
     await page
-      .locator('[data-testid="doc-row"]')
+      .locator('[data-role="doc-row"]')
       .first()
-      .locator('[data-testid="stacked-chart-detailed"]')
+      .locator('[data-role="stacked-chart-detailed"]')
       .click();
     await page.locator('[data-role="alt-query"]').waitFor();
 
@@ -630,7 +630,7 @@ test.describe('splainer smoke', () => {
     // rewrite — not at "is the test even right?". Decouples "can we test
     // this?" from "have we rewritten this?".
     //
-    // Click target: the [data-testid="stacked-chart-detailed"] anchor in
+    // Click target: the [data-role="stacked-chart-detailed"] anchor in
     // app/views/stackedChart.html — NOT scope.doc.showDetailed() like the
     // PR 8 tests. The whole point is real user interaction.
     await page.route('http://fake-solr.test/**', async (route) => {
@@ -660,18 +660,18 @@ test.describe('splainer smoke', () => {
     await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title`);
 
     // Wait for the row, then click the Detailed link inside its stacked chart.
-    await page.locator('[data-testid="doc-row"]').first().waitFor();
+    await page.locator('[data-role="doc-row"]').first().waitFor();
     await page
-      .locator('[data-testid="doc-row"]')
+      .locator('[data-role="doc-row"]')
       .first()
-      .locator('[data-testid="stacked-chart-detailed"]')
+      .locator('[data-role="stacked-chart-detailed"]')
       .click();
 
     // Modal opens, header is visible, body contains the explain string from
     // the canned response. The body assertion is what proves the explain tree
     // actually rendered — header alone could be there even if rendering broke.
-    await expect(page.locator('[data-testid="detailed-explain-modal"]')).toBeVisible();
-    await expect(page.locator('[data-testid="detailed-explain-body"]')).toContainText(
+    await expect(page.locator('[data-role="detailed-explain-modal"]')).toBeVisible();
+    await expect(page.locator('[data-role="detailed-explain-body"]')).toContainText(
       'weight(title:canned',
     );
 
@@ -680,7 +680,7 @@ test.describe('splainer smoke', () => {
     // swap has to preserve. Without it, 9bc could ship a modal that opens
     // fine but traps the user and no test would catch it.
     await page.keyboard.press('Escape');
-    await expect(page.locator('[data-testid="detailed-explain-modal"]')).toBeHidden();
+    await expect(page.locator('[data-role="detailed-explain-modal"]')).toBeHidden();
   });
 
   test('Search Args stays below Search Engine header when switching engines', async ({
@@ -702,7 +702,7 @@ test.describe('splainer smoke', () => {
       'http://fake-solr.test/solr/coll1/select?q=*:*',
     );
     await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title`);
-    await page.locator('[data-testid="doc-row"]').first().waitFor();
+    await page.locator('[data-role="doc-row"]').first().waitFor();
 
     // Open the Tweak panel and expand Search Engine.
     await page.locator('a:has-text("Tweak")').click();
@@ -781,7 +781,7 @@ test.describe('splainer smoke', () => {
       'http://fake-solr.test/solr/coll1/select?q=*:*',
     );
     await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title`);
-    await page.locator('[data-testid="doc-row"]').first().waitFor();
+    await page.locator('[data-role="doc-row"]').first().waitFor();
     await expect(page.getByText('Solr Result')).toBeVisible();
 
     // Open the Tweak panel.

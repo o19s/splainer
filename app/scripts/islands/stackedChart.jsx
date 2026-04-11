@@ -1,6 +1,6 @@
 /**
  * stackedChart island — rendered as a JSX child of DocRow.
- * data-testid="stacked-chart-detailed" is used by Playwright e2e tests.
+ * data-role="stacked-chart-detailed" is used by Playwright e2e tests.
  */
 import { useState } from 'preact/hooks';
 
@@ -49,7 +49,7 @@ export function StackedChart({ doc, maxScore, onDetailed }) {
         ))}
         {onDetailed && (
           <a
-            data-testid="stacked-chart-detailed"
+            data-role="stacked-chart-detailed"
             style={{ fontSize: '10px' }}
             href=""
             onClick={handleDetailed}
@@ -80,7 +80,7 @@ export function StackedChart({ doc, maxScore, onDetailed }) {
       {/* Detailed is unconditional in the >3 branch; handleDetailed
           no-ops if onDetailed is undefined. */}
       <a
-        data-testid="stacked-chart-detailed"
+        data-role="stacked-chart-detailed"
         style={{ fontSize: '10px' }}
         href=""
         onClick={handleDetailed}

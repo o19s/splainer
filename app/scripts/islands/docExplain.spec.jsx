@@ -17,7 +17,7 @@ describe('docExplain island', () => {
       <DocExplain doc={makeDoc({ title: 'the canned title' })} onClose={() => {}} />,
       el,
     );
-    const header = el.querySelector('[data-testid="detailed-explain-modal"]');
+    const header = el.querySelector('[data-role="detailed-explain-modal"]');
     expect(header.textContent).toContain('Explain for:');
     expect(header.textContent).toContain('the canned title');
   });
@@ -120,7 +120,7 @@ describe('docExplain island', () => {
     );
 
     // Header initially shows only the primary doc.
-    const header = el.querySelector('[data-testid="detailed-explain-modal"]');
+    const header = el.querySelector('[data-role="detailed-explain-modal"]');
     expect(header.textContent).toContain('PRIMARY');
     expect(header.textContent).not.toContain('ALT_DOC_TITLE');
 
@@ -131,9 +131,9 @@ describe('docExplain island', () => {
     );
     await new Promise((r) => setTimeout(r, 0));
 
-    // The nested DocRow should be in the DOM (data-testid is preserved
+    // The nested DocRow should be in the DOM (data-role is preserved
     // by docRow.jsx).
-    const nestedRows = el.querySelectorAll('[data-testid="doc-row"]');
+    const nestedRows = el.querySelectorAll('[data-role="doc-row"]');
     expect(nestedRows.length).toBe(1);
 
     // Click the nested row's wrapper — sets altDoc and adds the compare

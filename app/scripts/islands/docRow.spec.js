@@ -39,7 +39,7 @@ describe('docRow island', () => {
   it('renders the doc score and title', () => {
     const el = makeRoot();
     mount(el, makeDoc(), { maxScore: 1 });
-    expect(el.querySelector('[data-testid="doc-row"]')).not.toBeNull();
+    expect(el.querySelector('[data-role="doc-row"]')).not.toBeNull();
     expect(el.textContent).toContain('1.5');
     expect(el.textContent).toContain('canned');
     // The <em> highlight tag survives sanitization (it's on DOMPurify's
@@ -116,14 +116,14 @@ describe('docRow island', () => {
     expect(el.querySelectorAll('.graph-explain').length).toBeGreaterThan(0);
     expect(el.textContent).toContain('title:canned');
     // The Detailed link with the load-bearing PR 8.5 testid is present.
-    expect(el.querySelector('[data-testid="stacked-chart-detailed"]')).not.toBeNull();
+    expect(el.querySelector('[data-role="stacked-chart-detailed"]')).not.toBeNull();
   });
 
   it('clicking the StackedChart Detailed link fires onShowDetailed', () => {
     const el = makeRoot();
     const onShowDetailed = vi.fn();
     mount(el, makeDocWithChart(), { maxScore: 1, onShowDetailed });
-    el.querySelector('[data-testid="stacked-chart-detailed"]').dispatchEvent(
+    el.querySelector('[data-role="stacked-chart-detailed"]').dispatchEvent(
       new MouseEvent('click', { bubbles: true, cancelable: true }),
     );
     expect(onShowDetailed).toHaveBeenCalledTimes(1);
@@ -135,18 +135,18 @@ describe('docRow island', () => {
     // stackedChart spec for that case.)
     const el = makeRoot();
     mount(el, makeDocWithChart(), { maxScore: 1 });
-    expect(el.querySelector('[data-testid="stacked-chart-detailed"]')).toBeNull();
+    expect(el.querySelector('[data-role="stacked-chart-detailed"]')).toBeNull();
   });
 
   it('re-mounts cleanly after an unmount', () => {
     // Verify remount after unmount produces a valid tree.
     const el = makeRoot();
     mount(el, makeDoc(), { maxScore: 1 });
-    expect(el.querySelector('[data-testid="doc-row"]')).not.toBeNull();
+    expect(el.querySelector('[data-role="doc-row"]')).not.toBeNull();
     unmount(el);
-    expect(el.querySelector('[data-testid="doc-row"]')).toBeNull();
+    expect(el.querySelector('[data-role="doc-row"]')).toBeNull();
     mount(el, makeDoc({ score: 7 }), { maxScore: 1 });
-    expect(el.querySelector('[data-testid="doc-row"]')).not.toBeNull();
+    expect(el.querySelector('[data-role="doc-row"]')).not.toBeNull();
     expect(el.textContent).toContain('7');
   });
 
@@ -231,8 +231,8 @@ describe('docRow island', () => {
   it('unmount tears down the rendered DOM', () => {
     const el = makeRoot();
     mount(el, makeDoc(), { maxScore: 1 });
-    expect(el.querySelector('[data-testid="doc-row"]')).not.toBeNull();
+    expect(el.querySelector('[data-role="doc-row"]')).not.toBeNull();
     unmount(el);
-    expect(el.querySelector('[data-testid="doc-row"]')).toBeNull();
+    expect(el.querySelector('[data-role="doc-row"]')).toBeNull();
   });
 });

@@ -144,7 +144,7 @@ describe('SearchResults island', () => {
     );
 
     // Click the doc title link
-    const titleLink = root.querySelector('[data-testid="doc-row"] h4 a');
+    const titleLink = root.querySelector('[data-role="doc-row"] h4 a');
     titleLink.click();
     await new Promise((r) => setTimeout(r, 0));
 
@@ -161,7 +161,7 @@ describe('SearchResults island', () => {
     const cs = makeCurrSearch({ docs, numFound: 2 });
     render(<SearchResults currSearch={cs} solrUrlSvc={makeSolrUrlSvc()} />, root);
 
-    const docRows = root.querySelectorAll('[data-testid="doc-row"]');
+    const docRows = root.querySelectorAll('[data-role="doc-row"]');
     expect(docRows.length).toBe(2);
     expect(root.textContent).toContain('2 Total Results');
   });
@@ -276,7 +276,7 @@ describe('SearchResults island', () => {
 
     expect(root.textContent).toContain('Grouped by: category');
     expect(root.textContent).toContain('Action');
-    expect(root.querySelectorAll('[data-testid="doc-row"]').length).toBe(1);
+    expect(root.querySelectorAll('[data-role="doc-row"]').length).toBe(1);
   });
 
   it('renders pagination when moreResults is true', () => {
@@ -314,7 +314,7 @@ describe('SearchResults island', () => {
     const root = makeRoot();
     const cs = makeCurrSearch();
     mount(root, { currSearch: cs, solrUrlSvc: makeSolrUrlSvc() });
-    expect(root.querySelectorAll('[data-testid="doc-row"]').length).toBe(1);
+    expect(root.querySelectorAll('[data-role="doc-row"]').length).toBe(1);
 
     unmount(root);
     expect(root.innerHTML).toBe('');

@@ -11,8 +11,9 @@
 //     against real (Quepid TMDB) backends from both environments.
 //   - Assertions are user-visible-text-based, not selector-based. Prod is
 //     Angular with custom directives; local is Preact islands with
-//     [data-role] hooks. Both eventually render the same human-visible text,
-//     so that's the lowest-common-denominator assertion surface.
+//     [data-role] hooks. Neither hook convention is portable across
+//     frameworks, so both are captured in the structural snapshot but only
+//     the visible text is asserted on.
 //   - We capture pageerrors in attachments but do NOT hard-fail on them.
 //     The frozen prod build almost certainly has some baseline noise, and
 //     the audit's first job is to document current state, not prosecute it.
@@ -23,6 +24,7 @@
 // Adding a scenario: append to SCENARIOS. The shape is declarative — the
 // test loop at the bottom reads the `expect*` fields and enforces them.
 import { test, expect } from '@playwright/test';
+import { writeFile } from 'node:fs/promises';
 
 test.use({ viewport: { width: 1400, height: 900 } });
 
@@ -49,8 +51,28 @@ test.setTimeout(90_000);
 //   expectMaxDocRows: upper bound on visible doc rows (null = no constraint)
 //
 const TMDB_SELECT = 'http://quepid-solr.dev.o19s.com:8985/solr/tmdb/select';
+const TMDB_ES = 'http://quepid-elasticsearch.dev.o19s.com:9206/tmdb/_search';
+// Note: OS default in startUrl.jsx:28 embeds reader:reader@ credentials.
+// Modern browsers strip embedded credentials from fetch URLs (security
+// hardening circa 2019), so this URL may or may not actually authenticate
+// at runtime. We still include the OS scenario because any divergence in
+// how the two versions handle this is itself a useful audit signal.
+const TMDB_OS = 'https://reader:reader@quepid-opensearch.dev.o19s.com:9000/tmdb/_search';
+
 const solrHash = (query, fieldSpec = 'id+title') =>
   `#?solr=${encodeURIComponent(`${TMDB_SELECT}?q=${query}`)}&fieldSpec=${fieldSpec}`;
+
+// ES/OS hash shape: the body is a JSON query DSL document, URL-encoded.
+// Both prod and local parse these via the same `esUrl`/`esQuery` (or
+// `osUrl`/`osQuery`) + `fieldSpec` triplet — prod uses Angular's
+// $location.search() at scripts/controllers/startUrl.js:78, local uses
+// parseHash() at main.js:270. Different parsers, identical wire format.
+const esHash = (body, fieldSpec = 'id+title') =>
+  `#?esUrl=${encodeURIComponent(TMDB_ES)}&esQuery=${encodeURIComponent(body)}&fieldSpec=${fieldSpec}`;
+const osHash = (body, fieldSpec = 'id+title') =>
+  `#?osUrl=${encodeURIComponent(TMDB_OS)}&osQuery=${encodeURIComponent(body)}&fieldSpec=${fieldSpec}`;
+
+const MATCH_ALL = '{"query":{"match_all":{}}}';
 
 const SCENARIOS = [
   {
@@ -146,6 +168,29 @@ const SCENARIOS = [
     expectMinDocRows: 0,
     expectMaxDocRows: 0,
   },
+  {
+    name: 'es-tmdb-match-all',
+    description: 'Quepid TMDB Elasticsearch demo — match_all, default field spec.',
+    hash: esHash(MATCH_ALL),
+    // ES responses parse the same `hits.hits[]` shape on both sides, so
+    // results rendering is effectively identical. We can't assert on a
+    // specific movie title because match_all order depends on internal
+    // Lucene docId order, but we can assert the "a search ran" invariants.
+    expectBodyText: ['Splainer', 'Tweak'],
+    expectAbsentText: ['Splain This!'],
+    expectMinDocRows: 1,
+    expectMaxDocRows: null,
+  },
+  {
+    name: 'os-tmdb-match-all',
+    description:
+      'Quepid TMDB OpenSearch demo — match_all. Expected to be divergent if credential-in-URL handling differs.',
+    hash: osHash(MATCH_ALL),
+    expectBodyText: ['Splainer', 'Tweak'],
+    expectAbsentText: ['Splain This!'],
+    expectMinDocRows: 1,
+    expectMaxDocRows: null,
+  },
 ];
 
 // --- Structural capture helper -------------------------------------------
@@ -157,14 +202,11 @@ async function captureStructuralState(page) {
   return page.evaluate(() => {
     const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
-    // Union selector for doc rows: local uses [data-testid="doc-row"]
-    // (testing-library convention in docRow.jsx), prod uses an Angular
-    // element directive that Angular leaves in the DOM as literal <doc-row>
-    // tags (default restrict:'E' behavior). Note that docRow.jsx uses
-    // data-testid while startUrl.jsx uses data-role — the codebase is not
-    // internally consistent on which hook to use, so audit selectors have
-    // to accept either.
-    const docRowEls = $$('[data-testid="doc-row"], doc-row');
+    // Union selector for doc rows: local uses [data-role="doc-row"],
+    // prod uses an Angular element directive that Angular leaves in the
+    // DOM as literal <doc-row> tags (default restrict:'E' behavior).
+    // Either match counts.
+    const docRowEls = $$('[data-role="doc-row"], doc-row');
 
     // Engine tab / radio presence. Local uses <a href="#solr_">, prod uses
     // <input type="radio" value="solr" ng-model="workingWhichEngine">. We
@@ -243,7 +285,7 @@ async function waitForScenario(page, scenario) {
       .poll(
         async () => {
           return page.evaluate(() => {
-            const els = document.querySelectorAll('[data-testid="doc-row"], doc-row');
+            const els = document.querySelectorAll('[data-role="doc-row"], doc-row');
             return els.length;
           });
         },
@@ -323,20 +365,32 @@ for (const scenario of SCENARIOS) {
         structural = { captureError: 'captureStructuralState threw' };
       }
 
+      // Write each attachment to disk AND reference it from the HTML report.
+      // Writing to testInfo.outputPath (which is per-test-per-project) puts
+      // the files in a location the audit-diff.js script can walk — it pairs
+      // <scenario>.state.json across audit-prod and audit-local to compute a
+      // structural diff without having to parse the Playwright HTML report.
+      const stateJson = JSON.stringify(
+        { ...structural, pageErrorCount: pageErrors.length, pageErrors },
+        null,
+        2,
+      );
+      const stateJsonPath = testInfo.outputPath(`${scenario.name}.state.json`);
+      const consolePath = testInfo.outputPath(`${scenario.name}.console.txt`);
+      const requestsPath = testInfo.outputPath(`${scenario.name}.requests.txt`);
+      await writeFile(stateJsonPath, stateJson);
+      await writeFile(consolePath, consoleLog.join('\n') || '(no console output)');
+      await writeFile(requestsPath, requests.join('\n') || '(no requests captured)');
       await testInfo.attach(`${scenario.name}.state.json`, {
-        body: JSON.stringify(
-          { ...structural, pageErrorCount: pageErrors.length, pageErrors },
-          null,
-          2,
-        ),
+        path: stateJsonPath,
         contentType: 'application/json',
       });
       await testInfo.attach(`${scenario.name}.console.txt`, {
-        body: consoleLog.join('\n') || '(no console output)',
+        path: consolePath,
         contentType: 'text/plain',
       });
       await testInfo.attach(`${scenario.name}.requests.txt`, {
-        body: requests.join('\n') || '(no requests captured)',
+        path: requestsPath,
         contentType: 'text/plain',
       });
     }

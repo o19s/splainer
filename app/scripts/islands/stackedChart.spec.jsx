@@ -28,8 +28,8 @@ describe('stackedChart island', () => {
     expect(el.textContent).toContain('body:foo');
   });
 
-  it('preserves data-testid="stacked-chart-detailed" on the Detailed link', () => {
-    // Load-bearing: Playwright e2e test clicks via this exact testid.
+  it('preserves data-role="stacked-chart-detailed" on the Detailed link', () => {
+    // Load-bearing: Playwright e2e test clicks via this exact data-role.
     const el = makeRoot();
     render(
       <StackedChart
@@ -39,7 +39,7 @@ describe('stackedChart island', () => {
       />,
       el,
     );
-    expect(el.querySelector('[data-testid="stacked-chart-detailed"]')).not.toBeNull();
+    expect(el.querySelector('[data-role="stacked-chart-detailed"]')).not.toBeNull();
   });
 
   it('omits the Detailed link when no onDetailed handler is provided', () => {
@@ -48,7 +48,7 @@ describe('stackedChart island', () => {
       <StackedChart doc={makeDoc([{ description: 'x', percentage: 50 }])} maxScore={1} />,
       el,
     );
-    expect(el.querySelector('[data-testid="stacked-chart-detailed"]')).toBeNull();
+    expect(el.querySelector('[data-role="stacked-chart-detailed"]')).toBeNull();
   });
 
   it('clicking Detailed fires onDetailed and prevents default', () => {
@@ -62,7 +62,7 @@ describe('stackedChart island', () => {
       />,
       el,
     );
-    const link = el.querySelector('[data-testid="stacked-chart-detailed"]');
+    const link = el.querySelector('[data-role="stacked-chart-detailed"]');
     link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
     expect(onDetailed).toHaveBeenCalledTimes(1);
   });

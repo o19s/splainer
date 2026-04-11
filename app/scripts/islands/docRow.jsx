@@ -45,7 +45,7 @@ export function DocRow({ doc, maxScore, onShowDoc, onShowDetailed }) {
   }
 
   return (
-    <div class="row docRow" data-testid="doc-row">
+    <div class="row docRow" data-role="doc-row">
       <div class="col-md-4">
         <h4>{doc.score()}</h4>
         <StackedChart doc={doc} maxScore={maxScore} onDetailed={onShowDetailed} />
@@ -67,7 +67,11 @@ export function DocRow({ doc, maxScore, onShowDoc, onShowDetailed }) {
         )}
         {snippetEntries.map((fieldName) => (
           <div key={fieldName}>
-            <label class="fieldLabel">{fieldName}: </label>
+            {/* {' '} forces a preserved text node between the label and the
+                span. Without it, innerText collapses the boundary whitespace
+                and the rendered output reads "title:Foo" instead of
+                "title: Foo" */}
+            <label class="fieldLabel">{fieldName}:</label>{' '}
             <SanitizedSpan html={snippets[fieldName]} />
           </div>
         ))}

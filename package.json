@@ -48,6 +48,8 @@
     "stryker:dry": "stryker run --dryRunOnly",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "test:e2e:audit": "playwright test --project=audit-prod --project=audit-local && node scripts/audit-diff.js",
+    "test:e2e:audit:diff": "node scripts/audit-diff.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",

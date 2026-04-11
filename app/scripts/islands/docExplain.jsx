@@ -124,7 +124,7 @@ export function DocExplain({
   return (
     <dialog ref={ref} class="detailed-explain-dialog">
       <div style={{ margin: '20px', minWidth: '600px' }}>
-        <p class="modal-header" data-testid="detailed-explain-modal">
+        <p class="modal-header" data-role="detailed-explain-modal">
           Explain for: <i>{doc && doc.title}</i>
           {altDoc && (
             <span>
@@ -142,7 +142,7 @@ export function DocExplain({
             ×
           </button>
         </p>
-        <div class="modal-body" data-testid="detailed-explain-body">
+        <div class="modal-body" data-role="detailed-explain-body">
           <div class="row">
             <div>
               {/* Bootstrap 3 .nav-tabs targets > li > a specifically;
