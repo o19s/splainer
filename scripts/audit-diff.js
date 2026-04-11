@@ -47,8 +47,13 @@ const color = process.stdout.isTTY
 // Pair up prod/local directories by scenario name.
 function findScenarios() {
   if (!existsSync(RESULTS_DIR)) {
+    // Exit 1 — the audit pipeline is `test:e2e:audit = playwright && diff`,
+    // so a missing results dir here means playwright somehow succeeded
+    // without producing output, which is a real pipeline failure that
+    // CI and humans need to see. Exit 0 would let the `&&` chain report
+    // success on an audit that produced no data.
     console.error(`${RESULTS_DIR}/ not found — run the audit first.`);
-    process.exit(0);
+    process.exit(1);
   }
   const pairs = {};
   for (const entry of readdirSync(RESULTS_DIR)) {

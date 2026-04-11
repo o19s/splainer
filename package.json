@@ -13,7 +13,7 @@
     "bootstrap": "~3.4.1",
     "dompurify": "^3.3.3",
     "preact": "^10.29.1",
-    "splainer-search": "https://github.com/o19s/splainer-search.git#2754904ba122c33ccf995d3536623d0aaa231cf8",
+    "splainer-search": "https://github.com/o19s/splainer-search.git#975cd98655bde57f29ae780e016218672476bfed",
     "urijs": "^1.19.7"
   },
   "devDependencies": {

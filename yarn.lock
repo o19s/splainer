@@ -3148,10 +3148,9 @@ source-map@~0.7.4:
   resolved "https://registry.npmjs.org/source-map/-/source-map-0.7.6.tgz"
   integrity sha512-i5uvt8C3ikiWeNZSVZNWcfZPItFQOsYTUAOkcUPGd8DqDy1uOUikjt5dG+uRlwyvR108Fb9DOd4GvXfT0N2/uQ==
 
-"splainer-search@https://github.com/o19s/splainer-search.git#2754904ba122c33ccf995d3536623d0aaa231cf8":
+"splainer-search@https://github.com/o19s/splainer-search.git#975cd98655bde57f29ae780e016218672476bfed":
   version "3.0.0"
-  resolved "git+ssh://git@github.com/o19s/splainer-search.git#2754904ba122c33ccf995d3536623d0aaa231cf8"
-  integrity sha512-2rAyqSKipV7cV3LtbWOClJzB4JiSe/2bUiCF3URPW+/yTOQlG3sSDat/rHaJbZ2mLleYFQJJCaGe6CLuF1NKcg==
+  resolved "https://github.com/o19s/splainer-search.git#975cd98655bde57f29ae780e016218672476bfed"
   dependencies:
     urijs "^1.19.7"
 

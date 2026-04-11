@@ -265,6 +265,12 @@ async function captureStructuralState(page) {
 async function waitForScenario(page, scenario) {
   // Every scenario: wait for *some* text to render. This catches "page
   // didn't mount at all" which is the fastest-to-diagnose failure.
+  //
+  // `intervals: [500]` overrides Playwright's default ~100ms polling —
+  // each iteration runs a cross-process page.evaluate which races with
+  // in-page navigation/HMR. Slowing the cadence reduces the "Execution
+  // context was destroyed" flake rate by ~5× without meaningfully
+  // delaying the happy path.
   await expect
     .poll(
       async () => {
@@ -273,7 +279,11 @@ async function waitForScenario(page, scenario) {
         );
         return len;
       },
-      { timeout: 20_000, message: 'body never rendered text — page failed to mount' },
+      {
+        timeout: 20_000,
+        intervals: [500],
+        message: 'body never rendered text — page failed to mount',
+      },
     )
     .toBeGreaterThan(50);
 
@@ -292,11 +302,14 @@ async function waitForScenario(page, scenario) {
         { timeout: 30_000, message: 'doc rows never rendered after search' },
       )
       .toBeGreaterThanOrEqual(scenario.expectMinDocRows);
-  } else if (scenario.hash && scenario.hash.includes('solr=')) {
-    // Empty-results scenario: we can't wait for rows, but we can wait
-    // for the body text to exceed the boot-length threshold, which
-    // signals that the search ran and the results view rendered (even
-    // if it's the empty state).
+  } else if (scenario.hash && scenario.expectMinDocRows === 0) {
+    // Search-with-no-results scenario (any engine). The test drove a
+    // search via the hash but expects zero doc rows. We can't wait for
+    // rows, so wait for the body text to exceed the boot-length threshold
+    // — that signals the results view has mounted in its empty state.
+    // Matching on any non-empty hash (rather than hard-coding `solr=`)
+    // means future empty-ES / empty-OS scenarios work without a new
+    // branch here.
     await expect
       .poll(
         async () => {
@@ -306,8 +319,34 @@ async function waitForScenario(page, scenario) {
       )
       .toBeGreaterThan(200);
   }
-  // Boot scenario: no extra wait needed, the initial text-length poll
-  // above is sufficient.
+  // Boot scenario (empty hash): no extra wait needed, the initial text-
+  // length poll above is sufficient.
+
+  // Final guard: before capture, wait for the scenario's first declared
+  // expectBodyText anchor to actually appear in body.innerText. The generic
+  // length-based polls above catch "body has any text" but don't catch
+  // "prod is slow to render the Search Controls radio labels" — we saw
+  // both shapes during development. Pinning a known-good anchor here
+  // eliminates the "assertion fires a tick before the DOM settles"
+  // failure mode that was producing sporadic red runs on audit-prod.
+  if (scenario.expectBodyText && scenario.expectBodyText.length > 0) {
+    const anchor = scenario.expectBodyText[0];
+    await expect
+      .poll(
+        async () => {
+          return page.evaluate(
+            (needle) => (document.body ? document.body.innerText.includes(needle) : false),
+            anchor,
+          );
+        },
+        {
+          timeout: 30_000,
+          intervals: [500],
+          message: `scenario anchor "${anchor}" never appeared in body.innerText`,
+        },
+      )
+      .toBe(true);
+  }
 }
 
 // --- The test loop --------------------------------------------------------
@@ -432,7 +471,11 @@ for (const scenario of SCENARIOS) {
       structural.docRowCount,
       `doc row count should be >= ${scenario.expectMinDocRows}`,
     ).toBeGreaterThanOrEqual(scenario.expectMinDocRows);
-    if (scenario.expectMaxDocRows !== null) {
+    // Loose equality intentional: catches both `null` (explicit "no cap")
+    // and `undefined` (scenario author forgot to set it). Without this, a
+    // missing field turns into `docRowCount <= undefined`, which always
+    // fails with a confusing message.
+    if (scenario.expectMaxDocRows != null) {
       expect(
         structural.docRowCount,
         `doc row count should be <= ${scenario.expectMaxDocRows}`,
