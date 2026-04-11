@@ -40,7 +40,7 @@ function lsSet(key, value) {
 }
 
 // Cache the support check — avoids a write+remove test on every save().
-var _lsSupported = (function () {
+function detectLocalStorage() {
   try {
     var k = '__splainer_ls_test__';
     localStorage.setItem(k, '1');
@@ -49,7 +49,8 @@ var _lsSupported = (function () {
   } catch (_e) {
     return false;
   }
-})();
+}
+var _lsSupported = detectLocalStorage();
 
 // URL hash helpers — uses encodeURIComponent (spaces as %20) instead of
 // URLSearchParams (spaces as +) for back-compat with existing bookmarks.
