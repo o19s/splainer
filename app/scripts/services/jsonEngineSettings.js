@@ -23,7 +23,7 @@ export function parseUrl(url) {
   var result = { url: uri };
 
   if (parser.search.length > 0) {
-    var searchString = parser.search.substr(1);
+    var searchString = parser.search.slice(1);
     var queries = searchString.split('&');
 
     queries.forEach(function (query) {

@@ -12,10 +12,10 @@ const flush = async () => {
   await Promise.resolve();
 };
 
-// jsdom has no window.ace, so the ES/OS tabs fall back to the textarea
-// renderer (matches the fallback path in startUrl.jsx). The data-role
-// attributes are shared between the Ace and textarea paths, so these
-// specs exercise the same locators browser code sees.
+// Under jsdom, the CM6_AVAILABLE guard in startUrl.jsx is false, so the
+// ES/OS tabs render the textarea fallback. The data-role attributes are
+// shared between the CodeMirror and textarea paths, so these specs
+// exercise the same locators browser code sees.
 
 function makeSettings(overrides = {}) {
   return {

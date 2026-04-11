@@ -9,10 +9,16 @@
  */
 import { render } from 'preact';
 import { useState } from 'preact/hooks';
- 
+
 import { CustomHeaders } from './customHeaders.jsx';
-import { useAceEditor } from './useAceEditor.js';
+import { useCodeMirror } from './useCodeMirror.js';
 import { formatJson } from './formatJson.js';
+
+// jsdom detect: Vitest's jsdom env sets navigator.userAgent to include "jsdom".
+const CM6_AVAILABLE =
+  typeof window !== 'undefined' &&
+  typeof navigator !== 'undefined' &&
+  !/jsdom/i.test(navigator.userAgent || '');
 
 // Default start URLs — seeded on first mount only when empty, so
 // returning users keep their last-used URL from localStorage.
@@ -22,10 +28,8 @@ const DEFAULT_URLS = {
   os: 'https://reader:reader@quepid-opensearch.dev.o19s.com:9000/tmdb/_search',
 };
 
- 
-function AceArgsEditor({ value, onChange, engine }) {
-  const containerRef = useAceEditor(value, onChange, {
-    mode: 'ace/mode/json',
+function CodeMirrorArgsEditor({ value, onChange, engine }) {
+  const containerRef = useCodeMirror(value, onChange, {
     useWrapMode: false,
     tabSize: 2,
   });
@@ -80,8 +84,8 @@ function EngineAdvanced({ engine, settings, onRerender }) {
           />
         </div>
       )}
-      {typeof window !== 'undefined' && window.ace ? (
-        <AceArgsEditor
+      {CM6_AVAILABLE ? (
+        <CodeMirrorArgsEditor
           value={ws.searchArgsStr}
           onChange={(v) => {
             ws.searchArgsStr = v;

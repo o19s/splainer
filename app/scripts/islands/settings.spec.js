@@ -3,8 +3,9 @@ import { describe, it, expect, vi } from 'vitest';
 import { mount, unmount } from './settings.jsx';
 import { makeRoot } from '../test-helpers/factories.js';
 
-// jsdom has no window.ace, so the search-args editor falls back to a
-// textarea. Section toggles: Engine + Headers collapsed, rest expanded.
+// The settings island uses a plain textarea for the search-args editor
+// (not the CodeMirror hook — settings was never wired up to Ace either).
+// Section toggles: Engine + Headers collapsed, rest expanded.
 
 // Preact flushes hook state updates on a microtask, so any test that
 // asserts on DOM produced by a state change (toggle click → conditional

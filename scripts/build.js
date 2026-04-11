@@ -4,9 +4,9 @@
  *
  * Phase 13b: uses Vite's standard build to process index.html and main.js
  * as ESM entry points. Vite bundles all islands, services, and app scripts
- * into hashed JS/CSS chunks in dist/.
+ * (including CodeMirror 6) into hashed JS/CSS chunks in dist/.
  *
- * Vendor scripts loaded via plain <script> tags (ace, urijs, splainer-search)
+ * Vendor scripts loaded via plain <script> tags (urijs, splainer-search)
  * are NOT processed by Vite — they're copied into dist/node_modules/ so
  * the HTML references resolve.
  *
@@ -33,11 +33,6 @@ await build({
 console.log('Copying vendor files...');
 
 const vendorFiles = [
-  // Ace editor
-  'ace-builds/src-min-noconflict/ace.js',
-  'ace-builds/src-min-noconflict/ext-language_tools.js',
-  'ace-builds/src-min-noconflict/worker-json.js',
-  'ace-builds/src-min-noconflict/mode-json.js',
   // Bootstrap CSS (loaded via <link> in HTML — Vite may inline or copy it,
   // but the node_modules reference in help.html needs this too)
   'bootstrap/dist/css/bootstrap.css',

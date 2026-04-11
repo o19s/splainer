@@ -103,17 +103,14 @@
     <div id="splainer-modal-root"></div>
 
     <!-- Vendor scripts — these are IIFEs/UMDs with no ESM exports.
-         They must load (and execute) before main.js imports run. -->
-    <script src="node_modules/ace-builds/src-min-noconflict/ace.js"></script>
-    <script src="node_modules/ace-builds/src-min-noconflict/ext-language_tools.js"></script>
-    <!-- urijs MUST load before the wired IIFE: splainer-search 3.0.0 expects
-         globalThis.URI at call time. -->
+         They must load (and execute) before main.js imports run.
+         urijs MUST load before the wired IIFE: splainer-search 3.0.0
+         expects globalThis.URI at call time. -->
     <script src="node_modules/urijs/src/URI.js"></script>
     <script src="node_modules/splainer-search/dist/splainer-search-wired.js"></script>
 
-    <!-- Application entry point — imports all islands, services, panes, and
-         ace-config as ES modules. Replaces the 15+ individual script tags
-         from the IIFE architecture. -->
+    <!-- Application entry point — imports all islands, services, and panes
+         as ES modules. CodeMirror 6 is bundled into main.js by Vite. -->
     <script type="module" src="scripts/main.js"></script>
   </body>
 </html>

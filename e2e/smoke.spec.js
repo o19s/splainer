@@ -149,15 +149,14 @@ test.describe('splainer smoke', () => {
   test('customHeaders island renders and updates the editor body in a real browser', async ({
     page,
   }) => {
-    // PR 6 coverage: the customHeaders Preact island is used in 3 places
-    // (startUrl ES tab, startUrl OS tab, dev sidebar) and Vitest only
-    // covers the textarea-fallback path under jsdom. This test opens the
-    // ES tab in a real browser (where window.ace is loaded), expands the
-    // Advanced Settings section, and exercises the island end-to-end —
-    // verifying that (a) the island mounts via main.js,
-    // (b) the Ace `useEffect` lifecycle works (no pageerror), and
-    // (c) picking a header type populates the editor body via the
-    // template side effect.
+    // The customHeaders Preact island is used in 3 places (startUrl ES tab,
+    // startUrl OS tab, dev sidebar). Vitest only covers the textarea-fallback
+    // path under jsdom, so this test opens the ES tab in a real browser (where
+    // CodeMirror 6 is active), expands the Advanced Settings section, and
+    // exercises the island end-to-end — verifying that (a) the island mounts
+    // via main.js, (b) the useCodeMirror useEffect lifecycle works (no
+    // pageerror), and (c) picking a header type populates the editor body
+    // via the template side effect.
     await page.goto('/');
     await page.locator('a[href="#es_"]').click();
     await page.locator('#es_').getByRole('button', { name: 'Advanced Settings' }).click();
@@ -177,10 +176,10 @@ test.describe('splainer smoke', () => {
     // the editor body with the API Key template via the side effect.
     await select.selectOption('API Key');
 
-    // Read what actually landed in the settings store and Ace editor after
-    // the change. Polled because the change-handler → Preact-render →
-    // useEffect → ace.setValue chain takes a few microtasks to settle
-    // and Playwright's selectOption returns before it's done.
+    // Read what actually landed in the settings store and editor after the
+    // change. Polled because the change-handler → Preact-render → useEffect
+    // → CM6 dispatch chain takes a few microtasks to settle and Playwright's
+    // selectOption returns before it's done.
     await expect
       .poll(async () =>
         page.evaluate(() => {
@@ -191,9 +190,11 @@ test.describe('splainer smoke', () => {
           // store is wrong" bug class).
           const select = document.querySelector('#es_ [data-role="header-type"]');
           const container = document.querySelector('#es_ [data-role="header-editor"]');
-          const aceVal =
-            window.ace && container && container.tagName !== 'TEXTAREA'
-              ? window.ace.edit(container).getValue()
+          // CodeMirror 6: useCodeMirror stashes the EditorView on the
+          // container as __cmView. Textarea fallback path reads .value.
+          const editorVal =
+            container && container.__cmView
+              ? container.__cmView.state.doc.toString()
               : container && container.value;
           const storeHeaderType = window.SplainerServices
             ? window.SplainerServices.settingsStore.settings.es.headerType
@@ -201,14 +202,14 @@ test.describe('splainer smoke', () => {
           return {
             domHeaderType: select && select.value,
             storeHeaderType: storeHeaderType,
-            aceBody: aceVal,
+            editorBody: editorVal,
           };
         }),
       )
       .toEqual({
         domHeaderType: 'API Key',
         storeHeaderType: 'API Key',
-        aceBody: expect.stringContaining('Authorization'),
+        editorBody: expect.stringContaining('Authorization'),
       });
   });
 

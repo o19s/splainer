@@ -1,11 +1,10 @@
 /**
  * Application entry point. Imports all islands and services as ES modules.
- * Vendor scripts without ESM exports (splainer-search, urijs, ace) are
- * loaded via <script> tags and accessed from window.*.
+ * Vendor scripts without ESM exports (splainer-search, urijs) are loaded
+ * via <script> tags and accessed from window.*.
  */
 
 import { openEast, closeEast, toggleEast } from './panes.js';
-import './ace-config.js';
 import { mount as mountSearchResults } from './islands/searchResults.jsx';
 import { mount as mountStartUrl } from './islands/startUrl.jsx';
 import { mount as mountSettings } from './islands/settings.jsx';
