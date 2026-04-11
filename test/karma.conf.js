@@ -64,6 +64,7 @@ module.exports = function (config) {
       'app/scripts/services/solrSettings.js',
       'app/scripts/services/splSearch.js',
       'app/scripts/services/settingsStore.js',
+      'app/scripts/services/Search.js',
       'app/scripts/services/*.spec.js',
     ],
 

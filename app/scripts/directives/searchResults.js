@@ -83,11 +83,22 @@ angular.module('splain-app').directive('searchResultsIsland', [
           });
         }
 
-        // Pagination — wraps currSearch.page() in $apply so the $q
-        // deferred chain processes within a digest cycle.
+        // Pagination — the synchronous part (setting self.paging = true,
+        // reassigning self.searcher) runs inside $apply so the first
+        // digest sees the loading state. The async completion (native
+        // Promise from splainer-search 3.0.0) fires as a microtask
+        // outside Angular's digest; $applyAsync coalesces the state
+        // mutations (docs, paging, grouped) into the next digest.
         function onPage() {
           scope.$apply(function () {
-            scope.currSearch.page();
+            var promise = scope.currSearch.page();
+            if (promise && typeof promise.then === 'function') {
+              promise.then(function () {
+                scope.$applyAsync();
+              }, function () {
+                scope.$applyAsync();
+              });
+            }
           });
         }
 

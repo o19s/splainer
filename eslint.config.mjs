@@ -10,7 +10,7 @@
  * (e.g. under test/mock/) are linted together with specs via the test/ config block.
  * Playwright specs under e2e/ are ESM with Node + browser globals (callbacks run in the page).
  * Pure-JS service modules under app/scripts/services/ (esSettings.js, osSettings.js,
- * solrSettings.js, splSearch.js, settingsStore.js) are ESM (Vite islands bundle); they
+ * solrSettings.js, splSearch.js, settingsStore.js, Search.js) are ESM (Vite islands bundle); they
  * override sourceType for those paths.
  * Co-located Vitest specs (*.spec.js) in that folder import from vitest and those modules,
  * so they use sourceType: module as well.
@@ -70,6 +70,7 @@ export default [
       'app/scripts/services/solrSettings.js',
       'app/scripts/services/splSearch.js',
       'app/scripts/services/settingsStore.js',
+      'app/scripts/services/Search.js',
     ],
     languageOptions: {
       ecmaVersion: 2022,
