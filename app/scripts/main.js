@@ -216,7 +216,7 @@ function renderAll() {
 
 function updateChevrons() {
   tweakChevronLeft.className = sidebarOpen ? 'glyphicon glyphicon-chevron-left' : '';
-  tweakChevronRight.className = 'glyphicon glyphicon-chevron-right';
+  tweakChevronRight.className = sidebarOpen ? '' : 'glyphicon glyphicon-chevron-right';
 }
 
 // Event bindings
