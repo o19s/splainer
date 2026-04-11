@@ -1,12 +1,11 @@
-// Vite dev server config — PR 4a of the Angular removal migration.
+// Vite dev server config.
 //
-// Goal: prove the existing Angular 1 app boots under Vite's dev server
-// without changing any application code, while Grunt remains the
-// production build and the default `npm test` runner. Run with:
+// Serves the app from app/ on http://localhost:5173. The app uses plain
+// <script> tags (IIFE globals, not ES modules), so appType is 'mpa' to
+// prevent Vite from injecting HMR or transforming script tags.
 //
-//   yarn dev:vite        # serves app/ on http://localhost:5173
-//
-// We do NOT use Vite for the production build yet. That's PR 4b.
+//   yarn dev             # start dev server
+//   yarn build           # production build (see scripts/build.mjs)
 import { defineConfig } from 'vite';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
@@ -15,8 +14,7 @@ import { createReadStream, existsSync, statSync } from 'node:fs';
 const repoRoot = dirname(fileURLToPath(import.meta.url));
 const nodeModulesDir = resolve(repoRoot, 'node_modules');
 
-// Mirror the Grunt connect middleware (Gruntfile.js:75) that mounts
-// /node_modules → ./node_modules. The Angular index.html references
+// Bridge /node_modules → ./node_modules. The index.html references
 // vendor scripts as `node_modules/...` paths relative to app/, but
 // node_modules actually lives at the repo root (one level up from
 // the Vite root). This middleware bridges that gap.
@@ -43,7 +41,7 @@ function nodeModulesMiddleware() {
 
 export default defineConfig({
   root: 'app',
-  // The Angular app uses plain <script src="..."> tags, not ES modules.
+  // The app uses plain <script src="..."> tags, not ES modules.
   // 'mpa' tells Vite not to inject HMR client into HTML and not to try
   // ESM-transforming arbitrary script tags.
   appType: 'mpa',

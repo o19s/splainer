@@ -1,15 +1,9 @@
-// Playwright config — smoke flows against the current Angular app.
-// These tests are the safety net for the Angular → splainer-search 3.0.0
-// migration: they exercise user-visible behavior and should survive any
-// framework swap. See MIGRATION_OPTIONS.md (PR 3).
+// Playwright config — smoke flows exercising user-visible behavior.
+// These tests are the safety net for refactors and should survive any
+// framework swap. See MIGRATION_CHANGES.md.
 import { defineConfig, devices } from '@playwright/test';
 
-// Default: grunt serve on :9000. Override with SPLAINER_DEV=vite to run
-// the suite against the Vite dev server on :5173 — used during PR 4a
-// to prove Angular boots under Vite without making Vite the default yet.
-const useVite = process.env.SPLAINER_DEV === 'vite';
-const baseURL = useVite ? 'http://localhost:5173' : 'http://localhost:9000';
-const serverCommand = useVite ? 'yarn dev:vite' : 'grunt serve';
+const baseURL = 'http://localhost:5173';
 
 export default defineConfig({
   testDir: './e2e',
@@ -28,7 +22,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: serverCommand,
+    command: 'yarn dev:vite',
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

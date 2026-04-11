@@ -171,9 +171,7 @@
   }
 
   function onSearch(engine) {
-    if (window.jQuery) {
-      window.jQuery(document).trigger('openEast');
-    }
+    document.dispatchEvent(new CustomEvent('openEast'));
     if (engine === 'solr') runSolr();
     else if (engine === 'es') runEs();
     else if (engine === 'os') runOs();
@@ -239,9 +237,7 @@
   var brandBtn = document.getElementById('brand-btn');
   brandBtn.addEventListener('click', function (e) {
     e.preventDefault();
-    if (window.jQuery) {
-      window.jQuery(document).trigger('closeEast');
-    }
+    document.dispatchEvent(new CustomEvent('closeEast'));
     sidebarOpen = false;
     updateChevrons();
     search.reset();
@@ -251,9 +247,7 @@
     e.preventDefault();
     sidebarOpen = !sidebarOpen;
     updateChevrons();
-    if (window.jQuery) {
-      window.jQuery(document).trigger('toggleEast');
-    }
+    document.dispatchEvent(new CustomEvent('toggleEast'));
   });
 
   // --- Settings reactivity (replaces $watch + $applyAsync) ---

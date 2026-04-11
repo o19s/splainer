@@ -3,7 +3,6 @@
  * Code for managing the fixed slide-out drawer
  * */
 
-/* global $ */
 (function () {
   var slider = document.getElementsByClassName('east-slider')[0];
 
@@ -50,13 +49,13 @@
       slider.onmousedown = grabSlider;
       document.onmouseup = releaseSlider;
       moveEastTo(container.offsetWidth - 300);
-      $(slider).show();
-      $(east).show();
+      slider.style.display = 'block';
+      east.style.display = 'block';
     } else {
       slider.onmousedown = null;
       document.onmouseup = null;
-      $(slider).hide();
-      $(east).hide();
+      slider.style.display = 'none';
+      east.style.display = 'none';
       moveEastTo(container.offsetWidth);
     }
   };
@@ -73,7 +72,7 @@
     }
   };
 
-  $(window).on('resize', function () {
+  window.addEventListener('resize', function () {
     if (toggled) {
       moveEastTo(container.offsetWidth - 300);
     } else {
@@ -81,7 +80,7 @@
     }
   });
 
-  $(document).on('toggleEast', toggleEast);
-  $(document).on('openEast', openEast);
-  $(document).on('closeEast', closeEast);
+  document.addEventListener('toggleEast', toggleEast);
+  document.addEventListener('openEast', openEast);
+  document.addEventListener('closeEast', closeEast);
 })();

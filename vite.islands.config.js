@@ -22,9 +22,9 @@
 // at five-plus it probably isn't. DX/Tooling's PR 8 ask, noted here so PR
 // 9 doesn't re-derive the reasoning.
 //
-// Run `yarn build:islands` once before serving (grunt serve) or testing
-// (npm test). For dev iteration, run `yarn build:islands:watch` in a
-// separate terminal alongside `grunt serve` or `yarn dev:vite`.
+// Run `yarn build:islands` once before serving or testing. For dev
+// iteration, run `yarn build:islands:watch` in a separate terminal
+// alongside `yarn dev`.
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 

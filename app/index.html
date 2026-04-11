@@ -6,22 +6,12 @@
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width" />
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-    <!-- build:css(app) styles/vendor.css -->
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css" />
-    <!-- endbuild -->
-    <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css" />
     <link rel="stylesheet" href="styles/panes.css" />
     <link rel="stylesheet" href="styles/stackedChart.css" />
-    <!-- endbuild -->
   </head>
   <body>
-    <!--[if lt IE 7]>
-      <p class="browsehappy">
-        You are using an <strong>outdated</strong> browser. Please
-        <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.
-      </p>
-    <![endif]-->
     <!-- Add your site or application content here -->
     <div class="pane_container">
       <div class="pane_main">
@@ -53,7 +43,6 @@
               <a
                 id="help-link"
                 style="display:none"
-                data-toggle="tooltip"
                 title="Take a Tour"
                 href="help.html"
                 target="_blank"
@@ -133,35 +122,21 @@
       ga('send', 'pageview');
     </script>
 
-    <!-- excluded from vendor.js below to be replaced with cdn links -->
-    <script src="node_modules/jquery/dist/jquery.js"></script>
-
-    <!-- build:js(app) scripts/oldieshim.js -->
-    <!--[if lt IE 9]>
-      <script src="node_modules/es5-shim/es5-shim.js"></script>
-      <script src="node_modules/json3/lib/json3.min.js"></script>
-    <![endif]-->
-    <!-- endbuild -->
-    <!-- build:js(app) scripts/vendor.js -->
+    <!-- Vendor scripts -->
     <script src="node_modules/ace-builds/src-min-noconflict/ace.js"></script>
     <script src="node_modules/ace-builds/src-min-noconflict/ext-language_tools.js"></script>
-
-    <script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
-    <script src="node_modules/json3/lib/json3.js"></script>
     <!-- urijs MUST load before the wired IIFE: splainer-search 3.0.0 expects
          globalThis.URI at call time. -->
     <script src="node_modules/urijs/src/URI.js"></script>
     <script src="node_modules/splainer-search/dist/splainer-search-wired.js"></script>
-    <!-- Preact (+ hooks) for the post-Angular view islands.
+    <!-- Preact (+ hooks) for the view islands.
          UMD builds attach to window.preact and window.preactHooks. The .jsx
          island sources are pre-built into IIFEs by `yarn build:islands`
          (vite.islands.config.js) which references these as externals. -->
     <script src="node_modules/preact/dist/preact.umd.js"></script>
     <script src="node_modules/preact/hooks/dist/hooks.umd.js"></script>
 
-    <!-- endbuild -->
-
-    <!-- build:js({.tmp,app}) scripts/scripts.js -->
+    <!-- App scripts -->
     <script src="scripts/panes.js"></script>
     <!-- Preact islands — built from .jsx sources by `yarn build:islands`
          (see vite.islands.config.js). Each file attaches itself to
@@ -181,10 +156,8 @@
     <script src="scripts/services/dist/splSearch.js"></script>
     <script src="scripts/services/dist/settingsStore.js"></script>
     <script src="scripts/services/dist/Search.js"></script>
-    <!-- Bootstrap script — wires services and islands together. Replaces
-         Angular module wiring, SearchResultsCtrl, and all directive shims. -->
+    <!-- Bootstrap script — wires services and islands together. -->
     <script src="scripts/bootstrap.js"></script>
     <script src="scripts/ace-config.js"></script>
-    <!-- endbuild -->
   </body>
 </html>
