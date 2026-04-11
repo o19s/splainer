@@ -30,7 +30,6 @@ var esExplainExtractorSvc = wired.esExplainExtractorSvc;
 // Settings store singleton
 var store = createSettingsStore();
 
-// Curried Search constructor (packs the deps bag)
 var deps = {
   solrUrlSvc: solrUrlSvc,
   fieldSpecSvc: fieldSpecSvc,
@@ -38,12 +37,8 @@ var deps = {
   normalDocsSvc: normalDocsSvc,
 };
 
-function WrappedSearch(searchSettings, overridingExplains, _states, _engines) {
-  return new Search(deps, searchSettings, overridingExplains, _states, _engines);
-}
-
 // App state
-var currSearch = createSearch(WrappedSearch, store.settings);
+var currSearch = createSearch(Search, deps, store.settings);
 var search = {};
 
 search.search = function () {
@@ -54,7 +49,7 @@ search.search = function () {
 };
 
 search.reset = function () {
-  currSearch = createSearch(WrappedSearch, store.settings);
+  currSearch = createSearch(Search, deps, store.settings);
   renderAll();
 };
 

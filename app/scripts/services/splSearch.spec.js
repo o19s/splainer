@@ -20,16 +20,19 @@ describe('splSearch', () => {
   });
 
   describe('createSearch', () => {
-    function FakeSearch(settings, overridingExplains, st, eng) {
+    function FakeSearch(deps, settings, overridingExplains, st, eng) {
+      this._deps = deps;
       this._settings = settings;
       this._overridingExplains = overridingExplains;
       this._states = st;
       this._engines = eng;
     }
 
+    var fakeDeps = { tag: 'deps' };
+
     it('creates a Search instance with state constants attached', () => {
       var settings = { whichEngine: 'solr' };
-      var search = createSearch(FakeSearch, settings);
+      var search = createSearch(FakeSearch, fakeDeps, settings);
 
       expect(search).toBeInstanceOf(FakeSearch);
       expect(search.NO_SEARCH).toBe(states.NO_SEARCH);
@@ -38,10 +41,11 @@ describe('splSearch', () => {
       expect(search.IN_ERROR).toBe(states.IN_ERROR);
     });
 
-    it('passes states and engines to the Search constructor', () => {
+    it('passes deps, states and engines to the Search constructor', () => {
       var settings = { whichEngine: 'es' };
-      var search = createSearch(FakeSearch, settings);
+      var search = createSearch(FakeSearch, fakeDeps, settings);
 
+      expect(search._deps).toBe(fakeDeps);
       expect(search._states).toBe(states);
       expect(search._engines).toBe(engines);
     });
@@ -49,21 +53,21 @@ describe('splSearch', () => {
     it('passes overridingExplains through', () => {
       var settings = { whichEngine: 'solr' };
       var explains = { doc1: 'explain' };
-      var search = createSearch(FakeSearch, settings, explains);
+      var search = createSearch(FakeSearch, fakeDeps, settings, explains);
 
       expect(search._overridingExplains).toBe(explains);
     });
 
     it('defaults whichEngine to solr when unset', () => {
       var settings = {};
-      createSearch(FakeSearch, settings);
+      createSearch(FakeSearch, fakeDeps, settings);
 
       expect(settings.whichEngine).toBe('solr');
     });
 
     it('preserves existing whichEngine', () => {
       var settings = { whichEngine: 'es' };
-      createSearch(FakeSearch, settings);
+      createSearch(FakeSearch, fakeDeps, settings);
 
       expect(settings.whichEngine).toBe('es');
     });

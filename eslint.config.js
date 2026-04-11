@@ -18,6 +18,7 @@ export default [
     ignores: [
       'node_modules/**',
       'dist/**',
+      '.test-dist/**',
       '.tmp/**',
       'coverage/**',
       'solr-splainer-package/**',

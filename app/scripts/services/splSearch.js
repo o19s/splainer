@@ -1,5 +1,5 @@
 /**
- * Search state constants and factory. createSearch(SearchCtor, settings)
+ * Search state constants and factory. createSearch(Search, deps, settings)
  * produces a Search instance with state constants attached.
  */
 
@@ -16,8 +16,8 @@ export var engines = {
   OPENSEARCH: 'os',
 };
 
-export function createSearch(Search, searchSettings, overridingExplains) {
-  var search = new Search(searchSettings, overridingExplains, states, engines);
+export function createSearch(Search, deps, searchSettings, overridingExplains) {
+  var search = new Search(deps, searchSettings, overridingExplains, states, engines);
 
   search.NO_SEARCH = states.NO_SEARCH;
   search.DID_SEARCH = states.DID_SEARCH;
