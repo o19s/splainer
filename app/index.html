@@ -8,7 +8,6 @@
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(app) styles/vendor.css -->
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="node_modules/ng-json-explorer/dist/angular-json-explorer.css" />
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css" />
@@ -16,7 +15,7 @@
     <link rel="stylesheet" href="styles/stackedChart.css" />
     <!-- endbuild -->
   </head>
-  <body ng-app="splain-app">
+  <body>
     <!--[if lt IE 7]>
       <p class="browsehappy">
         You are using an <strong>outdated</strong> browser. Please
@@ -24,11 +23,11 @@
       </p>
     <![endif]-->
     <!-- Add your site or application content here -->
-    <div class="pane_container" ng-controller="SearchResultsCtrl">
+    <div class="pane_container">
       <div class="pane_main">
-        <header class="navbar-inverse navbar-secondary clearfix ng-scope">
+        <header class="navbar-inverse navbar-secondary clearfix">
           <a
-            ng-show="currSearch.state === currSearch.NO_SEARCH"
+            id="fork-ribbon"
             style="z-index: 10000"
             href="https://github.com/o19s/splainer"
             ><img
@@ -41,8 +40,7 @@
             <h3
               class="navbar-brand"
               style="cursor: pointer"
-              dispatch-on-click="closeEast"
-              ng-click="search.reset()"
+              id="brand-btn"
             >
               <a style="color: inherit; text-decoration: inherit" href="#">Splainer</a>
             </h3>
@@ -53,7 +51,8 @@
           <ul class="nav navbar-nav navbar-right">
             <li>
               <a
-                ng-show="currSearch.state !==currSearch.NO_SEARCH"
+                id="help-link"
+                style="display:none"
                 data-toggle="tooltip"
                 title="Take a Tour"
                 href="help.html"
@@ -64,29 +63,23 @@
             </li>
             <li>
               <a
-                ng-show="currSearch.state !== currSearch.NO_SEARCH"
-                dispatch-on-click="toggleEast"
+                id="tweak-btn"
+                style="display:none"
                 href=""
                 type="button"
-                ng-click="devSettingsSolr.sidebar = !devSettingsSolr.sidebar"
               >
-                <span
-                  ng-class="{true: 'glyphicon glyphicon-chevron-left', false: ''}[devSettingsSolr.sidebar]"
-                ></span>
+                <span id="tweak-chevron-left"></span>
                 Tweak
-                <span
-                  ng-class="{true: 'glyphicon-chevron-right', false: ''}[!devSettingsSolr.sidebar]"
-                  class="glyphicon glyphicon-chevron-right"
-                ></span>
+                <span id="tweak-chevron-right" class="glyphicon glyphicon-chevron-right"></span>
               </a>
             </li>
           </ul>
         </header>
 
         <div class="container">
-          <search-results-island curr-search="currSearch"></search-results-island>
-          <div ng-show="currSearch.state === currSearch.NO_SEARCH">
-            <start-url-island search="search"></start-url-island>
+          <div id="search-results-mount"></div>
+          <div id="start-url-wrapper">
+            <div id="start-url-mount"></div>
           </div>
         </div>
 
@@ -110,12 +103,7 @@
       <div class="east-slider"></div>
       <div class="pane_east">
         <h3>Search Controls</h3>
-        <!-- Settings island (PR 7). Replaces the inline ng-controller="SettingsCtrl"
-             form. The directive shim at app/scripts/directives/settings.js mounts
-             the Preact island built from app/scripts/islands/settings.jsx. The
-             legacy <custom-headers> directive is intentionally still alive for
-             startUrl.html (PRs 8-10); PR 11 deletes both. -->
-        <settings-island curr-search="currSearch" search="search"></settings-island>
+        <div id="settings-mount"></div>
       </div>
     </div>
 
@@ -147,8 +135,6 @@
 
     <!-- excluded from vendor.js below to be replaced with cdn links -->
     <script src="node_modules/jquery/dist/jquery.js"></script>
-    <script src="node_modules/angular/angular.js"></script>
-    <script src="node_modules/angular-sanitize/angular-sanitize.js"></script>
 
     <!-- build:js(app) scripts/oldieshim.js -->
     <!--[if lt IE 9]>
@@ -160,17 +146,13 @@
     <script src="node_modules/ace-builds/src-min-noconflict/ace.js"></script>
     <script src="node_modules/ace-builds/src-min-noconflict/ext-language_tools.js"></script>
 
-    <script src="node_modules/angular-local-storage/dist/angular-local-storage.js"></script>
-    <script src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
-    <script src="node_modules/angular-ui-ace/src/ui-ace.js"></script>
     <script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
     <script src="node_modules/json3/lib/json3.js"></script>
-    <script src="node_modules/ng-json-explorer/dist/angular-json-explorer.js"></script>
     <!-- urijs MUST load before the wired IIFE: splainer-search 3.0.0 expects
          globalThis.URI at call time. -->
     <script src="node_modules/urijs/src/URI.js"></script>
     <script src="node_modules/splainer-search/dist/splainer-search-wired.js"></script>
-    <!-- Preact (+ hooks) for the post-Angular view islands (PR 6 onward).
+    <!-- Preact (+ hooks) for the post-Angular view islands.
          UMD builds attach to window.preact and window.preactHooks. The .jsx
          island sources are pre-built into IIFEs by `yarn build:islands`
          (vite.islands.config.js) which references these as externals. -->
@@ -181,8 +163,6 @@
 
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="scripts/panes.js"></script>
-    <script src="scripts/app.js"></script>
-    <script src="scripts/services/splainerSearchShim.js"></script>
     <!-- Preact islands — built from .jsx sources by `yarn build:islands`
          (see vite.islands.config.js). Each file attaches itself to
          window.SplainerIslands.<name> as a side effect. -->
@@ -193,27 +173,17 @@
     <script src="scripts/islands/dist/detailedDoc.js"></script>
     <script src="scripts/islands/dist/docExplain.js"></script>
     <script src="scripts/islands/dist/searchResults.js"></script>
-    <script src="scripts/factories/Search.js"></script>
-    <script src="scripts/directives/customHeaders.js"></script>
-    <script src="scripts/directives/settings.js"></script>
-    <script src="scripts/directives/dispatchOnClick.js"></script>
-    <script src="scripts/directives/searchResults.js"></script>
-    <script src="scripts/directives/startUrl.js"></script>
-    <!-- Phase 11a: pure-JS service modules (built from ESM by
-         `yarn build:islands`). Must load before the Angular wrappers
-         below so globalThis.SplainerServices.* is populated. -->
+    <!-- Pure-JS service modules (built from ESM by `yarn build:islands`).
+         Must load before bootstrap.js so globalThis.SplainerServices.* is populated. -->
     <script src="scripts/services/dist/esSettings.js"></script>
     <script src="scripts/services/dist/osSettings.js"></script>
     <script src="scripts/services/dist/solrSettings.js"></script>
     <script src="scripts/services/dist/splSearch.js"></script>
     <script src="scripts/services/dist/settingsStore.js"></script>
     <script src="scripts/services/dist/Search.js"></script>
-    <script src="scripts/services/solrSettingsSvc.js"></script>
-    <script src="scripts/services/esSettingsSvc.js"></script>
-    <script src="scripts/services/osSettingsSvc.js"></script>
-    <script src="scripts/services/splSearchSvc.js"></script>
-    <script src="scripts/services/settingsStoreSvc.js"></script>
-    <script src="scripts/controllers/searchResults.js"></script>
+    <!-- Bootstrap script — wires services and islands together. Replaces
+         Angular module wiring, SearchResultsCtrl, and all directive shims. -->
+    <script src="scripts/bootstrap.js"></script>
     <script src="scripts/ace-config.js"></script>
     <!-- endbuild -->
   </body>

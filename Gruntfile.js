@@ -36,7 +36,7 @@ module.exports = function (grunt) {
       },
       jsTest: {
         files: ['test/spec/{,*/}*.js'],
-        tasks: ['karma:unit'],
+        tasks: [],
       },
       styles: {
         files: ['<%= yeoman.app %>/styles/{,*/}*.css'],
@@ -216,22 +216,6 @@ module.exports = function (grunt) {
       },
     },
 
-    // ngmin tries to make the code safe for minification automatically by
-    // using the Angular long form for dependency injection. It doesn't work on
-    // things like resolve or inject so those have to be done manually.
-    ngmin: {
-      dist: {
-        files: [
-          {
-            expand: true,
-            cwd: '.tmp/concat/scripts',
-            src: '*.js',
-            dest: '.tmp/concat/scripts',
-          },
-        ],
-      },
-    },
-
     // Copies remaining files to places other tasks can use
     copy: {
       dist: {
@@ -298,17 +282,6 @@ module.exports = function (grunt) {
       dist: ['copy:styles', 'imagemin', 'svgmin'],
     },
 
-    // Test settings
-    karma: {
-      unit: {
-        configFile: 'test/karma.conf.js',
-        singleRun: true,
-      },
-      debug: {
-        configFile: 'test/karma.debug.conf.js',
-        singleRun: false,
-      },
-    },
   });
 
   grunt.registerTask('serve', 'Compile then start a connect web server', function (target) {
@@ -329,7 +302,6 @@ module.exports = function (grunt) {
     'concurrent:test',
     'postcss',
     'connect:test',
-    'karma:unit',
   ]);
 
   grunt.registerTask('build', [
@@ -339,7 +311,6 @@ module.exports = function (grunt) {
     'svgmin',
     'postcss',
     'concat',
-    'ngmin',
     'copy:dist',
     'cssmin',
     'uglify',

@@ -1,7 +1,6 @@
-// Smoke flows against the current Angular splainer app.
-// Goal: catch regressions in user-visible behavior during the
-// Angular → splainer-search 3.0.0 migration. These tests must
-// survive whatever framework replaces Angular.
+// Smoke flows for splainer (Preact islands + pure ESM services).
+// Goal: catch regressions in user-visible behavior. Tests are
+// framework-agnostic — they interact via DOM selectors only.
 import { test, expect } from '@playwright/test';
 
 // All canned-backend responses need this so the browser doesn't block the
@@ -58,8 +57,7 @@ test.describe('splainer smoke', () => {
   test('app boots and shows the Solr URL form', async ({ page }) => {
     await page.goto('/');
     // The StartUrl view renders three engine forms (Solr, ES, OpenSearch).
-    // Selectors target data-role attributes rather than ng-model so the
-    // tests survive PRs 8-10, which rewrite StartUrl off Angular.
+    // Selectors target data-role attributes for framework-agnostic access.
     const solrInput = page.locator('[data-role="solr-start-url"]');
     await expect(solrInput).toBeVisible();
   });
@@ -74,8 +72,8 @@ test.describe('splainer smoke', () => {
   });
 
   test('bookmarked URL with hash fragment restores search state', async ({ page }) => {
-    // Splainer encodes Solr state as ?solr=<url>&fieldSpec=<spec> behind the hash
-    // (Angular hashPrefix(''), see settingsStoreSvc.js). Any request to the fake
+    // Splainer encodes Solr state as #?solr=<url>&fieldSpec=<spec> in the URL hash
+    // (see settingsStore.js buildHashString/parseHash). Any request to the fake
     // Solr host is intercepted and answered with a minimal canned response so the
     // test stays hermetic — no live Solr needed.
     let solrHits = 0;
@@ -126,16 +124,15 @@ test.describe('splainer smoke', () => {
     await page.locator('[data-role="solr-start-url"]').fill(url);
     await page.locator('[data-role="solr-submit"]').first().click();
 
-    // Poll-wait for the localStorage write — it happens inside Angular's
-    // $digest after fetch resolves, so there's no DOM signal we can await.
-    // Polling is the right primitive; waitForTimeout is forbidden.
+    // Poll-wait for the localStorage write — it happens asynchronously
+    // after fetch resolves, so there's no DOM signal we can await.
     await expect
       .poll(async () =>
         page.evaluate(() => JSON.stringify(window.localStorage).includes('fake-solr.test')),
       )
       .toBe(true);
 
-    // Reload — settings should come back from localStorage (settingsStoreSvc).
+    // Reload — settings should come back from localStorage (settingsStore).
     await page.reload();
     await expect
       .poll(async () =>
@@ -157,15 +154,13 @@ test.describe('splainer smoke', () => {
     // covers the textarea-fallback path under jsdom. This test opens the
     // ES tab in a real browser (where window.ace is loaded), expands the
     // Advanced Settings section, and exercises the island end-to-end —
-    // verifying that (a) the island mounts via the directive shim,
+    // verifying that (a) the island mounts via bootstrap.js,
     // (b) the Ace `useEffect` lifecycle works (no pageerror), and
     // (c) picking a header type populates the editor body via the
     // template side effect.
     await page.goto('/');
     await page.locator('a[href="#es_"]').click();
     await page.locator('#es_').getByRole('button', { name: 'Advanced Settings' }).click();
-    // Framework-agnostic: data-role on the ES URL input survives deangularize.
-
     // The select rendered by the Preact island. There are multiple
     // [data-role="header-type"] elements on the page (one per call site),
     // so we scope to the ES tab pane.
@@ -182,33 +177,26 @@ test.describe('splainer smoke', () => {
     // the editor body with the API Key template via the side effect.
     await select.selectOption('API Key');
 
-    // Read what actually landed in the Angular scope and Ace editor after
-    // the change. Polled because the change-handler → $apply → digest →
-    // $watch → Preact-render → useEffect → ace.setValue chain takes a few
-    // microtasks to settle and Playwright's selectOption returns before
-    // it's done.
+    // Read what actually landed in the settings store and Ace editor after
+    // the change. Polled because the change-handler → Preact-render →
+    // useEffect → ace.setValue chain takes a few microtasks to settle
+    // and Playwright's selectOption returns before it's done.
     await expect
       .poll(async () =>
         page.evaluate(() => {
           // Read the header type off the DOM select *and* the settings store.
           // Both checks matter: the DOM-only read would pass a regression
           // where the Preact island updates its <select> but fails to
-          // propagate the change into settingsStoreSvc (a "UI shows right,
-          // store is wrong" bug class). The store read uses Angular's
-          // injector, which will disappear with the directive shim in PR 11 —
-          // at that point this block should read whatever public API
-          // replaces settingsStoreSvc.
+          // propagate the change into the settings store (a "UI shows right,
+          // store is wrong" bug class).
           const select = document.querySelector('#es_ [data-role="header-type"]');
           const container = document.querySelector('#es_ [data-role="header-editor"]');
           const aceVal =
             window.ace && container && container.tagName !== 'TEXTAREA'
               ? window.ace.edit(container).getValue()
               : container && container.value;
-          const storeHeaderType = window.angular
-            ? window.angular
-                .element(document.querySelector('settings-island'))
-                .injector()
-                .get('settingsStoreSvc').settings.es.headerType
+          const storeHeaderType = window.SplainerServices
+            ? window.SplainerServices.settingsStore.settings.es.headerType
             : null;
           return {
             domHeaderType: select && select.value,
@@ -229,8 +217,8 @@ test.describe('splainer smoke', () => {
     // user picks "API Key" and enters their key, the resulting Solr/ES/OS
     // request includes the Authorization header. Without this assertion,
     // the entire CustomHeaders island can be working perfectly at the
-    // Angular/Preact/DOM layer while the headers silently fail to reach
-    // the backend (because of a bug in the directive shim, splainer-search
+    // Preact/DOM layer while the headers silently fail to reach
+    // the backend (because of a bug in the bootstrap wiring, splainer-search
     // 3.0.0's wired services, or anywhere else in the chain). This is the
     // *only* test that exercises the integration end-to-end.
     //
@@ -266,7 +254,7 @@ test.describe('splainer smoke', () => {
       .fill('http://fake-es.test/_search');
     // Open the Advanced Settings panel and pick API Key — the island's
     // setHeaderType handler populates the body with the Authorization
-    // template via the directive shim → scope mutation → splainer-search.
+    // template via the settings store → splainer-search.
     await page.locator('#es_').getByRole('button', { name: 'Advanced Settings' }).click();
     await page.locator('#es_ [data-role="header-type"]').selectOption('API Key');
 
@@ -292,9 +280,9 @@ test.describe('splainer smoke', () => {
     // PR 7 merge gate. Intercepts the outbound ES request and asserts that a
     // unique marker the user typed into the dev-sidebar Search Args editor
     // landed in the request body. This is the only test that proves the full
-    // chain from Settings island → directive shim → onPublish callback →
-    // esSettingsSvc.fromTweakedSettings → splainer-search 3.0.0 wired
-    // services → fetch is wired correctly. Internal-contract tests catch
+    // chain from Settings island → bootstrap.js onPublish → esSettings
+    // .fromTweakedSettings → splainer-search 3.0.0 wired services → fetch
+    // is wired correctly. Internal-contract tests catch
     // refactor regressions; this one catches silent integration breaks.
     //
     // Includes Security's two negative assertions: the marker must NOT be
@@ -327,7 +315,7 @@ test.describe('splainer smoke', () => {
     await page.goto('/');
 
     // Use the StartUrl ES tab to seed an initial ES search and route the
-    // backend to fake-es.test. This populates settingsStoreSvc.settings.es
+    // backend to fake-es.test. This populates settingsStore.settings.es
     // and triggers the first search, which puts the dev sidebar into the
     // 'es' engine — the state we want to test the dev sidebar against.
     await page.locator('a[href="#es_"]').click();
@@ -341,9 +329,9 @@ test.describe('splainer smoke', () => {
     await expect.poll(() => captured.length).toBeGreaterThan(0);
     captured.length = 0; // clear; we want to assert against the *post-edit* request
 
-    // Mutate searchArgsStr via the Angular store rather than the Ace editor
-    // input. We're testing the *publish* chain (Settings island → directive
-    // shim → onPublish → esSettingsSvc.fromTweakedSettings → fetch). The
+    // Mutate searchArgsStr via the settings store rather than the Ace editor
+    // input. We're testing the *publish* chain (Settings island → bootstrap
+    // onPublish → esSettings.fromTweakedSettings → fetch). The
     // editor → store mutation path has its own coverage in
     // app/scripts/islands/settings.spec.js (Vitest, textarea fallback) and
     // is structurally identical to PR 6's customHeaders editor wiring,
@@ -354,19 +342,11 @@ test.describe('splainer smoke', () => {
     const marker = 'PR7_MARKER_' + Math.random().toString(36).slice(2, 10);
     const newArgs = JSON.stringify({ query: { match: { title: marker } } });
     await page.evaluate((value) => {
-      const svc = window.angular
-        .element(document.querySelector('settings-island'))
-        .injector()
-        .get('settingsStoreSvc');
-      // Wrap in $apply so the directive's deep $watch fires and the island
-      // re-renders with the new searchArgsStr before we click submit.
-      const $rootScope = window.angular
-        .element(document.querySelector('settings-island'))
-        .injector()
-        .get('$rootScope');
-      $rootScope.$apply(function () {
-        svc.settings.es.searchArgsStr = value;
-      });
+      var store = window.SplainerServices.settingsStore;
+      store.settings.es.searchArgsStr = value;
+      // save() fires subscribe callbacks, which triggers renderAll() in
+      // bootstrap.js so the Settings island re-renders with the new value.
+      store.save();
     }, newArgs);
 
     // Click the new Settings island's Rerun Query button — uses the
@@ -414,8 +394,8 @@ test.describe('splainer smoke', () => {
     // modal body shows the doc fields splainer-search normalized from the
     // Solr response.
     //
-    // Uses canned Solr with a `subs`-shaped doc so the detailedDoc ng-repeat
-    // over doc.subs has something to render — the test would vacuously pass
+    // Uses canned Solr with a `subs`-shaped doc so the detailedDoc island
+    // iterating over doc.subs has something to render — the test would vacuously pass
     // against an empty subs map otherwise.
     await page.route('http://fake-solr.test/**', async (route) => {
       await fulfillSolr(route, {

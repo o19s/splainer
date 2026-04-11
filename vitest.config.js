@@ -1,7 +1,5 @@
-// Vitest config for new (post-Angular) code only.
-// The legacy Karma suite under test/spec/** continues to run via `npm test`
-// (grunt test) against the Angular code for as long as Angular exists.
-// See MIGRATION_OPTIONS.md for the rationale.
+// Vitest config — the sole unit/component test runner (Angular + Karma
+// removed in Phase 12). Covers Preact islands and pure ESM service modules.
 //
 // Mutation testing (Stryker + this file): `yarn stryker` (incremental),
 // `yarn stryker:full` (--force, refresh reports/stryker-incremental.json), `yarn stryker:dry`.

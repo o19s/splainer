@@ -5,11 +5,8 @@
 ace.config.set('themePath',  '/assets/ace-builds/src-min-noconflict');*/
 
 $(function () {
-  // For some reason when angular is in charge of refreshing the DOM,
-  // the old height of the element is the one that's being returned.
-  // So we need to tell it to "refetch" the element from the DOM to refresh
-  // and get the new height.
-  // WEIRD....
+  // The old height of the element can be stale after DOM updates,
+  // so we poll and re-query the element to get the current height.
   var $element = $('#queryParams');
   var lastHeight = $element.height();
   function checkForChanges() {
