@@ -47,7 +47,7 @@ export function CustomHeaders({ settings, onChange }) {
   const isReadOnly = headerType === 'None';
   const hasAce = typeof window !== 'undefined' && !!window.ace;
   // Used as <Editor /> below; core no-unused-vars does not treat JSX tags as references.
-  // eslint-disable-next-line no-unused-vars -- dynamic component (Ace vs textarea)
+   
   const Editor = hasAce ? AceEditor : TextareaFallback;
 
   function setHeaderType(e) {

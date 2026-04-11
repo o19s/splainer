@@ -16,12 +16,15 @@
  * Co-located Vitest specs (*.spec.js) in that folder import from vitest and those modules,
  * so they use sourceType: module as well.
  * Preact islands under app/scripts/islands/ are ESM (Vitest specs + Vite-built .jsx); they
- * override the classic-script rule for the rest of app/scripts.
+ * override the classic-script rule for the rest of app/scripts. eslint-plugin-react is loaded
+ * only for `react/jsx-uses-vars` so capitalized JSX tags count as variable uses for
+ * `no-unused-vars` (core ESLint does not treat `<Foo />` as a reference to `Foo`).
  *
  * Parser ecmaVersion is 2018 so trailing commas in argument lists parse correctly.
  */
 import js from '@eslint/js';
 import eslintConfigPrettier from 'eslint-config-prettier';
+import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 
@@ -117,10 +120,18 @@ export default [
       },
     },
     plugins: {
+      react,
       'react-hooks': reactHooks,
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
     },
     rules: {
       'no-unused-vars': ['error', unusedVarsOptions],
+      // Without this, components referenced only as JSX are falsely reported unused.
+      'react/jsx-uses-vars': 'error',
       // rules-of-hooks is mechanically decidable; zero false positives → error.
       'react-hooks/rules-of-hooks': 'error',
       // exhaustive-deps stays as warn because PR 6's three-ref pattern

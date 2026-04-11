@@ -1,6 +1,8 @@
 .DS_Store
 backup/
 node_modules
+# Yarn is the package manager (see package.json preinstall); ignore npm lockfile.
+package-lock.json
 .tmp
 .sass-cache
 dist/

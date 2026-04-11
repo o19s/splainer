@@ -165,26 +165,20 @@ function initSearchArgs() {
 
 // --- Save ---
 
+var PERSIST_FIELDS = ['customHeaders', 'searchUrl', 'startUrl', 'fieldSpecStr', 'searchArgsStr'];
+var PERSIST_ENGINES = ['solr', 'es', 'os'];
+
 function persistToLocalStorage(s) {
   if (!_lsSupported) return;
 
-  lsSet('solr_customHeaders', s.solr.customHeaders);
-  lsSet('solr_startUrl', s.solr.startUrl);
-  lsSet('solr_searchUrl', s.solr.searchUrl);
-  lsSet('solr_fieldSpecStr', s.solr.fieldSpecStr);
-  lsSet('solr_searchArgsStr', '!' + s.solr.searchArgsStr);
-
-  lsSet('es_customHeaders', s.es.customHeaders);
-  lsSet('es_startUrl', s.es.startUrl);
-  lsSet('es_searchUrl', s.es.searchUrl);
-  lsSet('es_fieldSpecStr', s.es.fieldSpecStr);
-  lsSet('es_searchArgsStr', '!' + s.es.searchArgsStr);
-
-  lsSet('os_customHeaders', s.os.customHeaders);
-  lsSet('os_startUrl', s.os.startUrl);
-  lsSet('os_searchUrl', s.os.searchUrl);
-  lsSet('os_fieldSpecStr', s.os.fieldSpecStr);
-  lsSet('os_searchArgsStr', '!' + s.os.searchArgsStr);
+  PERSIST_ENGINES.forEach(function (engine) {
+    PERSIST_FIELDS.forEach(function (field) {
+      var value = s[engine][field];
+      // searchArgsStr is stored with a `!` prefix (legacy format quirk).
+      if (field === 'searchArgsStr') value = '!' + value;
+      lsSet(engine + '_' + field, value);
+    });
+  });
 
   lsSet('whichEngine', s.whichEngine);
 }

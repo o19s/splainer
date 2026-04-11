@@ -39,16 +39,10 @@ function Search(deps, searchSettings, overridingExplains, states, engines) {
   var createSearcher = function (fieldSpec, parsedArgs, searchSettings) {
     var activeSettings = searchSettings[searchSettings.whichEngine];
 
-    if (searchSettings.whichEngine === engines.ELASTICSEARCH) {
+    if (searchSettings.whichEngine === engines.ELASTICSEARCH ||
+        searchSettings.whichEngine === engines.OPENSEARCH) {
       try {
-        parsedArgs = JSON.parse(searchSettings.es.searchArgsStr);
-      } catch (e) {
-        parsedArgs = '';
-        console.error(e);
-      }
-    } else if (searchSettings.whichEngine === engines.OPENSEARCH) {
-      try {
-        parsedArgs = JSON.parse(searchSettings.os.searchArgsStr);
+        parsedArgs = JSON.parse(activeSettings.searchArgsStr);
       } catch (e) {
         parsedArgs = '';
         console.error(e);

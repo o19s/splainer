@@ -14,9 +14,9 @@
  */
 import { render } from 'preact';
 import { useState, useRef } from 'preact/hooks';
-// eslint-disable-next-line no-unused-vars -- JSX usage
+ 
 import { DocRow } from './docRow.jsx';
-// eslint-disable-next-line no-unused-vars -- JSX usage
+ 
 import { SolrSettingsWarning } from './solrSettingsWarning.jsx';
 
 function currentArgsStr(currSearch) {
@@ -27,14 +27,14 @@ function currentArgsStr(currSearch) {
   }
 }
 
-// eslint-disable-next-line no-unused-vars -- JSX usage
+ 
 function JsonDetailLink({ label, onToggle }) {
   return (
     <a href="" onClick={(e) => { e.preventDefault(); onToggle(); }}>{label}</a>
   );
 }
 
-// eslint-disable-next-line no-unused-vars -- JSX usage
+ 
 function JsonDetailData({ data, show }) {
   if (!show) return null;
   return (

@@ -9,23 +9,13 @@ import { render } from 'preact';
 import { useState } from 'preact/hooks';
 import { useDialogModal } from './useDialogModal.js';
 import { DocRow } from './docRow.jsx';
+import { formatJson } from './formatJson.js';
 
 const TABS = [
   { id: 'summarized', label: 'Summarized' },
   { id: 'hot', label: 'Hot Matches' },
   { id: 'full', label: 'Full Explain' },
 ];
-
-function prettyJson(rawStr) {
-  // baseExplainSvc.rawStr() returns JSON.stringify(asJson) — minified.
-  // Re-stringify with indent for human reading. If parse fails (defensive),
-  // fall back to the raw blob.
-  try {
-    return JSON.stringify(JSON.parse(rawStr), null, 2);
-  } catch (_e) {
-    return rawStr;
-  }
-}
 
 function ExplainPane({ doc, tab }) {
   // All three tabs are in the DOM simultaneously (CSS-hidden when inactive).
@@ -41,7 +31,7 @@ function ExplainPane({ doc, tab }) {
         {doc.hotMatches().toStr()}
       </pre>
       <pre style={{ display: tab === 'full' ? 'block' : 'none' }}>
-        {prettyJson(doc.explain().rawStr())}
+        {formatJson(doc.explain().rawStr())}
       </pre>
     </div>
   );

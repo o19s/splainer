@@ -29,9 +29,10 @@
  */
 import { render } from 'preact';
 import { useState } from 'preact/hooks';
-// eslint-disable-next-line no-unused-vars -- JSX usage
+ 
 import { CustomHeaders } from './customHeaders.jsx';
 import { useAceEditor } from './useAceEditor.js';
+import { formatJson } from './formatJson.js';
 
 // Default start URLs — match the original ng-init values in startUrl.html.
 // These are written into the settings object on first mount only when the
@@ -51,7 +52,7 @@ const DEFAULT_URLS = {
   os: 'https://reader:reader@quepid-opensearch.dev.o19s.com:9000/tmdb/_search',
 };
 
-// eslint-disable-next-line no-unused-vars -- JSX usage
+ 
 function AceArgsEditor({ value, onChange, engine }) {
   const containerRef = useAceEditor(value, onChange, {
     mode: 'ace/mode/json',
@@ -67,7 +68,7 @@ function AceArgsEditor({ value, onChange, engine }) {
   );
 }
 
-// eslint-disable-next-line no-unused-vars -- JSX usage
+ 
 function TextareaArgsFallback({ value, onChange, engine }) {
   return (
     <textarea
@@ -81,7 +82,7 @@ function TextareaArgsFallback({ value, onChange, engine }) {
   );
 }
 
-// eslint-disable-next-line no-unused-vars -- JSX usage
+ 
 function EngineAdvanced({ engine, settings, onRerender }) {
   const ws = settings[engine];
   const [headersOpen, setHeadersOpen] = useState(false);
@@ -134,14 +135,8 @@ function EngineAdvanced({ engine, settings, onRerender }) {
         data-role={`${engine}-indent-json`}
         onClick={(e) => {
           e.preventDefault();
-          try {
-            ws.searchArgsStr = JSON.stringify(JSON.parse(ws.searchArgsStr), null, 2);
-            onRerender();
-          } catch (_err) {
-            // Swallow malformed JSON like the original Angular controller:
-            // the user clicked "Indent JSON" on unparseable input, a thrown
-            // exception would be worse UX than a no-op.
-          }
+          ws.searchArgsStr = formatJson(ws.searchArgsStr);
+          onRerender();
         }}
       >
         Indent JSON

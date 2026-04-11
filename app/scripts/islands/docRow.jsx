@@ -18,11 +18,11 @@ function sanitize(html) {
 // Two named wrappers instead of one polymorphic <SanitizedHtml tag={...}>:
 // a string-typed tag prop is an injection footgun if a future caller wires
 // it to user input.
-// eslint-disable-next-line no-unused-vars -- referenced via JSX below
+ 
 function SanitizedSpan({ html, ...rest }) {
   return <span {...rest} dangerouslySetInnerHTML={{ __html: sanitize(html) }} />;
 }
-// eslint-disable-next-line no-unused-vars -- referenced via JSX below
+ 
 function SanitizedAnchor({ html, ...rest }) {
   return <a {...rest} dangerouslySetInnerHTML={{ __html: sanitize(html) }} />;
 }

@@ -9,7 +9,7 @@
  */
 import { useState } from 'preact/hooks';
 
-// eslint-disable-next-line no-unused-vars -- referenced via JSX below
+ 
 function MatchRow({ match }) {
   // Min/max clamp handles maxScore=0 (which makes percentage = Infinity).
   const pct = Math.max(0, Math.min(100, match.percentage));

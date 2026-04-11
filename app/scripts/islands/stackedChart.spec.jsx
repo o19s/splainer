@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from 'preact';
-// eslint-disable-next-line no-unused-vars -- referenced via JSX below
+ 
 import { StackedChart } from './stackedChart.jsx';
 
 function makeRoot() {

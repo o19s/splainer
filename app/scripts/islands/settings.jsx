@@ -30,9 +30,10 @@
  */
 import { render } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
-// eslint-disable-next-line no-unused-vars -- JSX usage; eslint core doesn't see <CustomHeaders />
+ 
 import { CustomHeaders } from './customHeaders.jsx';
-// eslint-disable-next-line no-unused-vars -- JSX usage; rendered conditionally below
+import { formatJson } from './formatJson.js';
+ 
 function TextareaArgsFallback({ value, onChange }) {
   return (
     <textarea
@@ -97,15 +98,8 @@ export function SettingsIsland({ settings, currSearch, onPublish }) {
 
   function autoIndent() {
     if (workingWhichEngine === 'es' || workingWhichEngine === 'os') {
-      try {
-        ws.searchArgsStr = JSON.stringify(JSON.parse(ws.searchArgsStr), null, 2);
-        forceRerender();
-      } catch (_e) {
-        // Original Angular code lets the parse exception bubble. We swallow
-        // it because the user clicked a "pretty-print" link with malformed
-        // JSON in the editor — surfacing a thrown exception there would be
-        // worse UX than no-op.
-      }
+      ws.searchArgsStr = formatJson(ws.searchArgsStr);
+      forceRerender();
     }
   }
 
