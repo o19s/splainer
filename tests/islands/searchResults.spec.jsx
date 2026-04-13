@@ -162,6 +162,27 @@ describe('SearchResults island', () => {
     expect(root.textContent).toContain('2 Total Results');
   });
 
+  it('renders one row per hit when doc.id is empty (epoch + index keys)', () => {
+    const root = makeRoot();
+    const d1 = makeDoc({
+      id: 'd1',
+      title: 'First',
+      getHighlightedTitle: () => 'First',
+    });
+    const d2 = makeDoc({
+      id: 'd2',
+      title: 'Second',
+      getHighlightedTitle: () => 'Second',
+    });
+    d1.id = '';
+    d2.id = '';
+    const cs = makeCurrSearch({ docs: [d1, d2], numFound: 2 });
+    render(<SearchResults currSearch={cs} solrUrlSvc={makeSolrUrlSvc()} />, root);
+    expect(root.querySelectorAll('[data-role="doc-row"]').length).toBe(2);
+    expect(root.textContent).toContain('First');
+    expect(root.textContent).toContain('Second');
+  });
+
   it('renders total results as a link when linkUrl is present', () => {
     const root = makeRoot();
     const cs = makeCurrSearch({ linkUrl: 'http://example.com/select' });

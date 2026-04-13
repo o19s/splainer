@@ -2,13 +2,17 @@
  * searchResults island — renders search states, doc rows, query details,
  * and pagination.
  *
+ * List keys use `docRowListKey` (docListKeys.js) plus a per-search epoch when `doc.id` is
+ * empty, matching Angular ng-repeat tolerance for missing ids.
+ *
  * Props: currSearch, explainOther, solrUrlSvc, onPage.
  */
 import { render } from 'preact';
 import { useState, useRef } from 'preact/hooks';
- 
+
 import { DocRow } from './docRow.jsx';
- 
+import { docRowListKey } from './docListKeys.js';
+
 import { SolrSettingsWarning } from './solrSettingsWarning.jsx';
 import { openDocModal } from './modalRegistry.js';
 
@@ -47,9 +51,13 @@ export function SearchResults({ currSearch, explainOther, solrUrlSvc, onPage }) 
   // SearchResultsCtrl which set both to false in search() and reset().
   // Detect via searcher identity — a new reference means a new search.
   const prevSearcherRef = useRef(null);
+  const listEpochRef = useRef(0);
   const currentSearcher = currSearch && currSearch.searcher;
   if (currentSearcher !== prevSearcherRef.current) {
     prevSearcherRef.current = currentSearcher;
+    if (currSearch.state === currSearch.DID_SEARCH && currentSearcher) {
+      listEpochRef.current += 1;
+    }
     if (showQueryDetails) setShowQueryDetails(false);
     if (showParsedQueryDetails) setShowParsedQueryDetails(false);
   }
@@ -147,10 +155,10 @@ export function SearchResults({ currSearch, explainOther, solrUrlSvc, onPage }) 
       <hr style={{ marginTop: '5px' }} />
 
       {!currSearch.hasGroup() &&
-        currSearch.docs.map((doc) => {
+        currSearch.docs.map((doc, rowIndex) => {
           const cbs = makeDocCallbacks(doc);
           return (
-            <div key={doc.id}>
+            <div key={docRowListKey(doc, rowIndex, listEpochRef.current)}>
               <DocRow
                 doc={doc}
                 maxScore={currSearch.maxScore}
@@ -171,11 +179,11 @@ export function SearchResults({ currSearch, explainOther, solrUrlSvc, onPage }) 
                 <h4 style={{ marginLeft: '10px' }} title={`Group: ${group}, ${grouped.value}`}>
                   Value: <em>{grouped.value}</em>
                 </h4>
-                {grouped.docs.map((doc) => {
+                {grouped.docs.map((doc, gi) => {
                   const cbs = makeDocCallbacks(doc);
                   return (
                     <DocRow
-                      key={doc.id}
+                      key={docRowListKey(doc, gi, listEpochRef.current)}
                       doc={doc}
                       maxScore={currSearch.maxScore}
                       onShowDoc={cbs.onShowDoc}

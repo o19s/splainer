@@ -7,7 +7,7 @@ How to build, run, and test Splainer from this repository. For what Splainer is 
 * **Node.js** >= 20.12 (matches [`splainer-search`](https://github.com/o19s/splainer-search) and CI).
 * **[Yarn classic](https://classic.yarnpkg.com/lang/en/docs/install/)** (v1). The repo uses `only-allow yarn` on install.
 
-Splainer is a **Preact** + **Vite** front end; unit tests use **Vitest**, end-to-end tests use **Playwright**.
+Splainer is a **Preact** + **Vite** front end; unit tests use **Vitest**, end-to-end tests use **Playwright**. For how the UI is split into islands (mount points, modals, list keys, hooks, and adding a new island), see [app/scripts/islands/README.md](app/scripts/islands/README.md).
 
 ## Local dev (Yarn)
 
@@ -66,6 +66,6 @@ https://docs.docker.com/compose/extends/
 
 ## Testing notes
 
-* **Unit / component tests:** [Vitest](https://vitest.dev/) (`yarn test`), specs under `tests/`.
+* **Unit / component tests:** [Vitest](https://vitest.dev/) (`yarn test`), specs under `tests/` (Preact island specs under `tests/islands/`).
 * **End-to-end tests:** [Playwright](https://playwright.dev/) (`yarn test:e2e`), specs under `e2e/`.
 * The `./tests/splainer_test_links.html` file is a list of links that invoke Splainer, both the local version and the deployed version against Solr and Elasticsearch, and is a great manual check that bookmark URLs and integrations still behave. Use it to make sure existing links still work.

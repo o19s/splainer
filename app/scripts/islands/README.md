@@ -1,5 +1,7 @@
 # Preact Islands
 
+For prerequisites, local dev, Docker, and repo-wide test commands, see [DEVELOPER_GUIDE.md](../../../DEVELOPER_GUIDE.md) at the repository root.
+
 Preact JSX components that make up splainer's UI. Each island is an ES module imported by `app/scripts/main.js` and mounted into a DOM element.
 
 Here **island** means a **client-only root mount**: interactive Preact attached to a named DOM node from the normal SPA entry, all shipped in one Vite-built bundle. That is not the same as [Astro-style islands](https://docs.astro.build/en/concepts/islands/) (server-rendered HTML with selective client hydration) or separate per-feature entry chunks. The term stuck from the Angular migration, when each UI slice was still an independently mounted boundary.
@@ -9,6 +11,10 @@ Here **island** means a **client-only root mount**: interactive Preact attached 
 `main.js` is the single entry point. It imports all islands and services as ES modules, creates the settings store and search state, then calls each island's `mount()` function to render into named `<div>` mount points in `index.html`. Preact's reconciler diffs efficiently, so calling `mount()` repeatedly (e.g. after search completes) is cheap and idempotent.
 
 Modals (`detailedDoc`, `docExplain`) are opened via `modalRegistry.js`, which imports them statically and renders into `#splainer-modal-root`.
+
+## Result list keys and document ids
+
+Preact lists require stable `key` props. `docListKeys.js` exports `docRowListKey(doc, index, searchListEpoch)` so rows stay distinct when `doc.id` is empty (Solr `fl` omitting the unique key, etc.). `searchListEpoch` bumps whenever `currSearch.searcher` changes.
 
 ## Shared hooks
 

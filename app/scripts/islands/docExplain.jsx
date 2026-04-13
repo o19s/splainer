@@ -9,6 +9,7 @@ import { render } from 'preact';
 import { useState } from 'preact/hooks';
 import { useDialogModal } from './useDialogModal.js';
 import { DocRow } from './docRow.jsx';
+import { docRowListKey } from './docListKeys.js';
 import { formatJson } from './formatJson.js';
 
 const TABS = [
@@ -108,11 +109,13 @@ export function DocExplain({
   const [tab, setTab] = useState('summarized');
   const [altDoc, setAltDoc] = useState(null);
   const [altResults, setAltResults] = useState({ docs: [], maxScore: maxScore || 0 });
+  const [altListEpoch, setAltListEpoch] = useState(0);
 
   // No mounted-flag guard needed — setAltResults targets local state,
   // which Preact silently drops after unmount.
 
   function handleResults(result) {
+    setAltListEpoch((e) => e + 1);
     setAltResults({
       docs: (result && result.docs) || [],
       maxScore: (result && result.maxScore) || 0,
@@ -193,8 +196,12 @@ export function DocExplain({
               }}
             >
               <AltQueryForm explainOther={explainOther} onResults={handleResults} />
-              {altResults.docs.map((d) => (
-                <div key={d.id} class="container" onClick={() => setAltDoc(d)}>
+              {altResults.docs.map((d, i) => (
+                <div
+                  key={docRowListKey(d, i, altListEpoch)}
+                  class="container"
+                  onClick={() => setAltDoc(d)}
+                >
                   <DocRow
                     doc={d}
                     maxScore={altResults.maxScore}
