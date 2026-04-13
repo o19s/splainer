@@ -91,7 +91,7 @@ Replaced `controllers/settings.js` and the 140-line `<form ng-controller="Settin
 
 **Behavioral changes:** None.
 
-Third island; first one that coexists with an un-migrated Angular child (`<doc-row>`). The island owns the altQuery form and error banner; the result list's `ng-repeat` over `currSearch.docs` stays in the directive's inlined template. They share `currSearch` and `selectDoc` on the directive's isolate scope — a deliberate cross-framework bridge that survives only until Phase 9a deletes `<doc-row>`.
+Third island; first one that coexists with an un-migrated Angular child (`<doc-row>`). The island owns the `altQuery` form and error banner; the result list's `ng-repeat` over `currSearch.docs` stays in the directive's inlined template. They share `currSearch` and `selectDoc` on the directive's isolate scope — a deliberate cross-framework bridge that survives only until Phase 9a deletes `<doc-row>`.
 
 The shim absorbs the entire body of the old `DocSelectorCtrl.explainOther` (searcher construction, engine-specific arg parsing, extractor dispatch, `maxScore` ratcheting). The island is near-pure UI. This is the pattern: shim-heavy when the controller body is all Angular glue and the UI is simple; island-heavy when the reverse.
 
@@ -163,19 +163,19 @@ Established the `useDialogModal` hook and a `modalRegistry.js` global `openDocMo
 
 All four phases follow the two-file extraction pattern. Same `angular.forEach` → `.forEach`, `angular.isDefined(x)` → `x !== undefined`, `angular.isString(x)` → `typeof x === 'string'` swaps (verified line-by-line safe for the data in play); same thin Angular wrapper delegating to a pure module registered on `globalThis.SplainerServices`.
 
-### 11a — Easy: `esSettingsSvc`, `osSettingsSvc`, `splSearchSvc`
+### 11a: `esSettingsSvc`, `osSettingsSvc`, `splSearchSvc`
 
 **Behavioral changes:** None.
 
 `splSearch.js` exports `states`, `engines`, and `createSearch(Search, settings, overridingExplains)`. The `Search` constructor is passed as a parameter — the pure module has no Angular dependency. `esSettings.js` and `osSettings.js` are near-identical URL parsers differing only in `whichEngine`; kept separate to minimize blast radius (merged later in 13a cleanup).
 
-### 11b — Medium: `solrSettingsSvc`
+### 11b: `solrSettingsSvc`
 
 **Behavioral changes:** None.
 
 `solrUrlSvc` and `fieldSpecSvc` from `splainerSearchShim` are passed as leading parameters — the same DI-via-params pattern `splSearch.js` established with `Search`. `angular.copy(parsedUrl.solrArgs)` becomes `JSON.parse(JSON.stringify(...))`; safe here because `solrArgs` is `{string: string[]}` with no `undefined`, `Date`, `RegExp`, or cycles. A deep-clone safety test pins the no-mutation contract that `angular.copy` was enforcing.
 
-### 11c — The keystone: `settingsStoreSvc` → `SettingsStore`
+### 11c: `settingsStoreSvc` → `SettingsStore`
 
 **Behavioral changes:** Intentional parity with Angular. One dropped dependency (`angular-local-storage`), one persistence defaulting fix.
 
@@ -189,19 +189,17 @@ Every shim directive deep-watches `settingsStoreSvc.settings`, and every search 
 
 `headerType` is deliberately not persisted — matches the old code exactly. URL bootstrap (reading `$location.search()` at load) is intentionally kept in `directives/startUrl.js` at this phase; moving it to the store would change timing and require the store to understand search-trigger side effects. It moves out in Phase 12.
 
-The `splainer:v3:*` key namespace migration considered in the original plan is deferred indefinitely — a breaking change for no runtime benefit.
-
 ### 11d — `Search` factory → pure constructor
 
 **Behavioral changes:** One fix, one intentional improvement. See below.
 
-Kept as a constructor function, not ES6 class — consistency with the other 11.x extractions. The **deps bag pattern** lands here: `solrUrlSvc`, `fieldSpecSvc`, `searchSvc`, `normalDocsSvc` are packed into a single `deps` object and passed as the first constructor argument. The Angular wrapper returns a curried constructor: `new WrappedSearch(...)` transparently yields a `SearchCtor` instance because `new` uses an explicitly-returned object. (This wrapper is deleted in Phase 13c.)
+Kept as a constructor function, not ES6 class — consistency with the other extractions. The **deps bag pattern** lands here: `solrUrlSvc`, `fieldSpecSvc`, `searchSvc`, `normalDocsSvc` are packed into a single `deps` object and passed as the first constructor argument. The Angular wrapper returns a curried constructor: `new WrappedSearch(...)` transparently yields a `SearchCtor` instance because `new` uses an explicitly-returned object. (This wrapper is deleted in Phase 13c.)
 
 `$q.defer()` is removed from both `search()` and `page()`. Angular's digest no longer runs off native promise microtasks, so the directive's `onPage` callback now does `.then(fn, fn).then(() => scope.$applyAsync())` in both branches — **this is why `onPage` chains `$applyAsync`** in the current shim. `search()` didn't need the fix because `SearchResultsCtrl` still wraps it in its own `$q.defer()` at this phase.
 
 **Bug fix in `page()` error handling.** The old code had no error handler; a rejected paging request left the `$q` deferred forever-pending and froze the UI. The new code sets `IN_ERROR`, clears `paging`, and surfaces the error.
 
-**Latent bug fix.** Old `page()` error path referenced `self.state = self.IN_ERROR`, which pointed at an instance property set post-construction by `splSearch.createSearch`. Replaced with `states.IN_ERROR` (the canonical constant available during construction). Functionally equivalent, semantically correct, and still load-bearing — the `createSearch` call-site is the authority for state constants.
+**Latent bug fix.** Old `page()` error path referenced `self.state = self.IN_ERROR`, which pointed at an instance property set post-construction by `splSearch.createSearch`. Replaced with `states.IN_ERROR` (the canonical constant available during construction). Functionally equivalent — the `createSearch` call-site is the authority for state constants.
 
 **Settings snapshot.** `angular.copy(searchSettings)` becomes a two-level `Object.assign` that preserves top-level methods (`searchUrl`, `fieldSpecStr`, `searchArgsStr`) while isolating nested engine sub-objects. `JSON.parse(JSON.stringify(...))` was rejected because it silently strips functions.
 
@@ -209,7 +207,9 @@ Kept as a constructor function, not ES6 class — consistency with the other 11.
 
 **Behavioral changes:** None intended. Two subtle gotchas called out below.
 
-`bootstrap.js` (~200 lines, IIFE) replaces `SearchResultsCtrl`, all five directive shims, `dispatchOnClick`, `app.js`, `splainerSearchShim.js`, and every Angular service wrapper. Responsibilities: resolve services from `globalThis.SplainerServices.*` and `SplainerSearchWired.getDefaultWiredServices()`, curry a `WrappedSearch` constructor with the deps bag, expose `currSearch`/`search`/`explainOther`/`onPage`/`onPublish`/`onSearch`, parse `window.location.hash` on boot (using `decodeURIComponent` — see Phase 11c), mount the three page-level islands, subscribe to `store.subscribe(renderAll)` for settings reactivity, and bind navbar click handlers.
+`bootstrap.js` (~200 lines, IIFE) replaces `SearchResultsCtrl`, all five directive shims, `dispatchOnClick`, `app.js`, `splainerSearchShim.js`, and every Angular service wrapper.
+
+Responsibilities: resolve services from `globalThis.SplainerServices.*` and `SplainerSearchWired getDefaultWiredServices()`, curry a `WrappedSearch` constructor with the deps bag, expose `currSearch`/`search`/`explainOther`/`onPage`/`onPublish`/`onSearch`, parse `window.location.hash` on boot (using `decodeURIComponent` — see Phase 11c), mount the three page-level islands, subscribe to `store.subscribe(renderAll)` for settings reactivity, and bind navbar click handlers.
 
 `index.html` loses `ng-app`, `ng-controller`, every `ng-*` attribute, every Angular `<script>` tag (including `angular-sanitize`, `angular-local-storage`, `angular-ui-bootstrap`, `angular-ui-ace`, `ng-json-explorer`), and every Angular wrapper script. Replaced with `<div id="...">` mount points and `<script src="scripts/bootstrap.js">`. Seventeen files deleted, five directories removed. Karma, `angular-mocks`, `grunt-karma`, `grunt-ngmin`, and the full Karma test tree are dropped from `package.json`; `yarn test` is now `vitest run`.
 
@@ -236,8 +236,6 @@ Bootstrap 3's JS is a jQuery plugin system — it throws without jQuery. Audit c
 `scripts/build.mjs` is the new production build. Vite's module-aware `vite build` can't process plain `<script>`-tag IIFE globals — it skips non-`type="module"` tags. Instead, a straightforward Node script does what `copy:app` + `copy:dist` did: pre-build island/service IIFEs, copy `app/` to `dist/`, cherry-pick vendor files from `node_modules/`. Only files referenced by HTML `<script>`/`<link>` tags are copied — no wholesale dump.
 
 Deleted: `Gruntfile.js` (325 lines), 21 Grunt-related dev dependencies, `es5-shim`, `json3`, IE conditional-comment cruft, the stale Universal Analytics snippet (Google sunset UA in July 2023), `ng-json-explorer` CSS references, and the `<!-- build:js -->` / `<!-- build:css -->` Grunt `usemin` blocks. `playwright.config.js` now runs `yarn dev:vite`; `.circleci/config.yml` extracts `dist/` instead of `app/` + `node_modules/`.
-
-Net reduction ~5,800 lines (most of which is `yarn.lock` shrinkage from 21 dropped dependencies).
 
 ### 13a cleanup + test hardening
 
@@ -281,9 +279,9 @@ The Phase 11a/11d/12 entries above intentionally still describe the old `Wrapped
 
 **Why.** Ace uses `new Function()` internally, which requires `'unsafe-eval'` in any CSP. CodeMirror 6 is CSP-clean, ~35 KB gzipped for the set of extensions used here (vs ~400 KB of eager Ace), and ESM-first — Vite bundles it into `main.js` instead of requiring separate `<script>` tags.
 
-**Scope.** Only two consumers actually used Ace: `customHeaders.jsx` and `startUrl.jsx`. `settings.jsx` always used a plain `<textarea>`; the pre-implementation forecast was wrong. Verified by grep before implementing.
+**Scope.** Only two consumers actually used Ace: `customHeaders.jsx` and `startUrl.jsx`. `settings.jsx` always used a plain `<textarea>`.
 
-**`ace-config.js` deleted, not ported.** It was resize-polling element IDs (`es-query-params-editor`, `os-query-params-editor`) that don't exist anywhere in the current DOM — the real editors use `data-role` attributes. Module ran on every page load, polled for a non-existent `#queryParams` every 500 ms, and silently no-op'd for an unknown stretch of time.
+**`ace-config.js` deleted, not ported.** It was resize-polling element IDs (`es-query-params-editor`, `os-query-params-editor`) that don't exist anywhere in the current DOM — the real editors use `data-role` attributes.
 
 **New hook: `useCodeMirror`.** API mirrors `useAceEditor` — `(value, onChange, { readOnly, tabSize, useWrapMode })` — so consumer diffs were one-line import swaps. Same three-ref pattern (`viewRef`, `onChangeRef`, `suppressRef`) guarding the same echo loop. A one-shot `useEffect` creates the `EditorView`; value-sync dispatches a `changes` transaction instead of tearing down the view; `readOnly`-sync uses a `Compartment.reconfigure`. **e2e escape hatch:** the `EditorView` is stashed on the container DOM node as `container.__cmView` on mount, replacing the old `window.ace.edit(container).getValue()` read in Playwright specs.
 
@@ -307,7 +305,7 @@ The four CM6 packages are pinned individually (`@codemirror/state`, `@codemirror
 
 Three Playwright projects: `smoke-local` (existing hermetic mocked suite), `audit-prod` (live `http://splainer.io`), `audit-local` (live `http://localhost:5173`). Audit scenarios drive state via URL hash fragments — no interactive setup. Per-scenario capture writes a full-page screenshot, a `state.json` (structural snapshot, console log, network requests, framework-fingerprint booleans), all attached via `testInfo.attach` and wrapped in `try/finally` so a test that throws mid-wait still produces its diagnostics.
 
-**Prod is HTTP, not HTTPS** — S3 doesn't terminate TLS; `https://splainer.io` returns a connection reset. The audit is comparing `deangularize` against a 2024-03-17 snapshot, not live `main`. **Prod has a latent non-default-query bug**: `solrSettingsSvc.fromParsedUrl` strips args via `removeUnsupported()` and defaults to `q=*:*` if empty, so `#?solr=...q=batman` renders Batman results but persists `q=*:*` back to the hash. Local is strictly more correct; documented as a known-prod-bug in the diff.
+**Prod is HTTP, not HTTPS** — S3 doesn't terminate TLS; `https://splainer.io` returns a connection reset. The audit is comparing `deangularize` against a 2024-03-17 snapshot, not live `main`. **Prod has a latent non-default-query bug**: `solrSettingsSvc.fromParsedUrl` strips args via `removeUnsupported()` and defaults to `q=*:*` if empty, so `#?solr=...q=batman` renders Batman results but persists `q=*:*` back to the hash. deangularize is strictly more correct; documented as a known-prod-bug in the diff.
 
 ### 15b — Audit diff script, `data-role` unification, DocRow spacing
 
@@ -317,7 +315,7 @@ Three loosely-coupled changes from the same audit-driven review pass.
 
 **`data-testid` → `data-role` unification.** `docRow.jsx`, `stackedChart.jsx`, and `docExplain.jsx` used `data-testid` (testing-library convention) while every other island used `data-role`. Unified to `data-role`. Deliberately kept `data-testid` in `useCodeMirror.spec.jsx` — it uses testing-library's `getByTestId()` API, a different concern.
 
-**DocRow field-label spacing.** Local rendered `title:Foo`, prod rendered `title: Foo`. Root cause: JSX strips trailing whitespace adjacent to a closing tag, so `<label>{fieldName}: </label>` emitted just `title:`. Fix: `<label>{fieldName}:</label>{' '}<SanitizedSpan .../>`. `{' '}` survives JSX whitespace handling because it's an expression.
+**DocRow field-label spacing.** deangularize rendered `title:Foo`, prod rendered `title: Foo`. Root cause: JSX strips trailing whitespace adjacent to a closing tag, so `<label>{fieldName}: </label>` emitted just `title:`. Fix: `<label>{fieldName}:</label>{' '}<SanitizedSpan .../>`. `{' '}` survives JSX whitespace handling because it's an expression.
 
 Audit divergence count: 172 → 56 on first clean run. Most of the drop was the spacing fix times ~10 rows times 7 scenarios.
 
@@ -342,11 +340,13 @@ For multi-valued Solr fields like TMDB's `overview` (returned as a single-elemen
 
 **Fix.** Reverted to polymorphic slice with a null guard kept intact. Upstream commit `975cd98`, splainer-search 616 → 618 tests. Regression tests cover array-wrapped and primitive-string field values separately. splainer.io `package.json` bumped to `#975cd98`; the postinstall rebuilds the wired IIFE automatically.
 
-**Why upstream, not downstream.** The bug is strictly library-side, and `splainer-search`'s `.cursor/rules/GENERAL.md` explicitly asks contributors to highlight any divergence from the Angular version's behavior. A downstream shim would have hidden the regression from every other consumer of the library.
+**Why upstream, not downstream.** The bug is strictly library-side.
 
 ### 15e — Audit reliability
 
-Post-review hardening of the audit infrastructure. Generalized empty-results wait path (was hard-coded to `solr=`); tightened `expectMaxDocRows` loose-equality (missing field now means "no cap," not `<= undefined`); bumped the body-text-length poll to `intervals: [500]` to dodge the "Execution context was destroyed" race against Vite HMR and live-prod navigation. **Bonus fix:** scenario-anchor wait before capture — after the generic "body has text" gate, wait for `scenario.expectBodyText[0]` to actually appear before capturing state. Eliminates the sporadic audit-prod flakes where the Search Controls panel hadn't rendered radio labels yet at capture time. Escalated into scope when it started blocking validation of the other fixes. `audit-diff.js` exit code on missing results directory changed from 0 to 1 — the `&&` chain in `yarn test:e2e:audit` otherwise falsely reported success on an audit that produced no output.
+Post-review hardening of the audit infrastructure. Generalized empty-results wait path (was hard-coded to `solr=`); tightened `expectMaxDocRows` loose-equality (missing field now means "no cap," not `<= undefined`); bumped the body-text-length poll to `intervals: [500]` to dodge the "Execution context was destroyed" race against Vite HMR and live-prod navigation. 
+
+**Fix:** scenario-anchor wait before capture — after the generic "body has text" gate, wait for `scenario.expectBodyText[0]` to actually appear before capturing state. Eliminates the sporadic audit-prod flakes where the Search Controls panel hadn't rendered radio labels yet at capture time. Escalated into scope when it started blocking validation of the other fixes. `audit-diff.js` exit code on missing results directory changed from 0 to 1 — the `&&` chain in `yarn test:e2e:audit` otherwise falsely reported success on an audit that produced no output.
 
 ### 15f — `WeightExplain` docId upstream fix
 
