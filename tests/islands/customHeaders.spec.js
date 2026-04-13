@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from 'vitest';
-import { mount, unmount } from './customHeaders.jsx';
-import { makeRoot } from '../test-helpers/factories.js';
+import { mount, unmount } from '@app/islands/customHeaders.jsx';
+import { makeRoot } from '@test/factories.js';
 
 // jsdom does not load Ace, so the island falls back to the textarea
 // renderer (see TextareaFallback in customHeaders.jsx). The fallback uses

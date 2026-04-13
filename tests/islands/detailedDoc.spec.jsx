@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from 'preact';
-import { DetailedDoc, renderInto, unmount } from './detailedDoc.jsx';
+import { DetailedDoc, renderInto, unmount } from '@app/islands/detailedDoc.jsx';
 
 // Dialog polyfill (showModal/close) loaded via vitest setupFiles.
-import { makeRoot } from '../test-helpers/factories.js';
+import { makeRoot } from '@test/factories.js';
 
 function makeDoc(overrides) {
   return Object.assign(

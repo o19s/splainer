@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from 'preact';
- 
-import { StackedChart } from './stackedChart.jsx';
-import { makeRoot } from '../test-helpers/factories.js';
+
+import { StackedChart } from '@app/islands/stackedChart.jsx';
+import { makeRoot } from '@test/factories.js';
 
 function makeDoc(hots) {
   return {
@@ -44,10 +44,7 @@ describe('stackedChart island', () => {
 
   it('omits the Detailed link when no onDetailed handler is provided', () => {
     const el = makeRoot();
-    render(
-      <StackedChart doc={makeDoc([{ description: 'x', percentage: 50 }])} maxScore={1} />,
-      el,
-    );
+    render(<StackedChart doc={makeDoc([{ description: 'x', percentage: 50 }])} maxScore={1} />, el);
     expect(el.querySelector('[data-role="stacked-chart-detailed"]')).toBeNull();
   });
 
@@ -109,10 +106,7 @@ describe('stackedChart island', () => {
     const el = makeRoot();
     const evil = '<img src=x onerror="window.__xss_chart=1">';
     render(
-      <StackedChart
-        doc={makeDoc([{ description: evil, percentage: 50 }])}
-        maxScore={1}
-      />,
+      <StackedChart doc={makeDoc([{ description: evil, percentage: 50 }])} maxScore={1} />,
       el,
     );
     expect(el.querySelector('img')).toBeNull();

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from 'vitest';
-import { mount, unmount } from './settings.jsx';
-import { makeRoot } from '../test-helpers/factories.js';
+import { mount, unmount } from '@app/islands/settings.jsx';
+import { makeRoot } from '@test/factories.js';
 
 // The settings island uses a plain textarea for the search-args editor
 // (not the CodeMirror hook — settings was never wired up to Ace either).
@@ -72,7 +72,7 @@ describe('settings island', () => {
     expect(el.querySelector('[data-role="custom-headers-section"]')).not.toBeNull();
   });
 
-  it('switching engines preserves each engine\'s unsaved tweaks (round-trip)', async () => {
+  it("switching engines preserves each engine's unsaved tweaks (round-trip)", async () => {
     const el = makeRoot();
     const settings = defaultSettings();
     mount(el, { settings, currSearch: null }, () => {});
@@ -167,7 +167,9 @@ describe('settings island', () => {
     osRadio.click();
     await flush();
 
-    el.querySelector('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    el.querySelector('form').dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    );
 
     expect(onPublish).toHaveBeenCalled();
     const lastCall = onPublish.mock.calls[onPublish.mock.calls.length - 1];
@@ -188,7 +190,9 @@ describe('settings island', () => {
     const onPublish = vi.fn();
     mount(el, { settings, currSearch: null }, onPublish);
 
-    el.querySelector('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    el.querySelector('form').dispatchEvent(
+      new Event('submit', { bubbles: true, cancelable: true }),
+    );
 
     expect(onPublish).toHaveBeenCalledTimes(1);
     expect(onPublish.mock.calls[0][0]).toBe('solr');
@@ -219,9 +223,7 @@ describe('settings island', () => {
     await flush();
 
     // searchArgsStr is now indented.
-    expect(settings.es.searchArgsStr).toBe(
-      '{\n  "query": {\n    "match_all": {}\n  }\n}',
-    );
+    expect(settings.es.searchArgsStr).toBe('{\n  "query": {\n    "match_all": {}\n  }\n}');
   });
 
   it('Indent JSON pretty-prints os searchArgsStr too', async () => {
@@ -247,9 +249,7 @@ describe('settings island', () => {
     indent.click();
     await flush();
 
-    expect(settings.os.searchArgsStr).toBe(
-      '{\n  "query": {\n    "match_all": {}\n  }\n}',
-    );
+    expect(settings.os.searchArgsStr).toBe('{\n  "query": {\n    "match_all": {}\n  }\n}');
   });
 
   it('field-spec input is hidden when currSearch.searcher.isTemplateCall() is true', () => {

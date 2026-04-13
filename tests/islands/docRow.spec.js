@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount, unmount } from './docRow.jsx';
+import { mount, unmount } from '@app/islands/docRow.jsx';
 
-import { makeRoot, makeSearchDoc } from '../test-helpers/factories.js';
+import { makeRoot, makeSearchDoc } from '@test/factories.js';
 
 // Helpers ────────────────────────────────────────────────────────────────────
 
@@ -57,9 +57,7 @@ describe('docRow island', () => {
       }),
       { maxScore: 1 },
     );
-    const labels = Array.from(el.querySelectorAll('.fieldLabel')).map((l) =>
-      l.textContent.trim(),
-    );
+    const labels = Array.from(el.querySelectorAll('.fieldLabel')).map((l) => l.textContent.trim());
     expect(labels).toContain('body:');
     expect(labels).toContain('title:');
   });
@@ -162,8 +160,7 @@ describe('docRow island', () => {
     mount(
       el,
       makeDoc({
-        getHighlightedTitle: () =>
-          'safe text <img src=x onerror="window.__xss=1"> more',
+        getHighlightedTitle: () => 'safe text <img src=x onerror="window.__xss=1"> more',
       }),
       { maxScore: 1 },
     );
@@ -207,8 +204,7 @@ describe('docRow island', () => {
     mount(
       el,
       makeDoc({
-        getHighlightedTitle: () =>
-          '<a href="javascript:window.__xss3=1">click</a>',
+        getHighlightedTitle: () => '<a href="javascript:window.__xss3=1">click</a>',
       }),
       { maxScore: 1 },
     );

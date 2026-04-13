@@ -97,9 +97,7 @@ test.describe('splainer smoke', () => {
       });
     });
 
-    const bookmarkedSolr = encodeURIComponent(
-      'http://fake-solr.test/solr/coll1/select?q=*:*',
-    );
+    const bookmarkedSolr = encodeURIComponent('http://fake-solr.test/solr/coll1/select?q=*:*');
     await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title`);
 
     // Two-part assertion: the URL is reflected somewhere durable (DOM input
@@ -275,9 +273,7 @@ test.describe('splainer smoke', () => {
     await page.goto('/');
     await page.locator('a[href="#es_"]').click();
     // Set the ES URL to our intercepted host.
-    await page
-      .locator('#es_ [data-role="es-start-url"]')
-      .fill('http://fake-es.test/_search');
+    await page.locator('#es_ [data-role="es-start-url"]').fill('http://fake-es.test/_search');
     // Open the Advanced Settings panel and pick API Key — the island's
     // setHeaderType handler populates the body with the Authorization
     // template via the settings store → splainer-search.
@@ -345,9 +341,7 @@ test.describe('splainer smoke', () => {
     // and triggers the first search, which puts the dev sidebar into the
     // 'es' engine — the state we want to test the dev sidebar against.
     await page.locator('a[href="#es_"]').click();
-    await page
-      .locator('#es_ [data-role="es-start-url"]')
-      .fill('http://fake-es.test/_search');
+    await page.locator('#es_ [data-role="es-start-url"]').fill('http://fake-es.test/_search');
     await page.locator('#es_').getByRole('button', { name: 'Splain This!' }).click();
 
     // Wait until the first search lands so the dev sidebar's Settings island
@@ -359,7 +353,7 @@ test.describe('splainer smoke', () => {
     // input. We're testing the *publish* chain (Settings island → bootstrap
     // onPublish → esSettings.fromTweakedSettings → fetch). The
     // editor → store mutation path has its own coverage in
-    // app/scripts/islands/settings.spec.js (Vitest, textarea fallback) and
+    // tests/islands/settings.spec.js (Vitest, textarea fallback) and
     // is structurally identical to PR 6's customHeaders editor wiring,
     // which has its own browser-level Playwright test. Going through the
     // store keeps this test focused on the integration boundary it owns,
@@ -409,12 +403,13 @@ test.describe('splainer smoke', () => {
       }
       return out;
     }, marker);
-    expect(leakedKeys, `marker leaked into unexpected localStorage keys: ${leakedKeys.join(', ')}`).toEqual([]);
+    expect(
+      leakedKeys,
+      `marker leaked into unexpected localStorage keys: ${leakedKeys.join(', ')}`,
+    ).toEqual([]);
   });
 
-  test('clicking a doc-row title opens the detailed doc view with field data', async ({
-    page,
-  }) => {
+  test('clicking a doc-row title opens the detailed doc view with field data', async ({ page }) => {
     // Proves the user-level click path for the doc-row title link works
     // end-to-end: click the title, the detailedDoc modal opens, and the
     // modal body shows the doc fields splainer-search normalized from the
@@ -441,9 +436,7 @@ test.describe('splainer smoke', () => {
       });
     });
 
-    const bookmarkedSolr = encodeURIComponent(
-      'http://fake-solr.test/solr/coll1/select?q=*:*',
-    );
+    const bookmarkedSolr = encodeURIComponent('http://fake-solr.test/solr/coll1/select?q=*:*');
     await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title+director+release_year`);
 
     // Wait for the initial search to render at least one doc-row.
@@ -505,9 +498,7 @@ test.describe('splainer smoke', () => {
       });
     });
 
-    const bookmarkedSolr = encodeURIComponent(
-      'http://fake-solr.test/solr/coll1/select?q=*:*',
-    );
+    const bookmarkedSolr = encodeURIComponent('http://fake-solr.test/solr/coll1/select?q=*:*');
     await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title`);
 
     // Wait for the initial search to land and render the first doc-row.
@@ -538,9 +529,7 @@ test.describe('splainer smoke', () => {
     // splainer-search 3.0.0 either sets explainOther=<q> or re-runs the
     // query with q=<q> + explainOther=true. Either way, the marker appears
     // somewhere in the URL of the second request.
-    await expect
-      .poll(() => captured.some((u) => u.includes(marker)))
-      .toBe(true);
+    await expect.poll(() => captured.some((u) => u.includes(marker))).toBe(true);
   });
 
   test('docSelector island: backend error surfaces the error banner', async ({ page }) => {
@@ -583,9 +572,7 @@ test.describe('splainer smoke', () => {
       }
     });
 
-    const bookmarkedSolr = encodeURIComponent(
-      'http://fake-solr.test/solr/coll1/select?q=*:*',
-    );
+    const bookmarkedSolr = encodeURIComponent('http://fake-solr.test/solr/coll1/select?q=*:*');
     await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title`);
 
     await expect.poll(() => searchCount).toBeGreaterThan(0);
@@ -626,9 +613,7 @@ test.describe('splainer smoke', () => {
       }),
     );
 
-    const failingSolr = encodeURIComponent(
-      'http://fake-solr.test/solr/coll1/select?q=*:*',
-    );
+    const failingSolr = encodeURIComponent('http://fake-solr.test/solr/coll1/select?q=*:*');
     await page.goto(`/#?solr=${failingSolr}&fieldSpec=id+title`);
 
     // The app should reach the IN_ERROR state and surface SOMETHING to the
@@ -679,9 +664,7 @@ test.describe('splainer smoke', () => {
       });
     });
 
-    const bookmarkedSolr = encodeURIComponent(
-      'http://fake-solr.test/solr/coll1/select?q=*:*',
-    );
+    const bookmarkedSolr = encodeURIComponent('http://fake-solr.test/solr/coll1/select?q=*:*');
     await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title`);
 
     // Wait for the row, then click the Detailed link inside its stacked chart.
@@ -708,9 +691,7 @@ test.describe('splainer smoke', () => {
     await expect(page.locator('[data-role="detailed-explain-modal"]')).toBeHidden();
   });
 
-  test('Search Args stays below Search Engine header when switching engines', async ({
-    page,
-  }) => {
+  test('Search Args stays below Search Engine header when switching engines', async ({ page }) => {
     // Regression test: switching engines in the Tweak panel must not cause
     // the Search Args content to render above the Search Engine header.
     await page.route('http://fake-solr.test/**', async (route) => {
@@ -723,9 +704,7 @@ test.describe('splainer smoke', () => {
         },
       });
     });
-    const bookmarkedSolr = encodeURIComponent(
-      'http://fake-solr.test/solr/coll1/select?q=*:*',
-    );
+    const bookmarkedSolr = encodeURIComponent('http://fake-solr.test/solr/coll1/select?q=*:*');
     await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title`);
     await page.locator('[data-role="doc-row"]').first().waitFor();
 
@@ -742,7 +721,7 @@ test.describe('splainer smoke', () => {
         const east = document.querySelector('.pane_east');
         if (!east) return false;
         const headers = Array.from(east.querySelectorAll('.dev-header'));
-        const engineHeader = headers.find(h => h.textContent.includes('Search Engine'));
+        const engineHeader = headers.find((h) => h.textContent.includes('Search Engine'));
         const argsEditor = east.querySelector('[data-role="search-args-editor"]');
         if (!engineHeader || !argsEditor) return false;
         return argsEditor.getBoundingClientRect().top > engineHeader.getBoundingClientRect().bottom;
@@ -802,9 +781,7 @@ test.describe('splainer smoke', () => {
     });
 
     // Start with a Solr search.
-    const bookmarkedSolr = encodeURIComponent(
-      'http://fake-solr.test/solr/coll1/select?q=*:*',
-    );
+    const bookmarkedSolr = encodeURIComponent('http://fake-solr.test/solr/coll1/select?q=*:*');
     await page.goto(`/#?solr=${bookmarkedSolr}&fieldSpec=id+title`);
     await page.locator('[data-role="doc-row"]').first().waitFor();
     await expect(page.getByText('Solr Result')).toBeVisible();

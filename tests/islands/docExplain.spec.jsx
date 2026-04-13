@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from 'preact';
-import { DocExplain, renderInto, unmount } from './docExplain.jsx';
+import { DocExplain, renderInto, unmount } from '@app/islands/docExplain.jsx';
 
 // Dialog polyfill (showModal/close) loaded via vitest setupFiles.
-import { makeRoot, makeSearchDoc as makeDoc } from '../test-helpers/factories.js';
+import { makeRoot, makeSearchDoc as makeDoc } from '@test/factories.js';
 
 describe('docExplain island', () => {
   beforeEach(() => {
@@ -13,10 +13,7 @@ describe('docExplain island', () => {
 
   it('renders the heading with doc.title interpolated', () => {
     const el = makeRoot();
-    render(
-      <DocExplain doc={makeDoc({ title: 'the canned title' })} onClose={() => {}} />,
-      el,
-    );
+    render(<DocExplain doc={makeDoc({ title: 'the canned title' })} onClose={() => {}} />, el);
     const header = el.querySelector('[data-role="detailed-explain-modal"]');
     expect(header.textContent).toContain('Explain for:');
     expect(header.textContent).toContain('the canned title');
@@ -38,10 +35,7 @@ describe('docExplain island', () => {
     // All three tabs are in DOM simultaneously (CSS-hidden when inactive);
     // Playwright greps across tabs so conditional rendering would fail.
     const el = makeRoot();
-    render(
-      <DocExplain doc={makeDoc({ hotStr: 'HOT_MARKER foo' })} onClose={() => {}} />,
-      el,
-    );
+    render(<DocExplain doc={makeDoc({ hotStr: 'HOT_MARKER foo' })} onClose={() => {}} />, el);
     expect(el.textContent).toContain('HOT_MARKER');
   });
 
@@ -106,9 +100,7 @@ describe('docExplain island', () => {
   it('renders nested DocRow children for explainOther results and tracks altDoc selection', async () => {
     const el = makeRoot();
     const altDocFixture = makeDoc({ id: 'alt-doc-1', title: 'ALT_DOC_TITLE' });
-    const explainOther = vi
-      .fn()
-      .mockResolvedValue({ docs: [altDocFixture], maxScore: 2.5 });
+    const explainOther = vi.fn().mockResolvedValue({ docs: [altDocFixture], maxScore: 2.5 });
     render(
       <DocExplain
         doc={makeDoc({ title: 'PRIMARY' })}

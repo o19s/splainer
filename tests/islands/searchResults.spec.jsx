@@ -3,13 +3,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render } from 'preact';
 
 // Mock modalRegistry before importing searchResults (which imports it).
-vi.mock('./modalRegistry.js', () => ({
+vi.mock('@app/islands/modalRegistry.js', () => ({
   openDocModal: vi.fn(),
 }));
-import { openDocModal } from './modalRegistry.js';
+import { openDocModal } from '@app/islands/modalRegistry.js';
 
-import { SearchResults, mount, unmount } from './searchResults.jsx';
-import { makeRoot as _makeRoot, makeSearchDoc } from '../test-helpers/factories.js';
+import { SearchResults, mount, unmount } from '@app/islands/searchResults.jsx';
+import { makeRoot as _makeRoot, makeSearchDoc } from '@test/factories.js';
 
 const roots = [];
 function makeRoot() {
@@ -148,11 +148,7 @@ describe('SearchResults island', () => {
     titleLink.click();
     await new Promise((r) => setTimeout(r, 0));
 
-    expect(openDocModal).toHaveBeenCalledWith(
-      'detailedDoc',
-      doc,
-      {},
-    );
+    expect(openDocModal).toHaveBeenCalledWith('detailedDoc', doc, {});
   });
 
   it('renders doc rows for DID_SEARCH state', () => {
@@ -184,8 +180,8 @@ describe('SearchResults island', () => {
 
     expect(root.textContent).toContain('Total Results');
     // No link wrapping the total results text
-    const totalLink = [...root.querySelectorAll('a')].find(
-      (a) => a.textContent.includes('Total Results'),
+    const totalLink = [...root.querySelectorAll('a')].find((a) =>
+      a.textContent.includes('Total Results'),
     );
     expect(totalLink).toBeFalsy();
   });

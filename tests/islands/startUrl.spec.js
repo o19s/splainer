@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount, unmount } from './startUrl.jsx';
-import { makeRoot } from '../test-helpers/factories.js';
+import { mount, unmount } from '@app/islands/startUrl.jsx';
+import { makeRoot } from '@test/factories.js';
 
 // Preact batches state updates and defers useEffect to a microtask. Two
 // flushes cover both: one for the effect queue, one for any follow-up
@@ -66,7 +66,11 @@ describe('startUrl island', () => {
   it('does not overwrite an existing startUrl on mount', async () => {
     const el = makeRoot();
     const settings = makeSettings({
-      solr: { startUrl: 'http://user-chose:8983/solr/x/select?q=foo', searchArgsStr: '', fieldSpecStr: '' },
+      solr: {
+        startUrl: 'http://user-chose:8983/solr/x/select?q=foo',
+        searchArgsStr: '',
+        fieldSpecStr: '',
+      },
     });
     mount(el, { settings }, { onSearch: () => {} });
     await flush();

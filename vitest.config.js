@@ -1,5 +1,9 @@
 // Vitest config — covers Preact islands and service modules.
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   // JSX → preact for spec files. Vitest 4 uses oxc (not esbuild) under
@@ -8,16 +12,15 @@ export default defineConfig({
   // imports to Preact's runtime — same end result, more reliable mechanism.
   resolve: {
     alias: {
+      '@app': path.resolve(__dirname, 'app/scripts'),
+      '@test': path.resolve(__dirname, 'tests/helpers'),
       'react/jsx-dev-runtime': 'preact/jsx-dev-runtime',
       'react/jsx-runtime': 'preact/jsx-runtime',
     },
   },
   test: {
-    include: [
-      'app/scripts/islands/**/*.spec.{js,jsx}',
-      'app/scripts/services/**/*.spec.js',
-    ],
+    include: ['tests/islands/**/*.spec.{js,jsx}', 'tests/services/**/*.spec.js'],
     environment: 'jsdom',
-    setupFiles: ['./app/scripts/test-helpers/jsdom-dialog-polyfill.js'],
+    setupFiles: ['./tests/helpers/jsdom-dialog-polyfill.js'],
   },
 });

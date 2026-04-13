@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect } from 'vitest';
-import { parseUrl, createJsonEngineSettings } from './jsonEngineSettings.js';
+import { parseUrl, createJsonEngineSettings } from '@app/services/jsonEngineSettings.js';
 
 // --- parseUrl -----------------------------------------------------------------
 

@@ -1,11 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { formatJson } from './formatJson.js';
+import { formatJson } from '@app/islands/formatJson.js';
 
 describe('formatJson', () => {
   it('pretty-prints valid JSON with 2-space indent', () => {
-    expect(formatJson('{"a":1,"b":[2,3]}')).toBe(
-      '{\n  "a": 1,\n  "b": [\n    2,\n    3\n  ]\n}',
-    );
+    expect(formatJson('{"a":1,"b":[2,3]}')).toBe('{\n  "a": 1,\n  "b": [\n    2,\n    3\n  ]\n}');
   });
 
   it('returns the original string when JSON is invalid', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { fromStartUrl, fromTweakedSettings } from './solrSettings.js';
+import { fromStartUrl, fromTweakedSettings } from '@app/services/solrSettings.js';
 
 /**
  * Stub solrUrlSvc — mimics the subset of splainer-search's solrUrlSvc
@@ -27,7 +27,9 @@ function makeSolrUrlSvc() {
         });
       }
       return {
-        solrEndpoint: function () { return endpoint; },
+        solrEndpoint: function () {
+          return endpoint;
+        },
         solrArgs: args,
       };
     },
@@ -35,14 +37,17 @@ function makeSolrUrlSvc() {
       var args = {};
       // Normalize newline-delimited args back to & delimited, then parse
       var normalized = argsStr.replace(/\n&/g, '&');
-      normalized.split('&').filter(Boolean).forEach(function (pair) {
-        var eqIdx = pair.indexOf('=');
-        if (eqIdx === -1) return;
-        var key = pair.substring(0, eqIdx).trim();
-        var val = pair.substring(eqIdx + 1);
-        if (!args[key]) args[key] = [];
-        args[key].push(val);
-      });
+      normalized
+        .split('&')
+        .filter(Boolean)
+        .forEach(function (pair) {
+          var eqIdx = pair.indexOf('=');
+          if (eqIdx === -1) return;
+          var key = pair.substring(0, eqIdx).trim();
+          var val = pair.substring(eqIdx + 1);
+          if (!args[key]) args[key] = [];
+          args[key].push(val);
+        });
       return args;
     },
     formatSolrArgs: function (args) {
@@ -226,7 +231,9 @@ describe('solrSettings', () => {
       var spy = vi.spyOn(solrUrlSvc, 'parseSolrUrl');
       var fakeArgs = { q: ['*:*'], wt: ['json'] };
       spy.mockReturnValue({
-        solrEndpoint: function () { return 'http://localhost:8983/solr/example'; },
+        solrEndpoint: function () {
+          return 'http://localhost:8983/solr/example';
+        },
         solrArgs: fakeArgs,
       });
 

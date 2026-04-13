@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock the island modules that modalRegistry imports statically.
 // This lets us spy on renderInto/unmount without rendering real Preact trees.
-vi.mock('./detailedDoc.jsx', () => ({
+vi.mock('@app/islands/detailedDoc.jsx', () => ({
   renderInto: vi.fn((root) => {
     const marker = document.createElement('div');
     marker.dataset.kind = 'detailedDoc';
@@ -14,7 +14,7 @@ vi.mock('./detailedDoc.jsx', () => ({
   }),
 }));
 
-vi.mock('./docExplain.jsx', () => ({
+vi.mock('@app/islands/docExplain.jsx', () => ({
   renderInto: vi.fn((root) => {
     const marker = document.createElement('div');
     marker.dataset.kind = 'detailedExplain';
@@ -25,9 +25,9 @@ vi.mock('./docExplain.jsx', () => ({
   }),
 }));
 
-import { openDocModal } from './modalRegistry.js';
-import * as detailedDoc from './detailedDoc.jsx';
-import * as docExplain from './docExplain.jsx';
+import { openDocModal } from '@app/islands/modalRegistry.js';
+import * as detailedDoc from '@app/islands/detailedDoc.jsx';
+import * as docExplain from '@app/islands/docExplain.jsx';
 
 // modalRegistry keeps a module-level `current` handle. To avoid state leaking
 // between tests, each test that opens a modal should close it, or we account

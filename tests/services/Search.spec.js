@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { Search } from './Search.js';
-
+import { Search } from '@app/services/Search.js';
 
 var states = {
   NO_SEARCH: 0,
@@ -23,7 +22,12 @@ function makeDeps(overrides) {
       searchSvc: { createSearcher: vi.fn() },
       normalDocsSvc: {
         createNormalDoc: vi.fn(function (fs, doc) {
-          return { score: function () { return 1.0; }, _doc: doc };
+          return {
+            score: function () {
+              return 1.0;
+            },
+            _doc: doc,
+          };
         }),
       },
     },
@@ -35,9 +39,15 @@ function makeSettings(overrides) {
   return Object.assign(
     {
       whichEngine: 'solr',
-      searchUrl: function () { return 'http://example.com'; },
-      fieldSpecStr: function () { return 'title'; },
-      searchArgsStr: function () { return ''; },
+      searchUrl: function () {
+        return 'http://example.com';
+      },
+      fieldSpecStr: function () {
+        return 'title';
+      },
+      searchArgsStr: function () {
+        return '';
+      },
       solr: { searchArgsStr: 'q=*:*', customHeaders: '' },
       es: { searchArgsStr: '{}', customHeaders: '' },
       os: { searchArgsStr: '{}', customHeaders: '' },
@@ -139,7 +149,7 @@ describe('Search (pure constructor)', () => {
 
   describe('getOverridingExplain()', () => {
     it('returns explain for matching doc id', () => {
-      var explains = { '42': 'explain-tree' };
+      var explains = { 42: 'explain-tree' };
       var s = new Search(deps, settings, explains, states, engines);
       var result = s.getOverridingExplain({ id: '42' }, { id: 'id' });
       expect(result).toBe('explain-tree');
@@ -152,7 +162,7 @@ describe('Search (pure constructor)', () => {
     });
 
     it('returns null when doc has no id value', () => {
-      var s = new Search(deps, settings, { '42': 'expl' }, states, engines);
+      var s = new Search(deps, settings, { 42: 'expl' }, states, engines);
       var result = s.getOverridingExplain({}, { id: 'id' });
       expect(result).toBeNull();
     });

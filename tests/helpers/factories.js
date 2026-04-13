@@ -1,5 +1,6 @@
 /**
  * Shared test factories for splainer-search object shapes.
+ * Lives under `tests/helpers/`; import from specs as `@test/factories.js` (see `vitest.config.js` aliases).
  *
  * These match the doc interface that splainer-search 3.0.0 exposes:
  * score(), getHighlightedTitle(), subSnippets(), hasThumb(), hasImage(),
@@ -42,7 +43,7 @@ export function makeSearchDoc(overrides = {}) {
 
   const id = rest.id || 'doc-1';
   const title = rest.title || 'canned title';
-  const scoreFn = typeof scoreCfg === 'function' ? scoreCfg : () => (scoreCfg ?? 1.0);
+  const scoreFn = typeof scoreCfg === 'function' ? scoreCfg : () => scoreCfg ?? 1.0;
 
   const defaults = {
     id,

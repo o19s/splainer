@@ -21,7 +21,7 @@ Skip any of the three and you get stale-closure bugs, infinite loops, or silentl
 ## Adding a new island
 
 1. Write `app/scripts/islands/<name>.jsx`. Export `mount(rootEl, props...)` and `unmount(rootEl)`.
-2. Write a Vitest spec at `<name>.spec.js` next to the source. Use jsdom environment.
+2. Write a Vitest spec at `tests/islands/<name>.spec.js` (or `.spec.jsx`). Import the implementation with `@app/islands/<name>.jsx` and shared helpers with `@test/factories.js`. Use the jsdom environment.
 3. Import the island's `mount` function in `app/scripts/main.js` and call it from `renderAll()`.
 4. Add a `<div id="<name>-mount">` to `app/index.html` if the island needs a top-level mount point. (Islands rendered as JSX children of other islands, like `CustomHeaders` inside `StartUrl`, don't need one.)
 5. Run `yarn test && yarn test:e2e`. Both must be green.

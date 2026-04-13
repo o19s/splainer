@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect } from 'vitest';
-import { mount, unmount } from './solrSettingsWarning.jsx';
-import { makeRoot } from '../test-helpers/factories.js';
+import { mount, unmount } from '@app/islands/solrSettingsWarning.jsx';
+import { makeRoot } from '@test/factories.js';
 
 // Fake solrUrlSvc: mirrors the real splainer-search API surface the
 // island touches. parseSolrArgs returns an object; removeUnsupported

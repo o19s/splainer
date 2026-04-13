@@ -4,7 +4,6 @@
  */
 import { useState } from 'preact/hooks';
 
- 
 function MatchRow({ match }) {
   // Min/max clamp handles maxScore=0 (which makes percentage = Infinity).
   const pct = Math.max(0, Math.min(100, match.percentage));
@@ -27,7 +26,7 @@ function MatchRow({ match }) {
 export function StackedChart({ doc, maxScore, onDetailed }) {
   const [showAll, setShowAll] = useState(false);
 
-  // The defensive bail-out exists for docRow.spec.js's chart-agnostic
+  // The defensive bail-out exists for tests/islands/docRow.spec.js's chart-agnostic
   // tests, which use a makeDoc that omits hotMatchesOutOf to stay
   // decoupled from the chart's render shape. Production docs always
   // have it.

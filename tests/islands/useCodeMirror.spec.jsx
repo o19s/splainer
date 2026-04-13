@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/preact';
-import { useCodeMirror } from './useCodeMirror.js';
+import { useCodeMirror } from '@app/islands/useCodeMirror.js';
 
 // CodeMirror 6 runs in jsdom well enough for doc-state operations (value
 // sync, onChange, readOnly, unmount cleanup). Operations that need layout

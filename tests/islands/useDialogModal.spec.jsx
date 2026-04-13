@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from 'vitest';
 import { render } from 'preact';
-import { useDialogModal } from './useDialogModal.js';
-import { makeRoot } from '../test-helpers/factories.js';
+import { useDialogModal } from '@app/islands/useDialogModal.js';
+import { makeRoot } from '@test/factories.js';
 
 // jsdom dialog polyfill (showModal/close) loaded via vitest setupFiles.
 

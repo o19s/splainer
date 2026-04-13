@@ -86,6 +86,65 @@ export default [
       'no-unused-vars': ['error', unusedVarsOptions],
     },
   },
+  {
+    files: ['tests/helpers/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+    },
+    rules: {
+      'no-unused-vars': ['error', unusedVarsOptions],
+    },
+  },
+  {
+    files: ['tests/services/**/*.spec.js', 'tests/islands/**/*.spec.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+    },
+    rules: {
+      'no-unused-vars': ['error', unusedVarsOptions],
+    },
+  },
+  {
+    files: ['tests/islands/**/*.spec.jsx'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+    },
+    plugins: {
+      react,
+      'react-hooks': reactHooks,
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
+    rules: {
+      'no-unused-vars': ['error', unusedVarsOptions],
+      'react/jsx-uses-vars': 'error',
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+    },
+  },
   // Root tooling configs (ESM): Node globals such as `process` for CI flags.
   {
     files: ['playwright.config.js', 'scripts/**/*.{js,mjs}'],

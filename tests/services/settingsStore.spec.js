@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { createSettingsStore } from './settingsStore.js';
+import { createSettingsStore } from '@app/services/settingsStore.js';
 
 // angular-local-storage 0.7.1 default prefix
 var LS_PREFIX = 'ls.';
@@ -14,9 +14,7 @@ function setupMocks(storageContents) {
 
   vi.stubGlobal('localStorage', {
     getItem: function (key) {
-      return Object.prototype.hasOwnProperty.call(store, key)
-        ? store[key]
-        : null;
+      return Object.prototype.hasOwnProperty.call(store, key) ? store[key] : null;
     },
     setItem: function (key, val) {
       store[key] = val;
@@ -333,8 +331,12 @@ describe('settingsStore (pure module)', function () {
     var svc = createSettingsStore();
     var a = 0;
     var b = 0;
-    svc.subscribe(function () { a++; });
-    svc.subscribe(function () { b++; });
+    svc.subscribe(function () {
+      a++;
+    });
+    svc.subscribe(function () {
+      b++;
+    });
 
     svc.save();
     expect(a).toBe(1);

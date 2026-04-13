@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { states, engines, createSearch } from './splSearch.js';
+import { states, engines, createSearch } from '@app/services/splSearch.js';
 
 describe('splSearch', () => {
   describe('states', () => {
