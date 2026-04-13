@@ -3,9 +3,9 @@ import { describe, it, expect, vi } from 'vitest';
 import { mount, unmount } from '@app/islands/settings.jsx';
 import { makeRoot } from '@test/factories.js';
 
-// The settings island uses a plain textarea for the search-args editor
-// (not the CodeMirror hook — settings was never wired up to Ace either).
-// Section toggles: Engine + Headers collapsed, rest expanded.
+// Solr Search Args: textarea. ES/OS: CodeMirror in real browsers; under jsdom
+// the same textarea fallback as other islands. Section toggles: Engine + Headers
+// collapsed, rest expanded.
 
 // Preact flushes hook state updates on a microtask, so any test that
 // asserts on DOM produced by a state change (toggle click → conditional

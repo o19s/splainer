@@ -12,11 +12,11 @@ Modals (`detailedDoc`, `docExplain`) are opened via `modalRegistry.js`, which im
 
 ## Shared hooks
 
-Reusable Preact hooks live at the root of this directory alongside the island sources (e.g. `useAceEditor.js`) — flat layout, not a `hooks/` subdirectory. The `useAceEditor` hook wraps the Ace editor lifecycle with three refs every imperative-third-party-library wrapper needs:
+Reusable Preact hooks live at the root of this directory alongside the island sources (e.g. `useCodeMirror.js`) — flat layout, not a `hooks/` subdirectory. The `useCodeMirror` hook wraps the CodeMirror 6 `EditorView` lifecycle with three refs every imperative-third-party-library wrapper needs:
 
-1. `instanceRef` — the library instance.
+1. `viewRef` — the live `EditorView` (or equivalent library instance).
 2. `onChangeRef` — the latest `onChange` prop, updated via a no-deps `useEffect`. Without this, change handlers capture stale closures from the first render.
-3. `suppressRef` — an echo-suppression flag wrapped in `try/finally` around every programmatic mutation. Without this, programmatic `setValue` fires the library's own change event, which calls back into the parent, and the cycle corrupts state.
+3. `suppressRef` — an echo-suppression flag wrapped in `try/finally` around every programmatic doc sync. Without this, replacing the document fires the library's update listener, which calls back into the parent, and the cycle corrupts state.
 
 Skip any of the three and you get stale-closure bugs, infinite loops, or silently dropped input.
 

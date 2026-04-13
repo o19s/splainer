@@ -9,14 +9,27 @@
  * Settings are mutated in place so switching engines mid-typing doesn't
  * lose unsaved tweaks. A `tick` counter forces Preact re-renders after
  * in-place mutation.
+ *
+ * Search Args: Solr uses a textarea. Elasticsearch / OpenSearch use CodeMirror 6
+ * (JSON) in real browsers; under jsdom (Vitest) the textarea fallback matches
+ * `startUrl.jsx` / `customHeaders.jsx` so unit tests stay deterministic.
  */
 import { render } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
- 
+
 import { CustomHeaders } from './customHeaders.jsx';
 import { formatJson } from './formatJson.js';
- 
-function TextareaArgsFallback({ value, onChange }) {
+import { useCodeMirror } from './useCodeMirror.js';
+
+// jsdom detect: Vitest's jsdom env sets navigator.userAgent to include "jsdom".
+// Stryker disable all: jsdom path unreachable; real-browser path covered by e2e/smoke.spec.js.
+const CM6_AVAILABLE =
+  typeof window !== 'undefined' &&
+  typeof navigator !== 'undefined' &&
+  !/jsdom/i.test(navigator.userAgent || '');
+// Stryker restore all
+
+function TextareaSearchArgs({ value, onChange }) {
   return (
     <textarea
       data-role="search-args-editor"
@@ -24,6 +37,23 @@ function TextareaArgsFallback({ value, onChange }) {
       rows={10}
       value={value || ''}
       onInput={(e) => onChange(e.target.value)}
+    />
+  );
+}
+
+/** CodeMirror wrapper for ES/OS JSON search body in the Tweak panel (matches main `ui-ace`). */
+function SettingsEsOsCodeMirrorArgs({ engine, value, onChange }) {
+  const containerRef = useCodeMirror(value, onChange, {
+    useWrapMode: true,
+    tabSize: 2,
+  });
+  return (
+    <div
+      ref={containerRef}
+      data-role="search-args-editor"
+      id={engine === 'es' ? 'es-query-params-editor' : 'os-query-params-editor'}
+      class={engine === 'es' ? 'es-query-params' : 'os-query-params'}
+      style={{ height: '250px' }}
     />
   );
 }
@@ -179,7 +209,7 @@ export function SettingsIsland({ settings, currSearch, onPublish }) {
         </div>
       )}
 
-      {/* Search Args — expanded by default; textarea for solr, Ace for es/os */}
+      {/* Search Args — expanded by default; textarea for Solr; CodeMirror JSON for es/os */}
       <div class="dev-header" onClick={() => setArgsOpen((v) => !v)}>
         Search Args
         <span
@@ -188,10 +218,23 @@ export function SettingsIsland({ settings, currSearch, onPublish }) {
       </div>
       {argsOpen && (
         <div class="dev-section">
-          <TextareaArgsFallback
-            value={ws.searchArgsStr}
-            onChange={(v) => updateField('searchArgsStr', v)}
-          />
+          {workingWhichEngine === 'solr' ? (
+            <TextareaSearchArgs
+              value={ws.searchArgsStr}
+              onChange={(v) => updateField('searchArgsStr', v)}
+            />
+          ) : CM6_AVAILABLE ? (
+            <SettingsEsOsCodeMirrorArgs
+              engine={workingWhichEngine}
+              value={ws.searchArgsStr}
+              onChange={(v) => updateField('searchArgsStr', v)}
+            />
+          ) : (
+            <TextareaSearchArgs
+              value={ws.searchArgsStr}
+              onChange={(v) => updateField('searchArgsStr', v)}
+            />
+          )}
           {workingWhichEngine !== 'solr' && (
             <a
               href=""

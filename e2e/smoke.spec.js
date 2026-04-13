@@ -349,7 +349,7 @@ test.describe('splainer smoke', () => {
     await expect.poll(() => captured.length).toBeGreaterThan(0);
     captured.length = 0; // clear; we want to assert against the *post-edit* request
 
-    // Mutate searchArgsStr via the settings store rather than the Ace editor
+    // Mutate searchArgsStr via the settings store rather than the CodeMirror editor
     // input. We're testing the *publish* chain (Settings island → bootstrap
     // onPublish → esSettings.fromTweakedSettings → fetch). The
     // editor → store mutation path has its own coverage in
@@ -713,7 +713,7 @@ test.describe('splainer smoke', () => {
     await page.waitForTimeout(300);
     await page.locator('.dev-header:has-text("Search Engine")').click();
 
-    // Helper: assert the search-args-editor textarea is visually below
+    // Helper: assert the search-args editor (textarea or CodeMirror host) is visually below
     // the Search Engine header inside the settings form.
     async function assertArgsBelow(label) {
       await page.waitForTimeout(800);
