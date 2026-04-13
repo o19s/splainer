@@ -33,6 +33,7 @@ function nodeModulesMiddleware() {
 
 export default defineConfig({
   root: 'app',
+  base: './',
   // Preact JSX transform — Vite's esbuild handles .jsx files automatically.
   esbuild: {
     jsx: 'automatic',

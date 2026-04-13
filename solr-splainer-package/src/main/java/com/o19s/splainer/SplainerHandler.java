@@ -23,35 +23,32 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
+
 import org.apache.commons.io.IOUtils;
-import org.apache.http.entity.ContentType;
-import org.apache.lucene.util.ResourceLoader;
-import org.apache.lucene.util.ResourceLoaderAware;
 import org.apache.solr.api.Command;
 import org.apache.solr.api.EndPoint;
-import org.apache.solr.client.solrj.SolrRequest.METHOD;
+import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrException.ErrorCode;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
-import org.apache.solr.core.CoreContainer;
+
+import org.apache.lucene.util.ResourceLoader;
+import org.apache.lucene.util.ResourceLoaderAware;
 import org.apache.solr.core.SolrCore;
 import org.apache.solr.handler.ReplicationHandler;
+import org.apache.solr.jersey.RequestContextKeys;
 import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.response.SolrQueryResponse;
 import org.apache.solr.security.PermissionNameProvider;
+import org.apache.solr.servlet.ServletUtils;
 
 @EndPoint(
-  method = METHOD.GET,
-  path = "$path-prefix/*",
+  method = SolrRequest.METHOD.GET,
+  path = "/*",
   permission = PermissionNameProvider.Name.CONFIG_READ_PERM
 )
-@RequiredArgsConstructor
 public class SplainerHandler implements ResourceLoaderAware {
-  @SuppressWarnings("unused")
-  private final CoreContainer coreContainer;
-
   private ResourceLoader loader = null;
 
   @Override
@@ -63,7 +60,13 @@ public class SplainerHandler implements ResourceLoaderAware {
   @Command
   public void call(SolrQueryRequest req, SolrQueryResponse rsp) throws IOException {
     System.out.println("Splainer: call" + req);
+
+    // Get the path from the HTTP servlet request stored in the request context
+    jakarta.servlet.http.HttpServletRequest httpReq =
+        (jakarta.servlet.http.HttpServletRequest) req.getContext().get(RequestContextKeys.HTTP_SERVLET_REQ);
+    //String path = ServletUtils.getPathAfterContext(httpReq);
     String path = req.getHttpSolrCall().getPath();
+    System.out.println("\n\nThe path is coming:" + path);
     String filepath = resolveFilePath(path);
 
     final InputStream inputStream = loader.openResource(filepath);
@@ -79,13 +82,13 @@ public class SplainerHandler implements ResourceLoaderAware {
       indexPath = indexPath.replaceAll("____v2", "v2");
       data = ("<meta http-equiv=\"Refresh\" content=\"0; url='" + indexPath + "'\" />").getBytes(
         StandardCharsets.UTF_8);
-      contentType = ContentType.TEXT_HTML.getMimeType();
+      contentType = "text/html";
     } else {
       data = IOUtils.toByteArray(inputStream);
       contentType = contentType(filepath);
     }
     final ModifiableSolrParams newParams = new ModifiableSolrParams(req.getOriginalParams());
-    newParams.set(CommonParams.WT, ReplicationHandler.FILE_STREAM);
+    newParams.set(CommonParams.WT, "filestream");
     req.setParams(newParams);
 
     final SolrCore.RawWriter writer = new SolrCore.RawWriter() {
@@ -101,20 +104,20 @@ public class SplainerHandler implements ResourceLoaderAware {
       }
     };
 
-    rsp.add(ReplicationHandler.FILE_STREAM, writer);
+    rsp.add("filestream", writer);
   }
 
   private String contentType(final String filepath) {
     final Map<String, String> types = new HashMap<>();
-    types.put("jpg", ContentType.IMAGE_JPEG.getMimeType());
-    types.put("jpeg", ContentType.IMAGE_JPEG.getMimeType());
-    types.put("png", ContentType.IMAGE_PNG.getMimeType());
-    types.put("gif", ContentType.IMAGE_GIF.getMimeType());
-    types.put("svg", ContentType.IMAGE_SVG.getMimeType());
-    types.put("htm", ContentType.TEXT_HTML.getMimeType());
-    types.put("html", ContentType.TEXT_HTML.getMimeType());
-    types.put("json", ContentType.APPLICATION_JSON.getMimeType());
-    types.put("xml", ContentType.APPLICATION_XML.getMimeType());
+    types.put("jpg", "image/jpeg");
+    types.put("jpeg", "image/jpeg");
+    types.put("png", "image/png");
+    types.put("gif", "image/gif");
+    types.put("svg", "image/svg+xml");
+    types.put("htm", "text/html");
+    types.put("html", "text/html");
+    types.put("json", "application/json");
+    types.put("xml", "application/xml");
     types.put("js", "text/javascript");
     types.put("css", "text/css");
 
