@@ -22,9 +22,11 @@ Take the [tour](http://splainer.io/help.html) to see how you'd use Splainer.
 
 ### Using Splainer locally
 
-We have a Docker image published at https://hub.docker.com/r/o19s/splainer that you can use:
+We have a Docker image published at https://hub.docker.com/r/o19s/splainer that you can use (its run command and port may differ from the `Dockerfile` in this repo — check the image docs).
 
-`docker run -d -p 9000:9000 o19s/splainer` and then go to http://localhost:9000
+This repository’s `Dockerfile` runs the **Vite dev server** on **port 5173**. Example:
+
+`docker run --rm -p 5173:5173 splainer` (after `docker build -t splainer .`) then open http://localhost:5173
 
 ### Splainer Package for Solr
 
@@ -32,82 +34,73 @@ We have a Solr Package of Splainer that is compatible with Solr 9+.   Learn more
 
 ## Developing Splainer
 
-### Npm/Yarn Dev Environment
+### Prerequisites
 
-Splainer is written using AngularJS project. It requires npm, grunt, and yarn.
+* **Node.js** >= 20.12 (matches [`splainer-search`](https://github.com/o19s/splainer-search) and CI).
+* **[Yarn classic](https://classic.yarnpkg.com/lang/en/docs/install/)** (v1). The repo uses `only-allow yarn` on install.
 
-Be sure you've installed npm, yarn, and grunt on your machine.
+Splainer is a **Preact** + **Vite** front end; unit tests use **Vitest**, end-to-end tests use **Playwright**.
 
-* On a Mac [follow these instructions](http://thechangelog.com/install-node-js-with-homebrew-on-os-x/)
-* On Ubuntu [follow these instructions](https://rtcamp.com/tutorials/nodejs/node-js-npm-install-ubuntu/)
-* Use npm to install Grunt globally on your system (may require sudo)
+### Local dev (Yarn)
 
-```
-npm install -g grunt-cli
-```
-
-* Install yarn [follow these instructions](https://yarnpkg.com/en/docs/install)
-
-### With Npm/Yarn installed
-
-From the root of the project, you should be able to run the following:
+From the repository root:
 
 ```
-yarn
-grunt test
-grunt serve
+yarn install
+yarn dev
 ```
 
-Now browse to http://localhost:9000.
+Open http://localhost:5173 (Vite dev server).
 
-To build the project, simply run `grunt dist` to build the static artifacts in the dist/ folder.
+Other useful commands:
 
 ```
-grunt dist
+yarn build          # production build → dist/ (via scripts/build.js)
+yarn test           # Vitest (islands + services)
+yarn test:e2e       # Playwright
+yarn lint           # ESLint
 ```
 
-You can test out the static artifacts via `ruby -run -e httpd -- -p 5000 ./dist` and going to http://localhost:5000.
+To serve the built static site locally (after `yarn build`), use any static file server pointed at `dist/`, for example:
+
+```
+npx --yes serve dist -p 5000
+```
 
 ### With Docker installed
 
-From the root of the project, you should run:
+From the root of the project:
 
 ```
-docker build -t splainer  .
-docker run -p 9000:9000 splainer:latest
+docker build -t splainer .
+docker run --rm -p 5173:5173 splainer
 ```
 
-or use the following shortcuts if you have `ruby` installed:
-
-```
-bin/docker b
-```
-
-then to run the server run
-
-```
-bin/docker s
-```
+Then open http://localhost:5173.
 
 ### Using `docker-compose`
 
-From the root of the project,
+From the root of the project:
 
-    docker-compose build
-    docker-compose run --rm --service-ports app
+```
+docker-compose build
+docker-compose run --rm --service-ports app
+```
+
+The compose file maps **5173** and starts `yarn dev` (Vite) bound to `0.0.0.0`.
 
 ### Using Docker Compose to test splainer-search with splainer
 
-* By default, `package.json` installs [`splainer-search`](https://github.com/o19s/splainer-search) from GitHub (pinned commit) so Docker and CI do not need a sibling `../splainer-search` folder. When [PR #160](https://github.com/o19s/splainer-search/pull/160) changes, update the commit hash in that dependency URL and run `yarn install`. The `postinstall` script builds `splainer-search` `dist/` output when it is missing (git installs do not include prebuilt bundles).
+* By default, `package.json` installs [`splainer-search`](https://github.com/o19s/splainer-search) from GitHub (pinned commit) so Docker and CI do not need a sibling `../splainer-search` folder. When [PR #160](https://github.com/o19s/splainer-search/pull/160) changes, update the commit hash in that dependency URL and run `yarn install`. The `postinstall` script (`scripts/ensure-splainer-search.js`) checks that `splainer-search/wired.js` is present (the app imports it and Vite bundles it; no separate IIFE build step).
 * For a live local checkout instead, run `yarn add splainer-search@file:../splainer-search` (or keep that change uncommitted), or copy `docker-compose.override.yml.example` to `docker-compose.override.yml` and mount your `splainer-search` tree into `node_modules/splainer-search` as in that example.
 
 https://docs.docker.com/compose/extends/
 
 ### Testing Notes
 
-* Unit tests are written using Karma.
-
-* The `./tests/splainer_test_links.html` file is a list of links that invoke Splainer, both the local version and the deployed version against Solr and Elasticsearch, and is a great test to make sure the behavior hasn't reverted.  Use this to make sure existing links still work!
+* **Unit / component tests:** [Vitest](https://vitest.dev/) (`yarn test`), specs under `tests/`.
+* **End-to-end tests:** [Playwright](https://playwright.dev/) (`yarn test:e2e`), specs under `e2e/`.
+* The `./tests/splainer_test_links.html` file is a list of links that invoke Splainer, both the local version and the deployed version against Solr and Elasticsearch, and is a great manual check that bookmark URLs and integrations still behave. Use it to make sure existing links still work.
 
 ## Who?
 

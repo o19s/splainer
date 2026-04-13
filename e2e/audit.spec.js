@@ -311,9 +311,9 @@ async function captureStructuralState(page) {
       bodyTextLen: bodyText.length,
       bodyTextSample: bodyText.slice(0, 2000),
       bodyTextFull: bodyText,
-      // Deangularize branch exposes this global for tests; prod does not.
-      // Useful as an "am I looking at the refactored code" indicator.
-      servicesWired: typeof window.SplainerServices === 'object',
+      // Refactored app exposes `window.SplainerServices` for Playwright; prod does not.
+      // Useful as an "am I looking at the refactored build" indicator.
+      splainerServicesGlobal: typeof window.SplainerServices === 'object',
       // Angular footprint — presence of `ng-app` or an `angular` global.
       // Used as an "am I looking at Angular prod" indicator.
       angularFootprint: !!(

@@ -23,7 +23,7 @@ This plugin requires a manual custom step added after you run the main `yarn dis
 
 **To change the API method from JSONP to GET:**
 
-Edit `dist/node_modules/splainer-search/dist/splainer-search-wired.js` and locate the `defaultSolrConfig` object (around line 4060).
+Edit `node_modules/splainer-search/values/defaultSolrConfig.js` in your checkout (or the same path under `dist/node_modules/` after a production build) and adjust the `defaultSolrConfig` object.
 Search for `values/defaultSolrConfig.js`.
 
 Change:

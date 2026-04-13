@@ -7,7 +7,7 @@ import { makeRoot } from '@test/factories.js';
 // island touches. parseSolrArgs returns an object; removeUnsupported
 // returns an { argument: warning } map of what it *would* strip.
 // This lets the spec drive the visual output without pulling in the
-// real splainer-search wired build (which has no clean jsdom path).
+// real splainer-search stack (Vitest does not load the full wired module graph).
 function fakeSvc(warningsByArg) {
   return {
     parseSolrArgs: (s) => ({ _raw: s }),

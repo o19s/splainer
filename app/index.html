@@ -109,15 +109,8 @@
          first modal open. -->
     <div id="splainer-modal-root"></div>
 
-    <!-- Vendor scripts — these are IIFEs/UMDs with no ESM exports.
-         They must load (and execute) before main.js imports run.
-         urijs MUST load before the wired IIFE: splainer-search 3.0.0
-         expects globalThis.URI at call time. -->
-    <script src="node_modules/urijs/src/URI.js"></script>
-    <script src="node_modules/splainer-search/dist/splainer-search-wired.js"></script>
-
-    <!-- Application entry point — imports all islands, services, and panes
-         as ES modules. CodeMirror 6 is bundled into main.js by Vite. -->
+    <!-- Application entry point — imports all islands, services, panes, and
+         splainer-search (wired) as ES modules. CodeMirror 6 is bundled by Vite. -->
     <script type="module" src="scripts/main.js"></script>
   </body>
 </html>

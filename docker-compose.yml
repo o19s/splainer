@@ -8,7 +8,5 @@ services:
     volumes:
       - .:/home/splainer
     ports:
-      - 9000:9000
-      - 35729:35729
-    command: serve
-    entrypoint: /usr/local/bin/grunt
+      - 5173:5173
+    command: ['yarn', 'dev', '--host', '0.0.0.0', '--port', '5173']

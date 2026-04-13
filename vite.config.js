@@ -9,9 +9,9 @@ import { createReadStream, existsSync, statSync } from 'node:fs';
 const repoRoot = dirname(fileURLToPath(import.meta.url));
 const nodeModulesDir = resolve(repoRoot, 'node_modules');
 
-// Bridge /node_modules → ./node_modules for vendor <script> tags.
-// index.html references vendor scripts as `node_modules/...` relative to
-// the Vite root (app/), but node_modules lives at the repo root.
+// Bridge /node_modules → repo-root node_modules for dev-server requests.
+// index.html links Bootstrap (and similar) as `node_modules/...` relative to
+// the Vite root (app/), but dependencies live at the repo root.
 function nodeModulesMiddleware() {
   return {
     name: 'splainer-node-modules-middleware',

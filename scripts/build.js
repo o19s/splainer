@@ -6,12 +6,12 @@
  * as ESM entry points. Vite bundles all islands, services, and app scripts
  * (including CodeMirror 6) into hashed JS/CSS chunks in dist/.
  *
- * Vendor scripts loaded via plain <script> tags (urijs, splainer-search)
- * are NOT processed by Vite — they're copied into dist/node_modules/ so
- * the HTML references resolve.
+ * Vendor assets loaded via plain URLs in HTML (e.g. Bootstrap CSS) are
+ * copied into dist/node_modules/ so those references resolve in the
+ * production tree (and for help.html).
  *
  * Usage:
- *   node scripts/build.mjs          # full build
+ *   node scripts/build.js           # full build (or `yarn build`)
  */
 import { build } from 'vite';
 import { cpSync, existsSync, mkdirSync } from 'node:fs';
@@ -28,18 +28,14 @@ await build({
   configFile: resolve(root, 'vite.config.js'),
 });
 
-// --- Step 2: Copy vendor files that are loaded via plain <script> tags ---
-// These are IIFEs/UMDs not processed by Vite's module graph.
+// --- Step 2: Copy vendor assets referenced by HTML as node_modules/... URLs ---
+// Bootstrap CSS/fonts are not part of Vite's JS graph (linked from index/help).
 console.log('Copying vendor files...');
 
 const vendorFiles = [
   // Bootstrap CSS (loaded via <link> in HTML — Vite may inline or copy it,
   // but the node_modules reference in help.html needs this too)
   'bootstrap/dist/css/bootstrap.css',
-  // URI.js (must load before splainer-search)
-  'urijs/src/URI.js',
-  // splainer-search 3.0.0 wired IIFE
-  'splainer-search/dist/splainer-search-wired.js',
 ];
 
 // Bootstrap fonts (directory copy)

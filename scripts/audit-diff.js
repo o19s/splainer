@@ -142,7 +142,7 @@ const STRUCTURAL_FIELDS = [
   'engineRadiosProd',
   'dataRoles',
   'bodyTextLen',
-  'servicesWired',
+  'splainerServicesGlobal',
   'angularFootprint',
   'pageErrorCount',
   'pageErrors',

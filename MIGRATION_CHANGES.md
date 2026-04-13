@@ -255,7 +255,7 @@ Deleted: `Gruntfile.js` (325 lines), 21 Grunt-related dev dependencies, `es5-shi
 
 `app/scripts/main.js` absorbs `bootstrap.js`'s orchestration and imports everything as real ESM — islands, services, `panes`, the new CodeMirror config. Replaces 15 `<script>` tags with one `<script type="module" src="scripts/main.js">`. `panes.js` exports `openEast`/`closeEast`/`toggleEast` directly; `modalRegistry.js` imports `detailedDoc` and `docExplain` modules directly instead of reading `window.SplainerIslands.openDocModal`. Every `globalThis` assignment in island and service source files is deleted.
 
-`vite.config.js` goes from `appType: 'mpa'` to standard Vite ESM dev + build. `scripts/build.js` is rewritten to use `vite build` plus a selective vendor copy for the remaining IIFE scripts (`urijs`, `splainer-search-wired`). Preact UMD tags are removed — Vite bundles Preact from ESM imports. `index.html` shrinks from 143 lines / 18 scripts to 120 lines / 5 scripts.
+`vite.config.js` goes from `appType: 'mpa'` to standard Vite ESM dev + build. `scripts/build.js` is rewritten to use `vite build` plus a selective vendor copy for the remaining IIFE scripts (`urijs`, `splainer-search-wired`). Preact UMD tags are removed — Vite bundles Preact from ESM imports. `index.html` shrinks from 143 lines / 18 scripts to 120 lines / 5 scripts. *(Those two vendor IIFEs were later removed: splainer-search is imported as ESM from `splainer-search/wired`; see appendix.)*
 
 `package.json` gets `"type": "module"`; `.mjs` files rename to `.js`; `'use strict'` is removed from every file (ES modules are always strict). `build:islands` and `build:islands:watch` scripts are deleted — Vite processes ESM imports directly.
 
@@ -289,7 +289,7 @@ The Phase 11a/11d/12 entries above intentionally still describe the old `Wrapped
 
 The four CM6 packages are pinned individually (`@codemirror/state`, `@codemirror/view`, `@codemirror/lang-json`, `@codemirror/commands`) rather than the meta `codemirror` package — avoids pulling HTML/CSS/Python/etc. language modes the app will never use.
 
-**Gotcha for future contributors:** `scripts/ensure-splainer-search-dist.js` rebuilds `node_modules/splainer-search/dist/splainer-search-wired.js` only when a marker file is missing. If something wipes `dist/` without removing the marker (manual `rm -rf`, or a `yarn remove` cycle), subsequent `yarn add`/`yarn remove` skip the rebuild and the app fails to boot with `TypeError: Cannot read properties of undefined (reading 'getDefaultWiredServices')`. Workaround: run the script directly. Unit tests don't touch the wired IIFE, only e2e does.
+**Historical gotcha (wired IIFE era):** postinstall used to rebuild `dist/splainer-search-wired.js` when missing. **Current:** the app imports `splainer-search/wired` as ESM; postinstall only checks that `wired.js` exists. If `yarn install` leaves an empty or partial `splainer-search` tree, fix the install — there is no separate library `dist/` build step in this repo anymore.
 
 ### 14a cleanup — Last IIFE
 
@@ -382,7 +382,7 @@ Three findings from 15g, each requiring a **direction check** before becoming a 
 
 3. **Detailed-explain modal close button** (improvement, kept). Prod's `$uibModal` has no close button at all — relies on ESC / backdrop click. The refactor added an explicit `<button class="close" aria-label="Close">×</button>` for discoverability. Direction check says prod has a usability gap; kept the button. Wrapped `×` in `<span aria-hidden="true">` so assistive tech reads "Close" instead of "multiplication sign."
 
-Final audit state after 15h: 27/27 green, zero flakes across multiple consecutive runs. Body-text is fully identical across all scenarios. Remaining divergences are all framework fingerprints (`servicesWired`, `angularFootprint`), prod's non-default-query round-trip bug (15a), and one intentional a11y improvement.
+Final audit state after 15h: 27/27 green, zero flakes across multiple consecutive runs. Body-text is fully identical across all scenarios. Remaining divergences are all framework fingerprints (`splainerServicesGlobal`, `angularFootprint`), prod's non-default-query round-trip bug (15a), and one intentional a11y improvement.
 
 ## Phase 16 — Mutation testing + CI floor
 
@@ -423,4 +423,6 @@ Two upstream splainer-search bugs surfaced by the cross-version audit were fixed
 | 15d | `normalDocsSvc.getHighlightSnippet` pre-stringified multi-valued Solr fields before `.slice(0, 200)`, turning a no-op `Array.slice` into a real character truncation | Unhighlighted `overview` fields cut mid-sentence on `q=*:*` | Upstream `975cd98`: restore polymorphic slice with null guard; regression tests for array and string inputs |
 | 15f | `WeightExplain` regex `/^weight\(((?!FunctionScoreQuery).*)\)/` greedy-captured the Lucene docId tail | Stacked chart showed one row per docId (`text_all:batman in 2508`, …) instead of one aggregated row | Upstream `45bfd2f`: restore `/^weight\((.*?)\s+in\s+\d+\)/`, parameterized regression covering four docId shapes |
 
-Both fixes were SHA-bumped into splainer.io via `package.json` (`splainer-search.git#<sha>`); `scripts/ensure-splainer-search-dist.js` rebuilds the wired IIFE from source on install.
+Both fixes were SHA-bumped into splainer.io via `package.json` (`splainer-search.git#<sha>`).
+
+**Later:** the app dropped the `splainer-search-wired.js` IIFE and global `URI` script in favor of `import { getDefaultWiredServices } from 'splainer-search/wired'` in `main.js` (Vite bundles splainer-search and its `urijs` dependency). `scripts/ensure-splainer-search.js` now only verifies `node_modules/splainer-search/wired.js` exists after install.

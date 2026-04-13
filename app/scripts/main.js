@@ -1,8 +1,9 @@
 /**
  * Application entry point. Imports all islands and services as ES modules.
- * Vendor scripts without ESM exports (splainer-search, urijs) are loaded
- * via <script> tags and accessed from window.*.
+ * splainer-search services come from the library wired graph (bundled by Vite).
  */
+
+import { getDefaultWiredServices } from 'splainer-search/wired';
 
 import { openEast, closeEast, toggleEast } from './panes.js';
 import { mount as mountSearchResults } from './islands/searchResults.jsx';
@@ -15,9 +16,7 @@ import { fromStartUrl as solrFromStartUrl, fromTweakedSettings as solrFromTweake
 import { fromStartUrl as esFromStartUrl, fromTweakedSettings as esFromTweakedSettings } from './services/esSettings.js';
 import { fromStartUrl as osFromStartUrl, fromTweakedSettings as osFromTweakedSettings } from './services/osSettings.js';
 
-// Vendor globals (loaded via <script> tags)
-
-var wired = window.SplainerSearchWired.getDefaultWiredServices();
+var wired = getDefaultWiredServices();
 
 var solrUrlSvc = wired.solrUrlSvc;
 var fieldSpecSvc = wired.fieldSpecSvc;
