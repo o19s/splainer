@@ -1,10 +1,6 @@
 /**
- * customHeaders island — Preact component for editing custom HTTP headers.
- *
- * CodeMirror 6 editor lifecycle uses useEffect + useRef — the canonical
- * Preact pattern for wrapping imperative third-party libraries. The
- * textarea fallback keeps the spec runnable under jsdom (where CM6's
- * layout measurements don't work reliably).
+ * Custom HTTP headers: preset `<select>` + JSON body. (CM 6 in the browser; textarea under jsdom.
+ * `<fieldset>`/`<legend>` name the group without unique `id`s when multiple instances mount.
  */
 import { render } from 'preact';
 import { useCodeMirror } from './useCodeMirror.js';
@@ -15,8 +11,7 @@ const HEADER_TEMPLATES = {
   'API Key': '{\n  "Authorization": "ApiKey XXX"\n}',
 };
 
-// jsdom detect: Vitest's jsdom env sets navigator.userAgent to include "jsdom".
-// Stryker disable all: jsdom path unreachable; real-browser path covered by e2e/smoke.spec.js.
+// Stryker disable all: jsdom path; e2e covers real browser.
 const CM6_AVAILABLE =
   typeof window !== 'undefined' &&
   typeof navigator !== 'undefined' &&
@@ -24,14 +19,14 @@ const CM6_AVAILABLE =
 // Stryker restore all
 
 function CodeMirrorEditor({ value, readOnly, onChange }) {
-  const containerRef = useCodeMirror(value, onChange, { readOnly });
+  const containerRef = useCodeMirror(value, onChange, {
+    readOnly,
+    ariaLabel: 'Custom HTTP headers (JSON object)',
+  });
   return <div ref={containerRef} data-role="header-editor" style={{ height: '150px' }} />;
 }
 
 function TextareaFallback({ value, readOnly, onChange }) {
-  // Used under jsdom (CM6 layout measurements don't work reliably there).
-  // Same data-role attribute so specs can target it identically to the
-  // CodeMirror path.
   return (
     <textarea
       data-role="header-editor"
@@ -39,6 +34,7 @@ function TextareaFallback({ value, readOnly, onChange }) {
       style={{ height: '150px', fontFamily: 'monospace' }}
       value={value || ''}
       readOnly={!!readOnly}
+      aria-label="Custom HTTP headers (JSON object)"
       onInput={(e) => onChange(e.target.value)}
     />
   );
@@ -47,15 +43,12 @@ function TextareaFallback({ value, readOnly, onChange }) {
 export function CustomHeaders({ settings, onChange }) {
   const headerType = settings.headerType || 'None';
   const isReadOnly = headerType === 'None';
-  // Used as <Editor /> below; core no-unused-vars does not treat JSX tags as references.
-
   const Editor = CM6_AVAILABLE ? CodeMirrorEditor : TextareaFallback;
 
   function setHeaderType(e) {
     const next = e.target.value;
     onChange({
       headerType: next,
-      // Changing the type resets the body to the matching template.
       customHeaders: HEADER_TEMPLATES[next],
     });
   }
@@ -65,9 +58,23 @@ export function CustomHeaders({ settings, onChange }) {
   }
 
   return (
-    <div class="well well-sm">
+    <fieldset
+      class="well well-sm"
+      style={{ border: 'none', padding: 0, margin: 0, minWidth: 0 }}
+    >
+      <legend
+        class="control-label"
+        style={{
+          border: 'none',
+          width: 'auto',
+          marginBottom: '10px',
+          padding: 0,
+          display: 'block',
+        }}
+      >
+        Custom Headers
+      </legend>
       <div class="col-sm-12 clearfix">
-        <label class="control-label">Custom Headers</label>
         <p class="help-block">
           If you need to send headers to authenticate with your search engine you can specify them
           here.
@@ -80,6 +87,7 @@ export function CustomHeaders({ settings, onChange }) {
           <select
             class="form-control"
             data-role="header-type"
+            aria-label="Header preset"
             value={headerType}
             onChange={setHeaderType}
           >
@@ -90,7 +98,7 @@ export function CustomHeaders({ settings, onChange }) {
           <Editor value={settings.customHeaders} readOnly={isReadOnly} onChange={setBody} />
         </div>
       </div>
-    </div>
+    </fieldset>
   );
 }
 

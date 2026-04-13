@@ -3,9 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { mount, unmount } from '@app/islands/settings.jsx';
 import { makeRoot } from '@test/factories.js';
 
-// Solr Search Args: textarea. ES/OS: CodeMirror in real browsers; under jsdom
-// the same textarea fallback as other islands. Section toggles: Engine + Headers
-// collapsed, rest expanded.
+// Search args: CodeMirror in real browsers for every engine; textarea under jsdom. Custom headers: Elasticsearch/OpenSearch only.
 
 // Preact flushes hook state updates on a microtask, so any test that
 // asserts on DOM produced by a state change (toggle click → conditional
@@ -205,7 +203,7 @@ describe('settings island', () => {
     settings.es.searchArgsStr = '{"query":{"match_all":{}}}';
     mount(el, { settings, currSearch: null }, () => {});
 
-    // Solr first: no Indent JSON link.
+    // Solr first: no Indent JSON control.
     expect(el.querySelector('[data-role="indent-json"]')).toBeNull();
 
     // Switch to ES.

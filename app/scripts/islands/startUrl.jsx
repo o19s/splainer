@@ -1,7 +1,14 @@
 /**
  * startUrl island — landing form (NO_SEARCH state) with three tabs
- * (Solr / Elasticsearch / OpenSearch), each with a start URL input,
- * a "Splain This!" button, and ES/OS advanced settings.
+ * (Solr / Elasticsearch / OpenSearch). Each tab has a start URL input and a
+ * "Splain This!" button.
+ *
+ * Solr tab: editor for `settings.solr.searchArgsStr` only (Solr query parameters —
+ * not the start URL line). Uses plain CodeMirror in real browsers and a textarea
+ * under jsdom. No custom headers block (legacy parity with Angular).
+ *
+ * Elasticsearch / OpenSearch tabs: "Advanced Settings" reveals custom headers,
+ * then a JSON-highlighted editor for `searchArgsStr`, then an "Indent JSON" button.
  *
  * Props:
  *   - settings:  the {whichEngine, solr, es, os} object (mutated in place)
@@ -11,19 +18,18 @@ import { render } from 'preact';
 import { useState } from 'preact/hooks';
 
 import { CustomHeaders } from './customHeaders.jsx';
-import { useCodeMirror } from './useCodeMirror.js';
 import { formatJson } from './formatJson.js';
+import { searchArgsAriaLabel } from './searchArgsAriaLabel.js';
+import { useCodeMirror } from './useCodeMirror.js';
 
-// jsdom detect: Vitest's jsdom env sets navigator.userAgent to include "jsdom".
-// Stryker disable all: jsdom path unreachable; real-browser path covered by e2e/smoke.spec.js.
+// Stryker disable all: jsdom path; e2e covers real browser.
 const CM6_AVAILABLE =
   typeof window !== 'undefined' &&
   typeof navigator !== 'undefined' &&
   !/jsdom/i.test(navigator.userAgent || '');
 // Stryker restore all
 
-// Default start URLs — seeded on first mount only when empty, so
-// returning users keep their last-used URL from localStorage.
+// Default start URLs when empty (idempotent).
 const DEFAULT_URLS = {
   solr: 'http://quepid-solr.dev.o19s.com:8985/solr/tmdb/select?q=*:*',
   es: 'http://quepid-elasticsearch.dev.o19s.com:9206/tmdb/_search',
@@ -48,9 +54,12 @@ function writeTabHash(tab) {
 }
 
 function CodeMirrorArgsEditor({ value, onChange, engine }) {
+  const language = engine === 'solr' ? 'plain' : 'json';
   const containerRef = useCodeMirror(value, onChange, {
     useWrapMode: false,
     tabSize: 2,
+    language,
+    ariaLabel: searchArgsAriaLabel(engine),
   });
   return (
     <div
@@ -70,13 +79,37 @@ function TextareaArgsFallback({ value, onChange, engine }) {
       rows={10}
       style={{ marginTop: '20px' }}
       value={value || ''}
+      aria-label={searchArgsAriaLabel(engine)}
       onInput={(e) => onChange(e.target.value)}
     />
   );
 }
 
  
-function EngineAdvanced({ engine, settings, onRerender }) {
+function SolrSearchArgsOnly({ settings, onRerender }) {
+  const ws = settings.solr;
+  return CM6_AVAILABLE ? (
+    <CodeMirrorArgsEditor
+      value={ws.searchArgsStr}
+      onChange={(v) => {
+        ws.searchArgsStr = v;
+        onRerender();
+      }}
+      engine="solr"
+    />
+  ) : (
+    <TextareaArgsFallback
+      value={ws.searchArgsStr}
+      onChange={(v) => {
+        ws.searchArgsStr = v;
+        onRerender();
+      }}
+      engine="solr"
+    />
+  );
+}
+
+function EngineAdvancedEsOs({ engine, settings, onRerender }) {
   const ws = settings[engine];
   const [headersOpen, setHeadersOpen] = useState(false);
   return (
@@ -122,43 +155,34 @@ function EngineAdvanced({ engine, settings, onRerender }) {
           engine={engine}
         />
       )}
-      <a
-        href=""
-        class="label label-default"
+      <button
+        type="button"
+        class="btn btn-default btn-xs pull-right"
         data-role={`${engine}-indent-json`}
-        onClick={(e) => {
-          e.preventDefault();
+        onClick={() => {
           ws.searchArgsStr = formatJson(ws.searchArgsStr);
           onRerender();
         }}
       >
         Indent JSON
-      </a>
+      </button>
     </>
   );
 }
 
 export function StartUrl({ settings, onSearch }) {
-  // Seed default URLs synchronously before first render when unset. Done
-  // here (not in useEffect) so the first paint already shows the defaults
-  // — no flash of empty inputs — and so the mutation is observable
-  // immediately by tests that check the props object after mount().
-  // Idempotent: subsequent renders see populated values and short-circuit.
+  // Sync default URLs before paint (not useEffect) so first paint and tests see values.
   if (!settings.solr.startUrl) settings.solr.startUrl = DEFAULT_URLS.solr;
   if (!settings.es.startUrl) settings.es.startUrl = DEFAULT_URLS.es;
   if (!settings.os.startUrl) settings.os.startUrl = DEFAULT_URLS.os;
 
-  // Initial tab precedence: URL hash (e.g. `#/es_` bookmark) → settings
-  // whichEngine (last-used engine from localStorage) → 'solr' default.
-  // Hash wins so a shared URL lands on the intended tab regardless of
-  // what the browser had cached from a prior visit.
+  // Active tab: URL hash overrides `settings.whichEngine`, else solr default.
   const hashTab = parseTabHash();
   const initialTab =
     hashTab ||
     (settings.whichEngine === 'es' ? 'es' : settings.whichEngine === 'os' ? 'os' : 'solr');
   const [activeTab, setActiveTab] = useState(initialTab);
-  // Re-render trigger after in-place mutation of settings.
-  const [, setTick] = useState(0);
+  const [, setTick] = useState(0); // bump after mutating settings in place
   const rerender = () => setTick((t) => t + 1);
 
   function updateStartUrl(engine, value) {
@@ -166,7 +190,6 @@ export function StartUrl({ settings, onSearch }) {
     rerender();
   }
 
-  // Prevent default form submission (Enter key would reload the page).
   function handleFormSubmit(e) {
     e.preventDefault();
     onSearch(activeTab);
@@ -227,12 +250,10 @@ export function StartUrl({ settings, onSearch }) {
                       </button>
                     </span>
                   </div>
-                  {(t.key === 'es' || t.key === 'os') && (
-                    <EngineAdvanced
-                      engine={t.key}
-                      settings={settings}
-                      onRerender={rerender}
-                    />
+                  {t.key === 'solr' ? (
+                    <SolrSearchArgsOnly settings={settings} onRerender={rerender} />
+                  ) : (
+                    <EngineAdvancedEsOs engine={t.key} settings={settings} onRerender={rerender} />
                   )}
                 </div>
               ))}

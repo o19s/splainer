@@ -12,13 +12,15 @@ Here **island** means a **client-only root mount**: interactive Preact attached 
 
 Modals (`detailedDoc`, `docExplain`) are opened via `modalRegistry.js`, which imports them statically and renders into `#splainer-modal-root`.
 
+The landing form (`startUrl.jsx`) shows **custom headers** only on Elasticsearch and OpenSearch (behind Advanced Settings). **Solr** edits `searchArgsStr` (query parameters) with plain CodeMirror in browsers or a textarea under jsdom — not the start URL field — matching the tweak panel (`settings.jsx`), which also hides custom headers for Solr.
+
 ## Result list keys and document ids
 
 Preact lists require stable `key` props. `docListKeys.js` exports `docRowListKey(doc, index, searchListEpoch)` so rows stay distinct when `doc.id` is empty (Solr `fl` omitting the unique key, etc.). `searchListEpoch` bumps whenever `currSearch.searcher` changes.
 
 ## Shared hooks
 
-Reusable Preact hooks live at the root of this directory alongside the island sources (e.g. `useCodeMirror.js`) — flat layout, not a `hooks/` subdirectory. The `useCodeMirror` hook wraps the CodeMirror 6 `EditorView` lifecycle with three refs every imperative-third-party-library wrapper needs:
+Reusable Preact hooks and tiny shared helpers live at the root of this directory alongside the island sources (e.g. `useCodeMirror.js`, `searchArgsAriaLabel.js`) — flat layout, not a `hooks/` subdirectory. The `useCodeMirror` hook wraps the CodeMirror 6 `EditorView` lifecycle. Pass `language: 'json'` (default) for JSON highlighting on ES/OS bodies and headers; `language: 'plain'` for Solr query strings (line numbers and editing, no parser). It uses three refs every imperative-third-party-library wrapper needs:
 
 1. `viewRef` — the live `EditorView` (or equivalent library instance).
 2. `onChangeRef` — the latest `onChange` prop, updated via a no-deps `useEffect`. Without this, change handlers capture stale closures from the first render.

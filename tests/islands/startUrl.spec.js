@@ -12,10 +12,8 @@ const flush = async () => {
   await Promise.resolve();
 };
 
-// Under jsdom, the CM6_AVAILABLE guard in startUrl.jsx is false, so the
-// ES/OS tabs render the textarea fallback. The data-role attributes are
-// shared between the CodeMirror and textarea paths, so these specs
-// exercise the same locators browser code sees.
+// Under jsdom, `CM6_AVAILABLE` is false, so every tab uses a textarea for search args
+// (same `data-role` as the CodeMirror container in real browsers).
 
 function makeSettings(overrides = {}) {
   return {
@@ -297,29 +295,31 @@ describe('startUrl island', () => {
     });
   });
 
-  describe('EngineAdvanced gate', () => {
-    // Pins `(t.key === 'es' || t.key === 'os') && <EngineAdvanced ...>`:
-    // advanced settings exist on ES and OS panes but NEVER on solr.
+  describe('search args and Advanced Settings per engine', () => {
+    // Solr: plain search-args editor only (legacy parity — no custom headers UI).
+    // ES/OS: Advanced Settings button, headers island, JSON args editor, Indent JSON.
 
-    it('renders EngineAdvanced inside the es pane', () => {
+    it('Solr pane has search-args editor only (no Advanced Settings / headers)', () => {
+      const el = makeRoot();
+      mount(el, { settings: makeSettings() }, { onSearch: () => {} });
+      const solrPane = el.querySelector('#solr_');
+      expect(solrPane.querySelector('[data-role="solr-search-args-editor"]')).not.toBeNull();
+      expect(solrPane.querySelector('[data-role="solr-advanced-toggle"]')).toBeNull();
+      expect(solrPane.querySelector('[data-role="solr-indent-json"]')).toBeNull();
+    });
+
+    it('renders full Advanced block inside the es pane', () => {
       const el = makeRoot();
       mount(el, { settings: makeSettings({ whichEngine: 'es' }) }, { onSearch: () => {} });
       const esPane = el.querySelector('#es_');
       expect(esPane.querySelector('[data-role="es-advanced-toggle"]')).not.toBeNull();
     });
 
-    it('renders EngineAdvanced inside the os pane', () => {
+    it('renders full Advanced block inside the os pane', () => {
       const el = makeRoot();
       mount(el, { settings: makeSettings({ whichEngine: 'os' }) }, { onSearch: () => {} });
       const osPane = el.querySelector('#os_');
       expect(osPane.querySelector('[data-role="os-advanced-toggle"]')).not.toBeNull();
-    });
-
-    it('does NOT render EngineAdvanced inside the solr pane', () => {
-      const el = makeRoot();
-      mount(el, { settings: makeSettings() }, { onSearch: () => {} });
-      const solrPane = el.querySelector('#solr_');
-      expect(solrPane.querySelector('[data-role="solr-advanced-toggle"]')).toBeNull();
     });
   });
 });

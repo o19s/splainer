@@ -10,49 +10,64 @@
  * lose unsaved tweaks. A `tick` counter forces Preact re-renders after
  * in-place mutation.
  *
- * Search Args: Solr uses a textarea. Elasticsearch / OpenSearch use CodeMirror 6
- * (JSON) in real browsers; under jsdom (Vitest) the textarea fallback matches
- * `startUrl.jsx` / `customHeaders.jsx` so unit tests stay deterministic.
+ * Search Args: CodeMirror 6 in real browsers for every engine (plain Solr, JSON for Elasticsearch/OpenSearch); textarea under jsdom.
+ * Custom headers: Elasticsearch and OpenSearch only (Solr omits).
  */
 import { render } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 
 import { CustomHeaders } from './customHeaders.jsx';
 import { formatJson } from './formatJson.js';
+import { searchArgsAriaLabel } from './searchArgsAriaLabel.js';
 import { useCodeMirror } from './useCodeMirror.js';
 
-// jsdom detect: Vitest's jsdom env sets navigator.userAgent to include "jsdom".
-// Stryker disable all: jsdom path unreachable; real-browser path covered by e2e/smoke.spec.js.
+// Stryker disable all: jsdom path; e2e covers real browser.
 const CM6_AVAILABLE =
   typeof window !== 'undefined' &&
   typeof navigator !== 'undefined' &&
   !/jsdom/i.test(navigator.userAgent || '');
 // Stryker restore all
 
-function TextareaSearchArgs({ value, onChange }) {
+function TextareaSearchArgs({ value, onChange, engine }) {
   return (
     <textarea
       data-role="search-args-editor"
       class="form-control"
       rows={10}
       value={value || ''}
+      aria-label={searchArgsAriaLabel(engine)}
       onInput={(e) => onChange(e.target.value)}
     />
   );
 }
 
-/** CodeMirror wrapper for ES/OS JSON search body in the Tweak panel (matches main `ui-ace`). */
-function SettingsEsOsCodeMirrorArgs({ engine, value, onChange }) {
+/** Search-args CM; `key={engine}` remounts when language (plain vs json) must change. */
+function SettingsCodeMirrorSearchArgs({ engine, value, onChange }) {
+  const language = engine === 'solr' ? 'plain' : 'json';
   const containerRef = useCodeMirror(value, onChange, {
     useWrapMode: true,
     tabSize: 2,
+    language,
+    ariaLabel: searchArgsAriaLabel(engine),
   });
+  const id =
+    engine === 'es'
+      ? 'es-query-params-editor'
+      : engine === 'os'
+        ? 'os-query-params-editor'
+        : 'solr-query-params-editor';
+  const className =
+    engine === 'es'
+      ? 'es-query-params'
+      : engine === 'os'
+        ? 'os-query-params'
+        : 'solr-query-params';
   return (
     <div
       ref={containerRef}
       data-role="search-args-editor"
-      id={engine === 'es' ? 'es-query-params-editor' : 'os-query-params-editor'}
-      class={engine === 'es' ? 'es-query-params' : 'os-query-params'}
+      id={id}
+      class={className}
       style={{ height: '250px' }}
     />
   );
@@ -60,9 +75,8 @@ function SettingsEsOsCodeMirrorArgs({ engine, value, onChange }) {
 
 export function SettingsIsland({ settings, currSearch, onPublish }) {
   const [workingWhichEngine, setWorkingWhichEngine] = useState(settings.whichEngine || 'solr');
-  const [, setTick] = useState(0); // force re-render after in-place mutation
+  const [, setTick] = useState(0);
 
-  // Sync when external code (e.g. StartUrl's Splain This!) changes the engine.
   useEffect(() => {
     if (settings.whichEngine && settings.whichEngine !== workingWhichEngine) {
       setWorkingWhichEngine(settings.whichEngine);
@@ -70,7 +84,6 @@ export function SettingsIsland({ settings, currSearch, onPublish }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.whichEngine]);
 
-  // Section toggle defaults: Engine and Headers collapsed, rest expanded.
   const [engineOpen, setEngineOpen] = useState(false);
   const [urlOpen, setUrlOpen] = useState(true);
   const [fieldsOpen, setFieldsOpen] = useState(true);
@@ -209,7 +222,7 @@ export function SettingsIsland({ settings, currSearch, onPublish }) {
         </div>
       )}
 
-      {/* Search Args — expanded by default; textarea for Solr; CodeMirror JSON for es/os */}
+      {/* Search Args (default open) */}
       <div class="dev-header" onClick={() => setArgsOpen((v) => !v)}>
         Search Args
         <span
@@ -218,42 +231,37 @@ export function SettingsIsland({ settings, currSearch, onPublish }) {
       </div>
       {argsOpen && (
         <div class="dev-section">
-          {workingWhichEngine === 'solr' ? (
-            <TextareaSearchArgs
-              value={ws.searchArgsStr}
-              onChange={(v) => updateField('searchArgsStr', v)}
-            />
-          ) : CM6_AVAILABLE ? (
-            <SettingsEsOsCodeMirrorArgs
+          {CM6_AVAILABLE ? (
+            <SettingsCodeMirrorSearchArgs
+              key={workingWhichEngine}
               engine={workingWhichEngine}
               value={ws.searchArgsStr}
               onChange={(v) => updateField('searchArgsStr', v)}
             />
           ) : (
             <TextareaSearchArgs
+              key={workingWhichEngine}
+              engine={workingWhichEngine}
               value={ws.searchArgsStr}
               onChange={(v) => updateField('searchArgsStr', v)}
             />
           )}
           {workingWhichEngine !== 'solr' && (
-            <a
-              href=""
-              class="pull-right label"
+            <button
+              type="button"
+              class="btn btn-default btn-xs pull-right"
               data-role="indent-json"
-              onClick={(e) => {
-                e.preventDefault();
+              onClick={() => {
                 autoIndent();
               }}
             >
               Indent JSON
-            </a>
+            </button>
           )}
         </div>
       )}
 
-      {/* Custom Headers — es/os only, collapsed by default.
-          Test selectors: scope with `#es_` since header-type/header-editor
-          appear in both the sidebar and startUrl. */}
+      {/* Custom headers: ES/OS only */}
       {workingWhichEngine !== 'solr' && (
         <>
           <div class="dev-header" onClick={() => setHeadersOpen((v) => !v)}>
