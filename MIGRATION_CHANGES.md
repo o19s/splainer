@@ -388,8 +388,6 @@ Final audit state after 15h: 27/27 green, zero flakes across multiple consecutiv
 
 **Motivation.** Coverage-by-line is not bug-catching power. A shallow "does it render" test executes every line of a component without asserting a single user-visible contract. Stryker mutates the source and re-runs the tests; any surviving mutant is a line your tests execute but don't verify.
 
-**Stale-cache forensics.** The existing Stryker incremental cache (`reports/stryker-incremental.json`) predated the Phase 14a Ace→CodeMirror swap. The pre-flush report showed 47.8% mutation score, but ~70 of the "survivors" lived in deleted files (60 mutants on `useAceEditor.js`, plus the `window.ace` branches in `settings.jsx` and `startUrl.jsx`). **Rule:** before acting on any incremental Stryker report, cross-check the hot lines against `git log`; the cache is a liability when source has moved under it.
-
 **Fresh baseline after `yarn stryker:full`:** 62.42% overall (797 killed / 390 survived / 2 timeout / 91 no-coverage). Services aggregate 77.63% (healthy); islands aggregate 56.22% (shallow). Hot files: `docExplain.jsx` 32%, `startUrl.jsx` 46%, `Search.js` 63%.
 
 **Pragmatic triage.** A first-pass plan identified ~130 mutants across 10 areas. A second-pass review roughly halved it on three principles:
@@ -412,7 +410,7 @@ Overall 62.42% → 71.66%. Killed 797 → 886; survived 390 → 291; NoCoverage 
 
 ## Phase 14b (pending) — CSP + localStorage namespace
 
-With Ace gone, `script-src 'self'` CSP becomes possible via a `<meta>` tag — no server-side nonce needed for static S3 hosting. The `ls.*` → `splainer:v3:*` key-namespace migration remains optional and low-value; it would require a migration path for existing users and has no runtime benefit.
+With Ace gone, `script-src 'self'` CSP becomes possible via a `<meta>` tag — no server-side nonce needed for static S3 hosting.
 
 ---
 
@@ -426,5 +424,3 @@ Two upstream splainer-search bugs surfaced by the cross-version audit were fixed
 | 15f | `WeightExplain` regex `/^weight\(((?!FunctionScoreQuery).*)\)/` greedy-captured the Lucene docId tail | Stacked chart showed one row per docId (`text_all:batman in 2508`, …) instead of one aggregated row | Upstream `45bfd2f`: restore `/^weight\((.*?)\s+in\s+\d+\)/`, parameterized regression covering four docId shapes |
 
 Both fixes were SHA-bumped into splainer.io via `package.json` (`splainer-search.git#<sha>`); `scripts/ensure-splainer-search-dist.js` rebuilds the wired IIFE from source on install.
-
-**Pattern to remember.** When reviewing a refactor that touches polymorphic method calls or structural regex patterns, ask *"what is the old code doing that looks redundant but isn't?"* The answer is the next audit divergence. In both 15d and 15f, the old code was quietly doing a second job — `Array.slice` vs `String.slice` semantics in one case, a regex anchor that both captured and structurally rejected shapes in the other — that the refactor's author didn't know to preserve.
