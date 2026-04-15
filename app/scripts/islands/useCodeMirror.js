@@ -1,11 +1,6 @@
 /**
  * useCodeMirror — Preact hook wrapping a CodeMirror 6 EditorView.
  *
- * API mirrors the old useAceEditor hook so consumers only have to change
- * one import line: `(value, onChange, { readOnly, tabSize, useWrapMode, language, ariaLabel })`.
- * `language` `'json'` (default) vs `'plain'`; both fixed at mount like `tabSize` — remount with new `key` to change.
- * `ariaLabel` goes on the CM content node (`contentAttributes`), not the host `div`.
- *
  * Three-ref pattern for imperative third-party libraries:
  *   1. viewRef        — the live EditorView
  *   2. onChangeRef    — latest onChange prop (avoids stale-closure bugs)
@@ -67,7 +62,29 @@ export function useCodeMirror(value, onChange, options = {}) {
         EditorView.editable.of(!readOnly),
       ]),
       EditorView.theme({
-        '&': { height: '100%' },
+        '&': {
+          height: '100%',
+          border: '1px solid #ccc',
+          borderRadius: '4px',
+          backgroundColor: '#fff',
+          overflow: 'hidden',
+        },
+        '&.cm-focused': {
+          borderColor: '#66afe9',
+          outline: 'none',
+          boxShadow:
+            'inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6)',
+        },
+        '.cm-gutters': {
+          backgroundColor: '#f5f5f5',
+          color: '#999',
+          borderRight: '1px solid #ddd',
+          borderTopLeftRadius: '3px',
+          borderBottomLeftRadius: '3px',
+        },
+        '.cm-activeLineGutter': {
+          backgroundColor: '#e8e8e8',
+        },
         '.cm-scroller': { overflow: 'auto' },
       }),
       EditorView.contentAttributes.of((view) => {

@@ -144,7 +144,7 @@ function Search(deps, searchSettings, overridingExplains, states, engines) {
       function searchFailure(msg) {
         self.state = states.IN_ERROR;
         self.linkUrl = self.searcher.linkUrl;
-        self.errorMsg = msg.searchError;
+        self.errorMsg = msg && msg.searchError ? msg.searchError : '';
         // Intentionally does not re-throw: callers (searchResultsCtrl)
         // chain .then() with no .catch(), so a rejection would become
         // an unhandled promise rejection. Returning from the error

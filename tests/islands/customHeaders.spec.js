@@ -95,6 +95,13 @@ describe('customHeaders island', () => {
     );
   });
 
+  it('omits the in-well title when showHeading is false (mount options)', () => {
+    const el = makeRoot();
+    mount(el, { headerType: 'None', customHeaders: '' }, () => {}, { showHeading: false });
+    expect(el.querySelector('[data-role="custom-headers-heading"]')).toBeNull();
+    expect(el.querySelector('fieldset[aria-label="Custom HTTP headers"]')).not.toBeNull();
+  });
+
   it('defaults headerType to None when settings.headerType is undefined', () => {
     // Pins `const headerType = settings.headerType || 'None'`. Without this,
     // a mutation to '' survives because every other test passes an explicit

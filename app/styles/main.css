@@ -85,13 +85,46 @@
   color: #999;
 }
 
+/* Settings sidebar collapsible section titles (see settings.jsx — use <button type="button">). */
 .dev-header {
+  --dev-header-bg-top: #282828;
+  --dev-header-bg-bottom: #222;
+  --dev-header-border: #363636;
   background: #222;
+  background: linear-gradient(to bottom, var(--dev-header-bg-top), var(--dev-header-bg-bottom));
   background: -webkit-gradient(linear, 0 0, 0 100%, from(#282828), to(#222));
   color: #f0f0f0;
   padding: 15px;
-  border-bottom: 1px solid #363636;
+  border-bottom: 1px solid var(--dev-header-border);
   cursor: pointer;
+}
+
+button.dev-header {
+  display: block;
+  width: 100%;
+  margin: 0;
+  font: inherit;
+  line-height: inherit;
+  color: inherit;
+  text-align: left;
+  border: none;
+  border-radius: 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+button.dev-header:hover,
+button.dev-header:focus-visible {
+  background: #2a2a2a;
+  background: linear-gradient(to bottom, #303030, #2a2a2a);
+  color: #fff;
+}
+
+button.dev-header:focus-visible {
+  outline: 2px solid #66afe9;
+  outline-offset: -2px;
+  z-index: 1;
+  position: relative;
 }
 
 .dev-header .glyphicon {
@@ -147,4 +180,56 @@ search-results-island,
 settings-island,
 start-url-island {
   display: block;
+}
+
+/* ES/OS tabs: slight gap above the Advanced Settings toggle (rem scales with root font).
+   Preact mounts into #start-url-mount, not a <start-url-island> host. */
+#start-url-mount .btn.advanced-settings-toggle {
+  margin-top: 0.3125rem;
+}
+
+/* customHeaders island (startUrl Advanced Settings + settings sidebar): layout lives in CSS,
+   not inline styles — see app/scripts/islands/customHeaders.jsx */
+.custom-headers-fieldset.well {
+  border: none;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.custom-headers-body {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+/* Preset dropdown sits directly above the CM/textarea editor — separate them slightly. */
+.custom-headers-body .form-group > select.form-control {
+  margin-bottom: 0.75rem;
+}
+
+.custom-headers-heading.control-label {
+  border: none;
+  width: 100%;
+  margin-top: 0.25rem;
+  margin-bottom: 0.625rem;
+  padding: 0;
+  display: block;
+  /* Between body copy and the old 1.875rem “shouty” title — readable as a section heading. */
+  font-size: 1.8rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #333;
+}
+
+.custom-headers-editor {
+  height: 150px;
+}
+
+textarea.custom-headers-editor {
+  font-family: monospace;
+}
+
+/* Space between search-args editor and "Indent JSON" (settings + start URL ES/OS). */
+.btn-indent-json {
+  margin-top: 0.5rem;
 }

@@ -68,6 +68,10 @@ describe('settings island', () => {
     headers.click();
     await flush();
     expect(el.querySelector('[data-role="custom-headers-section"]')).not.toBeNull();
+    // Sidebar accordion already says "Custom Headers" — no duplicate in-well heading.
+    expect(
+      el.querySelector('[data-role="custom-headers-section"] [data-role="custom-headers-heading"]'),
+    ).toBeNull();
   });
 
   it("switching engines preserves each engine's unsaved tweaks (round-trip)", async () => {

@@ -7,8 +7,9 @@
  * not the start URL line). Uses plain CodeMirror in real browsers and a textarea
  * under jsdom. No custom headers block (legacy parity with Angular).
  *
- * Elasticsearch / OpenSearch tabs: "Advanced Settings" reveals custom headers,
- * then a JSON-highlighted editor for `searchArgsStr`, then an "Indent JSON" button.
+ * Elasticsearch / OpenSearch tabs: "Advanced Settings" reveals custom headers
+ * (toggle spacing: `main.css`, `#start-url-mount .btn.advanced-settings-toggle`),
+ * then a JSON-highlighted editor for `searchArgsStr`, then a left-aligned "Indent JSON" button (`.btn-indent-json`).
  *
  * Props:
  *   - settings:  the {whichEngine, solr, es, os} object (mutated in place)
@@ -18,16 +19,10 @@ import { render } from 'preact';
 import { useState } from 'preact/hooks';
 
 import { CustomHeaders } from './customHeaders.jsx';
+import { CM6_AVAILABLE } from './editorEnvironment.js';
 import { formatJson } from './formatJson.js';
 import { searchArgsAriaLabel } from './searchArgsAriaLabel.js';
 import { useCodeMirror } from './useCodeMirror.js';
-
-// Stryker disable all: jsdom path; e2e covers real browser.
-const CM6_AVAILABLE =
-  typeof window !== 'undefined' &&
-  typeof navigator !== 'undefined' &&
-  !/jsdom/i.test(navigator.userAgent || '');
-// Stryker restore all
 
 // Default start URLs when empty (idempotent).
 const DEFAULT_URLS = {
@@ -70,7 +65,6 @@ function CodeMirrorArgsEditor({ value, onChange, engine }) {
   );
 }
 
- 
 function TextareaArgsFallback({ value, onChange, engine }) {
   return (
     <textarea
@@ -85,7 +79,6 @@ function TextareaArgsFallback({ value, onChange, engine }) {
   );
 }
 
- 
 function SolrSearchArgsOnly({ settings, onRerender }) {
   const ws = settings.solr;
   return CM6_AVAILABLE ? (
@@ -117,7 +110,7 @@ function EngineAdvancedEsOs({ engine, settings, onRerender }) {
       <p>
         <button
           type="button"
-          class="btn btn-sm btn-default"
+          class="btn btn-sm btn-default advanced-settings-toggle"
           data-role={`${engine}-advanced-toggle`}
           onClick={() => setHeadersOpen((v) => !v)}
         >
@@ -157,7 +150,7 @@ function EngineAdvancedEsOs({ engine, settings, onRerender }) {
       )}
       <button
         type="button"
-        class="btn btn-default btn-xs pull-right"
+        class="btn btn-default btn-xs btn-indent-json"
         data-role={`${engine}-indent-json`}
         onClick={() => {
           ws.searchArgsStr = formatJson(ws.searchArgsStr);

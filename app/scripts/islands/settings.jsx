@@ -9,24 +9,15 @@
  * Settings are mutated in place so switching engines mid-typing doesn't
  * lose unsaved tweaks. A `tick` counter forces Preact re-renders after
  * in-place mutation.
- *
- * Search Args: CodeMirror 6 in real browsers for every engine (plain Solr, JSON for Elasticsearch/OpenSearch); textarea under jsdom.
- * Custom headers: Elasticsearch and OpenSearch only (Solr omits).
  */
 import { render } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 
 import { CustomHeaders } from './customHeaders.jsx';
+import { CM6_AVAILABLE } from './editorEnvironment.js';
 import { formatJson } from './formatJson.js';
 import { searchArgsAriaLabel } from './searchArgsAriaLabel.js';
 import { useCodeMirror } from './useCodeMirror.js';
-
-// Stryker disable all: jsdom path; e2e covers real browser.
-const CM6_AVAILABLE =
-  typeof window !== 'undefined' &&
-  typeof navigator !== 'undefined' &&
-  !/jsdom/i.test(navigator.userAgent || '');
-// Stryker restore all
 
 function TextareaSearchArgs({ value, onChange, engine }) {
   return (
@@ -132,12 +123,18 @@ export function SettingsIsland({ settings, currSearch, onPublish }) {
       onSubmit={handleSubmit}
     >
       {/* Search Engine selector — collapsed by default */}
-      <div class="dev-header" onClick={() => setEngineOpen((v) => !v)}>
+      <button
+        type="button"
+        class="dev-header"
+        aria-expanded={engineOpen}
+        onClick={() => setEngineOpen((v) => !v)}
+      >
         Search Engine
         <span
           class={`glyphicon ${engineOpen ? 'glyphicon-minus-sign' : 'glyphicon-plus-sign'}`}
+          aria-hidden="true"
         ></span>
-      </div>
+      </button>
       {engineOpen && (
         <div class="dev-section" data-role="engine-section">
           <label>
@@ -174,12 +171,18 @@ export function SettingsIsland({ settings, currSearch, onPublish }) {
       )}
 
       {/* Search URL — expanded by default */}
-      <div class="dev-header" onClick={() => setUrlOpen((v) => !v)}>
+      <button
+        type="button"
+        class="dev-header"
+        aria-expanded={urlOpen}
+        onClick={() => setUrlOpen((v) => !v)}
+      >
         Search URL
         <span
           class={`glyphicon ${urlOpen ? 'glyphicon-minus-sign' : 'glyphicon-plus-sign'}`}
+          aria-hidden="true"
         ></span>
-      </div>
+      </button>
       {urlOpen && (
         <div class="dev-section">
           <input
@@ -194,12 +197,18 @@ export function SettingsIsland({ settings, currSearch, onPublish }) {
       )}
 
       {/* Displayed Fields — expanded by default; hidden when isTemplateCall */}
-      <div class="dev-header" onClick={() => setFieldsOpen((v) => !v)}>
+      <button
+        type="button"
+        class="dev-header"
+        aria-expanded={fieldsOpen}
+        onClick={() => setFieldsOpen((v) => !v)}
+      >
         Displayed Fields
         <span
           class={`glyphicon ${fieldsOpen ? 'glyphicon-minus-sign' : 'glyphicon-plus-sign'}`}
+          aria-hidden="true"
         ></span>
-      </div>
+      </button>
       {fieldsOpen && (
         <div class="dev-section">
           {!isTemplateCall && (
@@ -223,12 +232,18 @@ export function SettingsIsland({ settings, currSearch, onPublish }) {
       )}
 
       {/* Search Args (default open) */}
-      <div class="dev-header" onClick={() => setArgsOpen((v) => !v)}>
+      <button
+        type="button"
+        class="dev-header"
+        aria-expanded={argsOpen}
+        onClick={() => setArgsOpen((v) => !v)}
+      >
         Search Args
         <span
           class={`glyphicon ${argsOpen ? 'glyphicon-minus-sign' : 'glyphicon-plus-sign'}`}
+          aria-hidden="true"
         ></span>
-      </div>
+      </button>
       {argsOpen && (
         <div class="dev-section">
           {CM6_AVAILABLE ? (
@@ -249,7 +264,7 @@ export function SettingsIsland({ settings, currSearch, onPublish }) {
           {workingWhichEngine !== 'solr' && (
             <button
               type="button"
-              class="btn btn-default btn-xs pull-right"
+              class="btn btn-default btn-xs btn-indent-json"
               data-role="indent-json"
               onClick={() => {
                 autoIndent();
@@ -264,15 +279,22 @@ export function SettingsIsland({ settings, currSearch, onPublish }) {
       {/* Custom headers: ES/OS only */}
       {workingWhichEngine !== 'solr' && (
         <>
-          <div class="dev-header" onClick={() => setHeadersOpen((v) => !v)}>
+          <button
+            type="button"
+            class="dev-header"
+            aria-expanded={headersOpen}
+            onClick={() => setHeadersOpen((v) => !v)}
+          >
             Custom Headers
             <span
               class={`glyphicon ${headersOpen ? 'glyphicon-minus-sign' : 'glyphicon-plus-sign'}`}
+              aria-hidden="true"
             ></span>
-          </div>
+          </button>
           {headersOpen && (
             <div class="dev-section black-label" data-role="custom-headers-section">
               <CustomHeaders
+                showHeading={false}
                 settings={ws}
                 onChange={(next) => {
                   ws.headerType = next.headerType;

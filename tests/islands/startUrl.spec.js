@@ -12,7 +12,7 @@ const flush = async () => {
   await Promise.resolve();
 };
 
-// Under jsdom, `CM6_AVAILABLE` is false, so every tab uses a textarea for search args
+// Under jsdom, `editorEnvironment.CM6_AVAILABLE` is false, so every tab uses a textarea for search args
 // (same `data-role` as the CodeMirror container in real browsers).
 
 function makeSettings(overrides = {}) {
