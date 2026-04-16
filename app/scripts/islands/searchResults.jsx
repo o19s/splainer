@@ -15,6 +15,7 @@ import { docRowListKey } from './docListKeys.js';
 
 import { SolrSettingsWarning } from './solrSettingsWarning.jsx';
 import { openDocModal } from './modalRegistry.js';
+import { JsonTree } from './jsonTree.jsx';
 
 function currentArgsStr(currSearch) {
   try {
@@ -24,21 +25,18 @@ function currentArgsStr(currSearch) {
   }
 }
 
- 
 function JsonDetailLink({ label, onToggle }) {
   return (
     <a href="" onClick={(e) => { e.preventDefault(); onToggle(); }}>{label}</a>
   );
 }
 
- 
+/** Bordered panel for Solr query / parsed-query JSON; styles in `main.css` (`.query-json-panel`). */
 function JsonDetailData({ data, show }) {
   if (!show) return null;
   return (
-    <div>
-      <pre style={{ maxHeight: '400px', overflow: 'auto' }}>
-        {JSON.stringify(data, null, 2)}
-      </pre>
+    <div class="query-json-panel" data-role="json-detail-json">
+      <JsonTree value={data} maxHeight="400px" />
     </div>
   );
 }

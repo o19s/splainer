@@ -39,7 +39,7 @@ describe('docExplain island', () => {
     expect(el.textContent).toContain('HOT_MARKER');
   });
 
-  it('renders pretty-printed JSON in the Full Explain tab', () => {
+  it('renders expandable JSON in the Full Explain tab', () => {
     const el = makeRoot();
     render(
       <DocExplain
@@ -48,9 +48,8 @@ describe('docExplain island', () => {
       />,
       el,
     );
-    // Pretty-printed: has a newline + two-space indent
     expect(el.textContent).toContain('FULL_MARKER');
-    expect(el.textContent).toMatch(/\n {2}"description"/);
+    expect(el.textContent).toContain('  "description"');
   });
 
   it('canExplainOther=false hides the alt-query form', () => {
@@ -197,10 +196,10 @@ describe('docExplain island', () => {
   });
 
   describe('tab switching', () => {
-    // All three <pre> panes live in the DOM simultaneously; the active tab
-    // is selected by toggling inline `display: block|none` rather than by
-    // conditional rendering. These tests pin that contract: clicking a tab
-    // must (a) show only its own <pre>, and (b) mark only its <li> active.
+    // Summarized / Hot use <pre>; Full Explain uses JsonTree in a div. All
+    // three panes live in the DOM simultaneously; the active tab is selected
+    // by toggling inline `display: block|none`. Clicking a tab must (a) show
+    // only its own pane, and (b) mark only its <li> active.
 
     function mountWithAllTabs() {
       const el = makeRoot();
@@ -219,11 +218,13 @@ describe('docExplain island', () => {
     }
 
     function panes(el) {
-      // Preact renders TABS in order: [summarized, hot, full]. The three
-      // top-level panes inside the primary .explain-view are at .explain-view
-      // > div > pre (order-matched to TABS).
-      const all = el.querySelectorAll('.explain-view pre');
-      return { summarized: all[0], hot: all[1], full: all[2] };
+      const wrap = el.querySelector('.explain-view > div');
+      const pres = wrap.querySelectorAll('pre');
+      return {
+        summarized: pres[0],
+        hot: pres[1],
+        full: wrap.querySelector('[data-role="explain-pane-full"]'),
+      };
     }
 
     function navItems(el) {

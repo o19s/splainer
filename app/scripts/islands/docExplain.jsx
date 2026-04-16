@@ -1,8 +1,9 @@
 /**
  * docExplain island — explain-tree modal with tab view and alt-doc compare.
  *
- * All <pre> content is text-interpolated (Preact escapes by default), so
- * explain strings containing user-influenced HTML render as literal text.
+ * Summarized / Hot tabs use <pre> with text interpolation (Preact escapes by default).
+ * Full Explain uses `JsonTree` with `maxHeight="60vh"` so large explains scroll inside the modal
+ * (searchResults query details use `400px` instead).
  * The Vitest XSS regression spec is the merge gate.
  */
 import { render } from 'preact';
@@ -10,7 +11,7 @@ import { useState } from 'preact/hooks';
 import { useDialogModal } from './useDialogModal.js';
 import { DocRow } from './docRow.jsx';
 import { docRowListKey } from './docListKeys.js';
-import { formatJson } from './formatJson.js';
+import { JsonTree } from './jsonTree.jsx';
 
 const TABS = [
   { id: 'summarized', label: 'Summarized' },
@@ -31,9 +32,12 @@ function ExplainPane({ doc, tab }) {
       <pre style={{ display: tab === 'hot' ? 'block' : 'none' }}>
         {doc.hotMatches().toStr()}
       </pre>
-      <pre style={{ display: tab === 'full' ? 'block' : 'none' }}>
-        {formatJson(doc.explain().rawStr())}
-      </pre>
+      <div
+        data-role="explain-pane-full"
+        style={{ display: tab === 'full' ? 'block' : 'none', maxWidth: '100%' }}
+      >
+        <JsonTree value={doc.explain().rawStr()} maxHeight="60vh" />
+      </div>
     </div>
   );
 }

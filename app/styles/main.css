@@ -233,3 +233,72 @@ textarea.custom-headers-editor {
 .btn-indent-json {
   margin-top: 0.5rem;
 }
+
+/* Expandable JSON (replaces ng-json-explorer).
+   pre-wrap preserves leading indent spaces in text nodes (normal HTML collapses them). */
+.json-tree {
+  font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: left;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Toggles: boxed chip; link color (Bootstrap 3 default #337ab7) so + / − match site links. */
+.json-tree-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 1.45em;
+  min-height: 1.45em;
+  margin: 0 4px 0 0;
+  padding: 0;
+  border: 1px solid #337ab7;
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1.1em;
+  font-weight: bold;
+  line-height: 1;
+  vertical-align: text-bottom;
+  color: #337ab7;
+  user-select: none;
+}
+
+.json-tree-toggle:hover {
+  border-color: #23527c;
+  color: #23527c;
+  background: #f5f9fc;
+}
+
+.json-tree-toggle:focus {
+  outline: none;
+}
+
+.json-tree-toggle:focus-visible {
+  outline: 2px solid #337ab7;
+  outline-offset: 1px;
+}
+
+/* Query Details / Parsed Query Details (searchResults island) */
+.query-json-panel {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border: 1px solid #e3e3e3;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
+.json-tree-line {
+  display: block;
+}
+
+.json-tree-fallback {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}

@@ -237,8 +237,8 @@ describe('SearchResults island', () => {
     });
     render(<SearchResults currSearch={cs} solrUrlSvc={makeSolrUrlSvc()} />, root);
 
-    // Initially no <pre>
-    expect(root.querySelector('pre')).toBeNull();
+    // Initially no JSON detail block
+    expect(root.querySelector('[data-role="json-detail-json"]')).toBeNull();
 
     // Click "Query Details"
     const detailLink = [...root.querySelectorAll('a')].find(
@@ -247,9 +247,9 @@ describe('SearchResults island', () => {
     detailLink.click();
     await new Promise((r) => setTimeout(r, 0));
 
-    const pre = root.querySelector('pre');
-    expect(pre).toBeTruthy();
-    expect(pre.textContent).toContain('test_query');
+    const block = root.querySelector('[data-role="json-detail-json"]');
+    expect(block).toBeTruthy();
+    expect(block.textContent).toContain('test_query');
   });
 
   it('resets query details toggle when searcher changes', async () => {
@@ -266,7 +266,7 @@ describe('SearchResults island', () => {
     );
     detailLink.click();
     await new Promise((r) => setTimeout(r, 0));
-    expect(root.querySelector('pre')).toBeTruthy();
+    expect(root.querySelector('[data-role="json-detail-json"]')).toBeTruthy();
 
     // Simulate a new search — new searcher reference
     const cs2 = makeCurrSearch({
@@ -277,7 +277,7 @@ describe('SearchResults island', () => {
     await new Promise((r) => setTimeout(r, 0));
 
     // Query details should be collapsed again
-    expect(root.querySelector('pre')).toBeNull();
+    expect(root.querySelector('[data-role="json-detail-json"]')).toBeNull();
   });
 
   it('renders grouped results when hasGroup is true', () => {
