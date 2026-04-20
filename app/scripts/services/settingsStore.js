@@ -183,7 +183,7 @@ function persistToLocalStorage(s) {
   lsSet('whichEngine', s.whichEngine);
 }
 
-function persistToUrl(s) {
+function bookmarkParamsFromSettings(s) {
   var params = {};
   if (s.whichEngine === 'solr') {
     params.solr = s.solr.startUrl;
@@ -197,7 +197,17 @@ function persistToUrl(s) {
     params.osQuery = s.os.searchArgsStr;
     params.fieldSpec = s.os.fieldSpecStr;
   }
-  window.location.hash = buildHashString(params);
+  return params;
+}
+
+var lastWrittenHash = '';
+
+export function getLastWrittenHash() { return lastWrittenHash; }
+
+function persistToUrl(s) {
+  var h = buildHashString(bookmarkParamsFromSettings(s));
+  lastWrittenHash = h;
+  window.location.hash = h;
 }
 
 // --- Public API ---

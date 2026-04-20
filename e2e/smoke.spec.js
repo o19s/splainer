@@ -134,6 +134,38 @@ test.describe('splainer smoke', () => {
       .toBe('id title');
   });
 
+  test('changing the hash in the same tab loads a new bookmark (hashchange)', async ({ page }) => {
+    let solrHits = 0;
+    await page.route('http://fake-solr.test/**', async (route) => {
+      solrHits++;
+      await fulfillSolr(route, {
+        responseHeader: { status: 0, QTime: 1 },
+        response: {
+          numFound: 1,
+          start: 0,
+          docs: [{ id: 'doc-1', title: 'first' }],
+        },
+      });
+    });
+
+    const bm1 = encodeURIComponent('http://fake-solr.test/solr/coll1/select?q=one');
+    const bm2 = encodeURIComponent('http://fake-solr.test/solr/coll1/select?q=two');
+    await page.goto(`/#?solr=${bm1}&fieldSpec=id`);
+
+    await expect
+      .poll(async () => solrHits)
+      .toBeGreaterThanOrEqual(1);
+    const hitsAfterFirst = solrHits;
+
+    await page.evaluate((h) => {
+      window.location.hash = h;
+    }, `?solr=${bm2}&fieldSpec=id`);
+
+    await expect
+      .poll(async () => solrHits)
+      .toBeGreaterThan(hitsAfterFirst);
+  });
+
   test('settings persist across reload via localStorage', async ({ page }) => {
     await page.route('http://fake-solr.test/**', (route) =>
       fulfillSolr(route, {

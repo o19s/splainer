@@ -9,7 +9,7 @@ import { openEast, closeEast, toggleEast } from './panes.js';
 import { mount as mountSearchResults } from './islands/searchResults.jsx';
 import { mount as mountStartUrl } from './islands/startUrl.jsx';
 import { mount as mountSettings } from './islands/settings.jsx';
-import { createSettingsStore } from './services/settingsStore.js';
+import { createSettingsStore, getLastWrittenHash } from './services/settingsStore.js';
 import { createSearch } from './services/splSearch.js';
 import { Search } from './services/Search.js';
 import { fromStartUrl as solrFromStartUrl, fromTweakedSettings as solrFromTweakedSettings } from './services/solrSettings.js';
@@ -266,27 +266,25 @@ function parseHash() {
   return params;
 }
 
-var searchParams = parseHash();
-var overridingFieldSpec;
-if (Object.prototype.hasOwnProperty.call(searchParams, 'fieldSpec')) {
-  overridingFieldSpec = searchParams.fieldSpec;
+function applyBookmarkFromHash() {
+  var p = parseHash();
+  var fieldSpec = p.fieldSpec;
+  if (p.solr) {
+    store.settings.solr.startUrl = p.solr;
+    runSolr(fieldSpec);
+  } else if (p.esUrl) {
+    runEs({ searchUrl: p.esUrl, searchArgsStr: p.esQuery, fieldSpecStr: fieldSpec });
+  } else if (p.osUrl) {
+    runOs({ searchUrl: p.osUrl, searchArgsStr: p.osQuery, fieldSpecStr: fieldSpec });
+  }
 }
-if (Object.prototype.hasOwnProperty.call(searchParams, 'solr')) {
-  store.settings.solr.startUrl = searchParams.solr;
-  runSolr(overridingFieldSpec);
-} else if (Object.prototype.hasOwnProperty.call(searchParams, 'esUrl')) {
-  runEs({
-    searchUrl: searchParams.esUrl,
-    searchArgsStr: searchParams.esQuery,
-    fieldSpecStr: overridingFieldSpec,
-  });
-} else if (Object.prototype.hasOwnProperty.call(searchParams, 'osUrl')) {
-  runOs({
-    searchUrl: searchParams.osUrl,
-    searchArgsStr: searchParams.osQuery,
-    fieldSpecStr: overridingFieldSpec,
-  });
-}
+
+applyBookmarkFromHash();
+
+window.addEventListener('hashchange', function () {
+  if (window.location.hash.slice(1) === getLastWrittenHash()) return;
+  applyBookmarkFromHash();
+});
 
 // Expose for Playwright e2e tests.
 window.SplainerServices = { settingsStore: store };
