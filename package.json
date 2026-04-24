@@ -14,7 +14,7 @@
     "bootstrap": "~3.4.1",
     "dompurify": "^3.3.3",
     "preact": "^10.29.1",
-    "splainer-search": "https://github.com/o19s/splainer-search.git#204260d4d5bf4e76949f80edcbd6cc856bd6108a"
+    "splainer-search": "3.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
