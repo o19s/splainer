@@ -34,7 +34,7 @@ We have a Solr Package of Splainer that is compatible with Solr 9+.   Learn more
 
 ## Developing Splainer
 
-For prerequisites, Yarn/Docker workflows, `splainer-search` integration, and testing, see [DEVELOPERS_GUIDE.md](DEVELOPERS_GUIDE.md).
+For prerequisites, Yarn/Docker workflows, `splainer-search` integration, and testing, see [DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md).
 
 ## Who?
 
