@@ -8,7 +8,7 @@
  * Props: currSearch, explainOther, solrUrlSvc, onPage.
  */
 import { render } from 'preact';
-import { useState, useRef, useEffect } from 'preact/hooks';
+import { useState, useRef } from 'preact/hooks';
 
 import { DocRow } from './docRow.jsx';
 import { docRowListKey } from './docListKeys.js';
@@ -48,21 +48,19 @@ export function SearchResults({ currSearch, explainOther, solrUrlSvc, onPage }) 
   // Reset toggle state when a new search starts, matching the original
   // SearchResultsCtrl which set both to false in search() and reset().
   // Detect via searcher identity — a new reference means a new search.
-  // Runs in an effect to avoid setState during render.
-  const prevSearcherRef = useRef(null);
+  const [prevSearcher, setPrevSearcher] = useState(null);
   const listEpochRef = useRef(0);
   const currentSearcher = currSearch && currSearch.searcher;
-  useEffect(() => {
-    if (currentSearcher === prevSearcherRef.current) {
-      return;
+  if (currentSearcher !== prevSearcher) {
+    if (prevSearcher != null) {
+      setShowQueryDetails(false);
+      setShowParsedQueryDetails(false);
     }
-    prevSearcherRef.current = currentSearcher;
     if (currSearch && currSearch.state === currSearch.DID_SEARCH && currentSearcher) {
       listEpochRef.current += 1;
     }
-    setShowQueryDetails(false);
-    setShowParsedQueryDetails(false);
-  }, [currentSearcher, currSearch]);
+    setPrevSearcher(currentSearcher);
+  }
 
   if (!currSearch) return null;
 
@@ -99,8 +97,8 @@ export function SearchResults({ currSearch, explainOther, solrUrlSvc, onPage }) 
 
   function makeDocCallbacks(doc) {
     return {
-      onShowDoc: (d) => {
-        openDocModal('detailedDoc', d, {});
+      onShowDoc: () => {
+        openDocModal('detailedDoc', doc, {});
       },
       onShowDetailed: () => {
         openDocModal('detailedExplain', doc, {
