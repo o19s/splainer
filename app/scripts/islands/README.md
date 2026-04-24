@@ -1,0 +1,41 @@
+# Preact Islands
+
+For prerequisites, local dev, Docker, and repo-wide test commands, see [DEVELOPER_GUIDE.md](../../../DEVELOPER_GUIDE.md) at the repository root.
+
+Preact JSX components that make up splainer's UI. Each island is an ES module imported by `app/scripts/main.js` and mounted into a DOM element.
+
+Here **island** means a **client-only root mount**: interactive Preact attached to a named DOM node from the normal SPA entry, all shipped in one Vite-built bundle. That is not the same as [Astro-style islands](https://docs.astro.build/en/concepts/islands/) (server-rendered HTML with selective client hydration) or separate per-feature entry chunks. The term stuck from the Angular migration, when each UI slice was still an independently mounted boundary.
+
+## Architecture
+
+`main.js` is the single entry point. It imports all islands and services as ES modules, creates the settings store and search state, then calls each island's `mount()` function to render into named `<div>` mount points in `index.html`. Preact's reconciler diffs efficiently, so calling `mount()` repeatedly (e.g. after search completes) is cheap and idempotent.
+
+Modals (`detailedDoc`, `docExplain`) are opened via `modalRegistry.js`, which imports them statically and renders into `#splainer-modal-root`.
+
+The landing form (`startUrl.jsx`) shows **custom headers** only on Elasticsearch and OpenSearch (behind Advanced Settings). **Solr** edits `searchArgsStr` (query parameters) with plain CodeMirror in browsers or a textarea under jsdom — not the start URL field — matching the tweak panel (`settings.jsx`), which also hides custom headers for Solr.
+
+## Result list keys and document ids
+
+Preact lists require stable `key` props. `docListKeys.js` exports `docRowListKey(doc, index, searchListEpoch)` so rows stay distinct when `doc.id` is empty (Solr `fl` omitting the unique key, etc.). `searchListEpoch` bumps whenever `currSearch.searcher` changes.
+
+## Shared hooks
+
+Reusable Preact hooks and tiny shared helpers live at the root of this directory alongside the island sources (e.g. `useCodeMirror.js`, `searchArgsAriaLabel.js`) — flat layout, not a `hooks/` subdirectory. The `useCodeMirror` hook wraps the CodeMirror 6 `EditorView` lifecycle. Pass `language: 'json'` (default) for JSON highlighting on ES/OS bodies and headers; `language: 'plain'` for Solr query strings (line numbers and editing, no parser). It uses three refs every imperative-third-party-library wrapper needs:
+
+1. `viewRef` — the live `EditorView` (or equivalent library instance).
+2. `onChangeRef` — the latest `onChange` prop, updated via a no-deps `useEffect`. Without this, change handlers capture stale closures from the first render.
+3. `suppressRef` — an echo-suppression flag wrapped in `try/finally` around every programmatic doc sync. Without this, replacing the document fires the library's update listener, which calls back into the parent, and the cycle corrupts state.
+
+Skip any of the three and you get stale-closure bugs, infinite loops, or silently dropped input.
+
+## Adding a new island
+
+1. Write `app/scripts/islands/<name>.jsx`. Export `mount(rootEl, props...)` and `unmount(rootEl)`.
+2. Write a Vitest spec at `tests/islands/<name>.spec.js` (or `.spec.jsx`). Import the implementation with `@app/islands/<name>.jsx` and shared helpers with `@test/factories.js`. Use the jsdom environment.
+3. Import the island's `mount` function in `app/scripts/main.js` and call it from `renderAll()`.
+4. Add a `<div id="<name>-mount">` to `app/index.html` if the island needs a top-level mount point. (Islands rendered as JSX children of other islands, like `CustomHeaders` inside `StartUrl`, don't need one.)
+5. Run `yarn test && yarn test:e2e`. Both must be green.
+
+## Outbound-request tests as the merge gate
+
+Every island that touches user-configurable behavior should have one Playwright test that intercepts the outbound request and asserts the config landed on the wire — not internal state mutation. The custom-headers test that asserts `Authorization: ApiKey ...` reaches the backend is the canonical example.

@@ -22,9 +22,11 @@ Take the [tour](http://splainer.io/help.html) to see how you'd use Splainer.
 
 ### Using Splainer locally
 
-We have a Docker image published at https://hub.docker.com/r/o19s/splainer that you can use:
+We have a Docker image published at https://hub.docker.com/r/o19s/splainer that you can use (its run command and port may differ from the `Dockerfile` in this repo — check the image docs).
 
-`docker run -d -p 9000:9000 o19s/splainer` and then go to http://localhost:9000
+This repository’s `Dockerfile` runs the **Vite dev server** on **port 5173**. Example:
+
+`docker run --rm -p 5173:5173 splainer` (after `docker build -t splainer .`) then open http://localhost:5173
 
 ### Splainer Package for Solr
 
@@ -32,81 +34,7 @@ We have a Solr Package of Splainer that is compatible with Solr 9+.   Learn more
 
 ## Developing Splainer
 
-### Npm/Yarn Dev Environment
-
-Splainer is written using AngularJS project. It requires npm, grunt, and yarn.
-
-Be sure you've installed npm, yarn, and grunt on your machine.
-
-* On a Mac [follow these instructions](http://thechangelog.com/install-node-js-with-homebrew-on-os-x/)
-* On Ubuntu [follow these instructions](https://rtcamp.com/tutorials/nodejs/node-js-npm-install-ubuntu/)
-* Use npm to install Grunt globally on your system (may require sudo)
-
-```
-npm install -g grunt-cli
-```
-
-* Install yarn [follow these instructions](https://yarnpkg.com/en/docs/install)
-
-### With Npm/Yarn installed
-
-From the root of the project, you should be able to run the following:
-
-```
-yarn
-grunt test
-grunt serve
-```
-
-Now browse to http://localhost:9000.
-
-To build the project, simply run `grunt dist` to build the static artifacts in the dist/ folder.
-
-```
-grunt dist
-```
-
-You can test out the static artifacts via `ruby -run -e httpd -- -p 5000 ./dist` and going to http://localhost:5000.
-
-### With Docker installed
-
-From the root of the project, you should run:
-
-```
-docker build -t splainer  .
-docker run -p 9000:9000 splainer:latest
-```
-
-or use the following shortcuts if you have `ruby` installed:
-
-```
-bin/docker b
-```
-
-then to run the server run
-
-```
-bin/docker s
-```
-
-### Using `docker-compose`
-
-From the root of the project,
-
-    docker-compose build
-    docker-compose run --rm --service-ports app
-
-### Using Docker Compose to test splainer-search with splainer
-
-* `docker-compose.override.yml.example` can be copied to `docker-compose.override.yml` and use it to override environment variables or work with a local copy of the [`splainer-search`](https://github.com/o19s/splainer-search) JS library during development defined in `docker-compose.yml`.  Example is included.  Just update the path to `splainer-search` with your local checkout!
-
-https://docs.docker.com/compose/extends/
-
-### Testing Notes
-
-* Unit tests are written using Karma.
-
-* The `./tests/splainer_test_links.html` file is a list of links that invoke Splainer, both the local version and the deployed version against Solr and Elasticsearch, and is a great test to make sure the behavior hasn't reverted.  Use this to make sure existing links still work!
+For prerequisites, Yarn/Docker workflows, `splainer-search` integration, and testing, see [DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md).
 
 ## Who?
 

@@ -1,9 +1,9 @@
 .graph-explain .progress {
-    height: 7px;
-    margin: 2px 0 5px 0;
+  height: 7px;
+  margin: 2px 0 5px 0;
 }
 
 .graph-explain .graph-label {
-    font-size: 12px;
-    word-wrap: break-word;
+  font-size: 12px;
+  word-wrap: break-word;
 }

@@ -1,26 +1,8 @@
-/* Everything but the jumbotron gets side spacing for mobile first views */
-.header,
-.marketing,
+/* Custom page footer */
 .footer {
   text-align: center;
   padding-left: 15px;
   padding-right: 15px;
-}
-
-/* Custom page header */
-.header {
-  border-bottom: 1px solid #e5e5e5;
-}
-/* Make the masthead heading the same height as the navigation */
-.header h3 {
-  margin-top: 0;
-  margin-bottom: 0;
-  line-height: 40px;
-  padding-bottom: 19px;
-}
-
-/* Custom page footer */
-.footer {
   margin-top: 100px;
   margin-bottom: 10px;
   padding-top: 19px;
@@ -35,50 +17,18 @@
     width: 100%;
   }
 }
-.container-narrow > hr {
-  margin: 30px 0;
-}
-
-/* Main marketing message and sign up button */
-.jumbotron {
-  text-align: center;
-  border-bottom: 1px solid #e5e5e5;
-}
-.jumbotron .btn {
-  font-size: 21px;
-  padding: 14px 24px;
-}
-
-/* Supporting marketing content */
-.marketing {
-  margin: 40px 0;
-}
-.marketing p + h4 {
-  margin-top: 28px;
-}
 
 /* Responsive: Portrait tablets and up */
 @media screen and (min-width: 768px) {
-  /* Remove the padding we set earlier */
-  .header,
-  .marketing,
   .footer {
     padding-left: 0;
     padding-right: 0;
   }
-  /* Space out the masthead */
-  .header {
-    margin-bottom: 30px;
-  }
-  /* Remove the bottom border on the jumbotron for visual effect */
-  .jumbotron {
-    border-bottom: 0;
-  }
 }
 
 .loading {
-    background-image:url('../images/ajax-loader.gif');
-    text-align: center
+  background-image: url('../images/ajax-loader.gif');
+  text-align: center;
 }
 
 .alert {
@@ -106,7 +56,7 @@
 
 .pane_main .navbar-brand {
   font-style: italic;
-  color: #FFF;
+  color: #fff;
   padding: 10px 0 0 0;
   margin: 0;
   height: auto;
@@ -116,24 +66,13 @@
 
 .navbar-header small {
   font-size: 11px;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
   display: block;
   margin: 3px 0 0 25px;
 }
 
-.tweak-button small {
-  font-size: 11px;
-  color: rgba(255,255,255,0.5);
-  display: block;
-  margin: 3px 0 10px 25px;
-}
-
-.tweak-button small a {
-  color: rgba(255,255,255,0.75);
-}
-
 .navbar-header small a {
-  color: rgba(255,255,255,0.75);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .pane_east h3 {
@@ -146,23 +85,52 @@
   color: #999;
 }
 
-.starter-URL {
-  margin: 0 0 0px 0;
+/* Settings sidebar collapsible section titles (see settings.jsx — use <button type="button">). */
+.dev-header {
+  --dev-header-bg-top: #282828;
+  --dev-header-bg-bottom: #222;
+  --dev-header-border: #363636;
+  background: #222;
+  background: linear-gradient(to bottom, var(--dev-header-bg-top), var(--dev-header-bg-bottom));
+  background: -webkit-gradient(linear, 0 0, 0 100%, from(#282828), to(#222));
+  color: #f0f0f0;
+  padding: 15px;
+  border-bottom: 1px solid var(--dev-header-border);
+  cursor: pointer;
 }
 
-.dev-header{
-  background:#222;
-  background:-webkit-gradient(linear,0 0,0 100%,from(#282828),to(#222));
-  color:#F0F0F0;
-  padding:15px;
-  border-bottom:1px solid #363636;
-  cursor:pointer
+button.dev-header {
+  display: block;
+  width: 100%;
+  margin: 0;
+  font: inherit;
+  line-height: inherit;
+  color: inherit;
+  text-align: left;
+  border: none;
+  border-radius: 0;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-.dev-header .glyphicon{
-  margin-left:10px;
-  font-size:14px;
-  font-weight:400
+button.dev-header:hover,
+button.dev-header:focus-visible {
+  background: #2a2a2a;
+  background: linear-gradient(to bottom, #303030, #2a2a2a);
+  color: #fff;
+}
+
+button.dev-header:focus-visible {
+  outline: 2px solid #66afe9;
+  outline-offset: -2px;
+  z-index: 1;
+  position: relative;
+}
+
+.dev-header .glyphicon {
+  margin-left: 10px;
+  font-size: 14px;
+  font-weight: 400;
 }
 
 .dev-section {
@@ -170,26 +138,15 @@
 }
 
 .fieldLabel {
-  font-weight:  bold;
+  font-weight: bold;
 }
 
 .osc_logo {
-    height: 2em;
+  height: 2em;
 }
 
 .grouped .docRow {
-    margin-left: 0.5em;
-}
-
-/*dont style inspector-* tags, style the corresponding bootstrap
- *   classes (or your own)*/
-.popover {
-        max-width: 800px;
-            width: auto;
-}
-
-.modal-content {
-    overflow-x: auto;
+  margin-left: 0.5em;
 }
 
 .navbar-secondary .navbar-nav {
@@ -208,16 +165,140 @@
   color: rgb(205, 221, 235);
 }
 
-.selectableDoc:hover {
-    background-color: #EEE;
-    cursor:pointer;
-}
-
 .explain-view {
-    max-height: 400px;
-    overflow-y: auto;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .black-label label {
   color: black;
+}
+
+/* Custom HTML elements default to display:inline — force block so
+   Preact-rendered content (Ace editors, forms) is properly contained. */
+search-results-island,
+settings-island,
+start-url-island {
+  display: block;
+}
+
+/* ES/OS tabs: slight gap above the Advanced Settings toggle (rem scales with root font).
+   Preact mounts into #start-url-mount, not a <start-url-island> host. */
+#start-url-mount .btn.advanced-settings-toggle {
+  margin-top: 0.3125rem;
+}
+
+/* customHeaders island (startUrl Advanced Settings + settings sidebar): layout lives in CSS,
+   not inline styles — see app/scripts/islands/customHeaders.jsx */
+.custom-headers-fieldset.well {
+  border: none;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.custom-headers-body {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+/* Preset dropdown sits directly above the CM/textarea editor — separate them slightly. */
+.custom-headers-body .form-group > select.form-control {
+  margin-bottom: 0.75rem;
+}
+
+.custom-headers-heading.control-label {
+  border: none;
+  width: 100%;
+  margin-top: 0.25rem;
+  margin-bottom: 0.625rem;
+  padding: 0;
+  display: block;
+  /* Between body copy and the old 1.875rem “shouty” title — readable as a section heading. */
+  font-size: 1.8rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #333;
+}
+
+.custom-headers-editor {
+  height: 150px;
+}
+
+textarea.custom-headers-editor {
+  font-family: monospace;
+}
+
+/* Space between search-args editor and "Indent JSON" (settings + start URL ES/OS). */
+.btn-indent-json {
+  margin-top: 0.5rem;
+}
+
+/* Expandable JSON (replaces ng-json-explorer).
+   pre-wrap preserves leading indent spaces in text nodes (normal HTML collapses them). */
+.json-tree {
+  font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: left;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Toggles: boxed chip; link color (Bootstrap 3 default #337ab7) so + / − match site links. */
+.json-tree-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 1.45em;
+  min-height: 1.45em;
+  margin: 0 4px 0 0;
+  padding: 0;
+  border: 1px solid #337ab7;
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1.1em;
+  font-weight: bold;
+  line-height: 1;
+  vertical-align: text-bottom;
+  color: #337ab7;
+  user-select: none;
+}
+
+.json-tree-toggle:hover {
+  border-color: #23527c;
+  color: #23527c;
+  background: #f5f9fc;
+}
+
+.json-tree-toggle:focus {
+  outline: none;
+}
+
+.json-tree-toggle:focus-visible {
+  outline: 2px solid #337ab7;
+  outline-offset: 1px;
+}
+
+/* Query Details / Parsed Query Details (searchResults island) */
+.query-json-panel {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border: 1px solid #e3e3e3;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
+.json-tree-line {
+  display: block;
+}
+
+.json-tree-fallback {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
