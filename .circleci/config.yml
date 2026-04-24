@@ -115,4 +115,4 @@ workflows:
             - build
           filters:
             branches:
-              only: deangularize
+              only: main
