@@ -17,13 +17,13 @@ bin/solr package deploy solr-splainer -y -cluster
 
 ## Building and installation
 
-This plugin requires a manual custom step added after you run the main `yarn dist` process in the Splainer application that builds a complete webapp in the `../dist` directory.  _This should be automated someday ;-( _.
+This plugin requires a manual custom step added after you run `yarn build` in the Splainer application root, which produces a complete webapp in the `../dist` directory. _This should be automated someday ;-( _.
 
 1. Configure Splainer to use GET instead of JSONP for Solr connections:
 
 **To change the API method from JSONP to GET:**
 
-Edit `node_modules/splainer-search/values/defaultSolrConfig.js` in your checkout (or the same path under `dist/node_modules/` after a production build) and adjust the `defaultSolrConfig` object.
+Edit `node_modules/splainer-search/values/defaultSolrConfig.js` in the Splainer project (after `yarn install`) and adjust the `defaultSolrConfig` object, **before** you run `yarn build`. Vite bundles `splainer-search` into the app output; that file is not present as a separate copy under `dist/`.
 Search for `values/defaultSolrConfig.js`.
 
 Change:

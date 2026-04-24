@@ -59,8 +59,8 @@ The compose file maps **5173** and starts `yarn dev` (Vite) bound to `0.0.0.0`.
 
 ## Using Docker Compose to test splainer-search with splainer
 
-* By default, `package.json` installs [`splainer-search`](https://github.com/o19s/splainer-search) from GitHub (pinned commit) so Docker and CI do not need a sibling `../splainer-search` folder. When [PR #160](https://github.com/o19s/splainer-search/pull/160) changes, update the commit hash in that dependency URL and run `yarn install`. The `postinstall` script (`scripts/ensure-splainer-search.js`) checks that `splainer-search/wired.js` is present (the app imports it and Vite bundles it; no separate IIFE build step).
-* For a live local checkout instead, run `yarn add splainer-search@file:../splainer-search` (or keep that change uncommitted), or copy `docker-compose.override.yml.example` to `docker-compose.override.yml` and mount your `splainer-search` tree into `node_modules/splainer-search` as in that example.
+* By default, `package.json` lists [`splainer-search`](https://github.com/o19s/splainer-search) as an npm dependency (see the `splainer-search` version there). To upgrade the library, change that version in `package.json` and run `yarn install`. The `postinstall` script ([`scripts/ensure-splainer-search.js`](scripts/ensure-splainer-search.js)) checks that `node_modules/splainer-search/wired.js` exists after install (the app imports `splainer-search/wired` and Vite bundles it).
+* To work against a local `splainer-search` checkout, run `yarn add splainer-search@file:../splainer-search` (or keep that change uncommitted), or copy `docker-compose.override.yml.example` to `docker-compose.override.yml` and mount your `splainer-search` tree over `node_modules/splainer-search` as in that example.
 
 https://docs.docker.com/compose/extends/
 

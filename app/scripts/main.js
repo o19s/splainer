@@ -51,10 +51,11 @@ search.reset = function () {
   renderAll();
 };
 
-// explainOther
+// explainOther — same createSearcher options as Search (customHeaders for ES/OS/Solr).
 
 function explainOther(altQuery) {
   var settings = store.settings;
+  var activeSettings = settings[settings.whichEngine];
   var fieldSpec = fieldSpecSvc.createFieldSpec(settings.fieldSpecStr());
   var args;
   if (settings.whichEngine === 'es' || settings.whichEngine === 'os') {
@@ -71,7 +72,9 @@ function explainOther(altQuery) {
     settings.searchUrl(),
     args,
     '',
-    {},
+    {
+      customHeaders: activeSettings.customHeaders,
+    },
     settings.whichEngine,
   );
   return searcher.explainOther(altQuery, fieldSpec).then(function () {

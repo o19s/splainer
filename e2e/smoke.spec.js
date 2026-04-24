@@ -328,6 +328,86 @@ test.describe('splainer smoke', () => {
       .toBe(true);
   });
 
+  test('Elasticsearch explainOther (alt query) sends configured API Key header', async ({
+    page,
+  }) => {
+    // Regression guard for main.js explainOther: it must pass the same
+    // customHeaders into createSearcher as Search.js, or the alt-query /
+    // "Find others" flow hits ES without auth while normal search works.
+    //
+    // Splainer-search runs a follow-up _search then per-doc _explain POSTs;
+    // any of those requests without the header fails this test after we
+    // clear captures at the modal boundary.
+    const captured = [];
+    await page.route('**/fake-es.test/**', async (route) => {
+      captured.push(route.request().headers());
+      const url = route.request().url();
+      if (url.includes('_explain')) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          headers: corsHeaders,
+          body: JSON.stringify({
+            matched: true,
+            explanation: { value: 1, description: 'weight(title:alt)', details: [] },
+          }),
+        });
+        return;
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        headers: corsHeaders,
+        body: JSON.stringify({
+          took: 1,
+          timed_out: false,
+          _shards: { total: 1, successful: 1, skipped: 0, failed: 0 },
+          hits: {
+            total: { value: 1, relation: 'eq' },
+            max_score: 1,
+            hits: [
+              {
+                _index: 'i',
+                _type: '_doc',
+                _id: 'doc-1',
+                _score: 1,
+                _source: { title: 'canned title' },
+              },
+            ],
+          },
+        }),
+      });
+    });
+
+    await page.goto('/');
+    await page.locator('a[href="#es_"]').click();
+    await page.locator('#es_ [data-role="es-start-url"]').fill('http://fake-es.test/_search');
+    await page.locator('#es_').getByRole('button', { name: 'Advanced Settings' }).click();
+    await page.locator('#es_ [data-role="header-type"]').selectOption('API Key');
+    await page.locator('#es_').getByRole('button', { name: 'Splain This!' }).click();
+
+    await page.locator('[data-role="doc-row"]').first().waitFor();
+    await page
+      .locator('[data-role="doc-row"]')
+      .first()
+      .locator('[data-role="stacked-chart-detailed"]')
+      .click();
+    await page.locator('[data-role="alt-query"]').waitFor();
+
+    captured.length = 0;
+    const marker = 'ESaltOther' + Math.random().toString(36).slice(2, 10);
+    await page.locator('[data-role="alt-query"]').fill(marker);
+    await page.locator('[data-role="find-others"]').click();
+
+    await expect
+      .poll(() =>
+        captured.some(
+          (h) => typeof h.authorization === 'string' && h.authorization.includes('ApiKey'),
+        ),
+      )
+      .toBe(true);
+  });
+
   test('settings island: configured search args reach the backend on the wire', async ({
     page,
   }) => {
