@@ -8,7 +8,7 @@
  * Props: currSearch, explainOther, solrUrlSvc, onPage.
  */
 import { render } from 'preact';
-import { useState, useRef } from 'preact/hooks';
+import { useState, useRef, useEffect } from 'preact/hooks';
 
 import { DocRow } from './docRow.jsx';
 import { docRowListKey } from './docListKeys.js';
@@ -48,17 +48,21 @@ export function SearchResults({ currSearch, explainOther, solrUrlSvc, onPage }) 
   // Reset toggle state when a new search starts, matching the original
   // SearchResultsCtrl which set both to false in search() and reset().
   // Detect via searcher identity — a new reference means a new search.
+  // Runs in an effect to avoid setState during render.
   const prevSearcherRef = useRef(null);
   const listEpochRef = useRef(0);
   const currentSearcher = currSearch && currSearch.searcher;
-  if (currentSearcher !== prevSearcherRef.current) {
+  useEffect(() => {
+    if (currentSearcher === prevSearcherRef.current) {
+      return;
+    }
     prevSearcherRef.current = currentSearcher;
-    if (currSearch.state === currSearch.DID_SEARCH && currentSearcher) {
+    if (currSearch && currSearch.state === currSearch.DID_SEARCH && currentSearcher) {
       listEpochRef.current += 1;
     }
-    if (showQueryDetails) setShowQueryDetails(false);
-    if (showParsedQueryDetails) setShowParsedQueryDetails(false);
-  }
+    setShowQueryDetails(false);
+    setShowParsedQueryDetails(false);
+  }, [currentSearcher, currSearch]);
 
   if (!currSearch) return null;
 
