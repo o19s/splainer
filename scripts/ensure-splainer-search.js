@@ -1,11 +1,12 @@
 /**
- * splainer-search is installed from Git and ships library source (including
- * `wired.js`) in the package root. The Splainer app imports
- * `splainer-search/wired` and Vite bundles it — no `dist/*.js` build is
- * required for local dev, CI, or Docker.
+ * `splainer-search` is a normal dependency (see `package.json`); the published
+ * package includes `wired.js` at the package root. The Splainer app imports
+ * `splainer-search/wired` and Vite bundles it — no separate library `dist/`
+ * build step is required in this repo for local dev, CI, or Docker.
  *
- * This script fails fast if the dependency is missing or incomplete after
- * `yarn install`.
+ * Fails fast if the dependency is missing or incomplete after `yarn install`
+ * (including when using `splainer-search@file:../splainer-search` for local
+ * development).
  */
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -25,7 +26,7 @@ if (!existsSync(pkgJson)) {
 
 if (!existsSync(wiredEntry)) {
   console.error(
-    'ensure-splainer-search: splainer-search/wired.js missing — incomplete package checkout.',
+    'ensure-splainer-search: splainer-search/wired.js missing — incomplete install.',
   );
   process.exit(1);
 }

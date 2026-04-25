@@ -89,6 +89,27 @@ describe('settingsStore (pure module)', function () {
     expect(s.whichEngine).toBe('solr');
   });
 
+  it('does not strip the first character when searchArgsStr was stored without !', function () {
+    setupMocks({
+      solr_searchArgsStr: JSON.stringify('q=*:*'),
+      whichEngine: JSON.stringify('solr'),
+    });
+
+    var svc = createSettingsStore();
+    expect(svc.settings.solr.searchArgsStr).toBe('q=*:*');
+  });
+
+  it('does not strip the first character when ES searchArgsStr was stored without !', function () {
+    var json = '{"query":{"match_all":{}}}';
+    setupMocks({
+      es_searchArgsStr: JSON.stringify(json),
+      whichEngine: JSON.stringify('es'),
+    });
+
+    var svc = createSettingsStore();
+    expect(svc.settings.es.searchArgsStr).toBe(json);
+  });
+
   it('loads bare (non-JSON-encoded) localStorage values for back-compat', function () {
     setupMocks({
       solr_startUrl: 'http://example.com/solr?q=test',

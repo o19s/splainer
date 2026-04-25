@@ -99,6 +99,16 @@ function loadSetting(key, engine, defaults, supported) {
   }
 }
 
+/**
+ * Drop the legacy `!` prefix used when persisting searchArgsStr to localStorage.
+ * If the stored value has no prefix (hand-edited keys or very old data), leave it unchanged
+ * so the first character of the query is not lost.
+ */
+function stripStoredSearchArgsPrefix(s) {
+  if (typeof s !== 'string') return s;
+  return s.charAt(0) === '!' ? s.slice(1) : s;
+}
+
 function initSearchArgs() {
   var searchSettings = {
     solr: {
@@ -155,10 +165,9 @@ function initSearchArgs() {
     searchSettings.whichEngine = 'solr';
   }
 
-  // Strip the `!` prefix from searchArgsStr (storage format quirk).
-  searchSettings.solr.searchArgsStr = searchSettings.solr.searchArgsStr.slice(1);
-  searchSettings.es.searchArgsStr = searchSettings.es.searchArgsStr.slice(1);
-  searchSettings.os.searchArgsStr = searchSettings.os.searchArgsStr.slice(1);
+  searchSettings.solr.searchArgsStr = stripStoredSearchArgsPrefix(searchSettings.solr.searchArgsStr);
+  searchSettings.es.searchArgsStr = stripStoredSearchArgsPrefix(searchSettings.es.searchArgsStr);
+  searchSettings.os.searchArgsStr = stripStoredSearchArgsPrefix(searchSettings.os.searchArgsStr);
 
   return searchSettings;
 }
