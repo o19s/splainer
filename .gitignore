@@ -1,4 +1,5 @@
 .DS_Store
+.idea/
 backup/
 node_modules
 # Yarn is the package manager (see package.json preinstall); ignore npm lockfile.
